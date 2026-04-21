@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formation DevOps — Portail</title>
+<title>Portail de Formation</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -16,13 +16,6 @@
   --border2: #273d57;
   --text: #e8f0fe;
   --muted: #5a7494;
-  --accent: #4f9cf9;
-  --green: #34d399;
-  --orange: #fb923c;
-  --purple: #a78bfa;
-  --pink: #f472b6;
-  --yellow: #fbbf24;
-  --teal: #2dd4bf;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -35,517 +28,363 @@ body {
   overflow-x: hidden;
 }
 
-/* ── BACKGROUND GRID ── */
 body::before {
   content: '';
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background-image:
     linear-gradient(rgba(79,156,249,0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(79,156,249,0.03) 1px, transparent 1px);
   background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; z-index: 0;
 }
 
-/* ── GLOW ORBS ── */
-.orb1, .orb2 {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.5;
-}
-.orb1 { width: 500px; height: 500px; background: rgba(79,156,249,0.08); top: -150px; right: -100px; }
-.orb2 { width: 400px; height: 400px; background: rgba(167,139,250,0.07); bottom: -100px; left: -100px; }
+.orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+.orb1 { width: 500px; height: 500px; background: rgba(79,156,249,0.07); top: -150px; right: -100px; }
+.orb2 { width: 400px; height: 400px; background: rgba(167,139,250,0.06); bottom: -100px; left: -100px; }
 
-/* ── LAYOUT ── */
 .page { position: relative; z-index: 1; }
 
-/* ── NAV ── */
+/* NAV */
 nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 32px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(8,12,20,0.85);
-  backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 32px; border-bottom: 1px solid var(--border);
+  background: rgba(8,12,20,0.9); backdrop-filter: blur(12px);
   position: sticky; top: 0; z-index: 100;
 }
 .nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent);
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  font-weight: 700; color: #4f9cf9;
 }
-.nav-logo .dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 8px var(--green);
-  animation: pulse 2s infinite;
+.nav-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #34d399; box-shadow: 0 0 8px #34d399;
+  animation: blink 2s infinite;
 }
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 .nav-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--muted);
-  background: var(--s2);
-  border: 1px solid var(--border);
-  padding: 4px 12px;
-  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--muted); background: var(--s2);
+  border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px;
 }
 
-/* ── HERO ── */
+/* HERO */
 .hero {
-  text-align: center;
-  padding: 72px 24px 56px;
-  max-width: 720px;
-  margin: 0 auto;
+  text-align: center; padding: 68px 24px 52px;
+  max-width: 700px; margin: 0 auto;
 }
-.hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(79,156,249,0.08);
-  border: 1px solid rgba(79,156,249,0.25);
-  color: var(--accent);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  padding: 5px 16px;
-  border-radius: 20px;
-  margin-bottom: 24px;
-  letter-spacing: 2px;
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(79,156,249,0.08); border: 1px solid rgba(79,156,249,0.25);
+  color: #4f9cf9; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 22px; letter-spacing: 2px;
 }
 .hero h1 {
-  font-size: clamp(32px, 5vw, 56px);
-  font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 16px;
-  letter-spacing: -1px;
+  font-size: clamp(30px,5vw,52px); font-weight: 900;
+  line-height: 1.1; margin-bottom: 14px; letter-spacing: -1px;
 }
-.hero h1 .line1 { color: var(--text); }
-.hero h1 .line2 {
+.hero h1 em {
+  font-style: normal;
   background: linear-gradient(135deg, #4f9cf9 0%, #a78bfa 50%, #f472b6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.hero p {
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1.7;
-  max-width: 480px;
-  margin: 0 auto 36px;
-}
-.hero-stats {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.stat-num {
-  font-size: 28px;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-family: 'JetBrains Mono', monospace;
-}
-.stat-label { font-size: 12px; color: var(--muted); }
+.hero p { color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 460px; margin: 0 auto 32px; }
 
-/* ── MODULES GRID ── */
-.modules-section {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 24px 80px;
+.stats { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.stat-n {
+  font-size: 30px; font-weight: 900;
+  background: linear-gradient(135deg, #4f9cf9, #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; font-family: 'JetBrains Mono', monospace;
 }
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+.stat-l { font-size: 12px; color: var(--muted); }
+
+/* LOADING */
+.loading {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; padding: 80px 24px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted);
 }
-.section-header h2 {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
+.spin {
+  width: 20px; height: 20px; border: 2px solid var(--border);
+  border-top-color: #4f9cf9; border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
-.section-header::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-box {
+  max-width: 500px; margin: 40px auto;
+  background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.2);
+  border-radius: 12px; padding: 24px; text-align: center;
+}
+.error-box h3 { color: #f87171; margin-bottom: 8px; }
+.error-box p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.error-box code {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  background: var(--s2); border: 1px solid var(--border);
+  padding: 2px 8px; border-radius: 4px; color: #fb923c;
 }
 
+/* FORMATIONS */
+.formations { max-width: 1060px; margin: 0 auto; padding: 0 24px 80px; }
+.formation-block { margin-bottom: 56px; }
+
+.formation-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 20px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.formation-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.formation-meta h2 { font-size: 20px; font-weight: 800; }
+.formation-meta p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.formation-count {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--muted); background: var(--s2);
+  border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* GRID */
 .modules-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
 }
 
-/* ── MODULE CARD ── */
+/* MODULE CARD */
 .mod-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  transition: all 0.25s;
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  transition: all 0.22s; text-decoration: none; display: block;
   position: relative;
 }
-.mod-card:hover {
-  border-color: var(--border2);
+.mod-card.clickable:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.45);
 }
-.mod-card.locked {
-  opacity: 0.5;
-  cursor: default;
-  pointer-events: none;
-}
+.mod-card.locked { opacity: 0.45; cursor: default; pointer-events: none; }
 
-.mod-card-top {
-  padding: 22px 22px 16px;
-  position: relative;
-}
+.card-top { padding: 20px 20px 14px; }
 .mod-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--muted);
-  margin-bottom: 12px;
-  letter-spacing: 1px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--muted); margin-bottom: 10px; letter-spacing: 1px;
 }
-.mod-icon {
-  width: 48px; height: 48px;
-  border-radius: 12px;
+.mod-icon-wrap {
+  width: 44px; height: 44px; border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  margin-bottom: 14px;
+  font-size: 20px; margin-bottom: 12px;
 }
-.mod-card h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  line-height: 1.3;
-}
-.mod-card p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-}
+.mod-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+.mod-card .desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
-.mod-card-bottom {
-  padding: 14px 22px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.card-bottom {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
 }
-.mod-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+.tags { display: flex; gap: 5px; flex-wrap: wrap; }
 .tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 2px 7px; border-radius: 4px; border: 1px solid;
 }
-.mod-arrow {
-  font-size: 16px;
-  color: var(--muted);
-  transition: transform 0.2s, color 0.2s;
-}
-.mod-card:hover .mod-arrow { transform: translateX(4px); color: var(--accent); }
+.arrow { font-size: 15px; color: var(--muted); transition: all 0.2s; }
+.mod-card.clickable:hover .arrow { transform: translateX(4px); color: #4f9cf9; }
 
-/* STATUS BADGE */
 .status-badge {
-  position: absolute;
-  top: 16px; right: 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  padding: 3px 9px;
-  border-radius: 20px;
-  border: 1px solid;
-  letter-spacing: 1px;
-}
-.status-done { color: var(--green); border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.08); }
-.status-new { color: var(--accent); border-color: rgba(79,156,249,0.35); background: rgba(79,156,249,0.08); }
-.status-soon { color: var(--muted); border-color: rgba(90,116,148,0.35); background: rgba(90,116,148,0.06); }
-
-/* COLOR THEMES per module */
-.theme-blue .mod-icon { background: rgba(79,156,249,0.12); }
-.theme-blue h3 { color: #93c5fd; }
-.theme-blue .mod-card:hover { border-color: rgba(79,156,249,0.4); box-shadow: 0 12px 40px rgba(79,156,249,0.08); }
-
-.theme-purple .mod-icon { background: rgba(167,139,250,0.12); }
-.theme-purple h3 { color: #c4b5fd; }
-.theme-purple .mod-card:hover { border-color: rgba(167,139,250,0.4); box-shadow: 0 12px 40px rgba(167,139,250,0.08); }
-
-.theme-green .mod-icon { background: rgba(52,211,153,0.12); }
-.theme-green h3 { color: #6ee7b7; }
-.theme-green .mod-card:hover { border-color: rgba(52,211,153,0.4); box-shadow: 0 12px 40px rgba(52,211,153,0.08); }
-
-.theme-orange .mod-icon { background: rgba(251,146,60,0.12); }
-.theme-orange h3 { color: #fdba74; }
-.theme-orange .mod-card:hover { border-color: rgba(251,146,60,0.4); box-shadow: 0 12px 40px rgba(251,146,60,0.08); }
-
-.theme-pink .mod-icon { background: rgba(244,114,182,0.12); }
-.theme-pink h3 { color: #f9a8d4; }
-.theme-pink .mod-card:hover { border-color: rgba(244,114,182,0.4); box-shadow: 0 12px 40px rgba(244,114,182,0.08); }
-
-.theme-teal .mod-icon { background: rgba(45,212,191,0.12); }
-.theme-teal h3 { color: #5eead4; }
-.theme-teal .mod-card:hover { border-color: rgba(45,212,191,0.4); box-shadow: 0 12px 40px rgba(45,212,191,0.08); }
-
-/* COMING SOON CARD */
-.coming-soon-card {
-  background: var(--s1);
-  border: 1px dashed var(--border);
-  border-radius: 16px;
-  padding: 32px 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center;
-  min-height: 200px;
-}
-.coming-soon-card .cs-icon { font-size: 28px; opacity: 0.3; }
-.coming-soon-card p { font-size: 13px; color: var(--muted); }
-.coming-soon-card .cs-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--border2);
-  letter-spacing: 1px;
+  position: absolute; top: 14px; right: 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 3px 9px; border-radius: 20px; border: 1px solid; letter-spacing: 1px;
 }
 
-/* ── FOOTER ── */
+/* THEMES */
+.t-blue  .mod-icon-wrap { background: rgba(79,156,249,0.12); }
+.t-blue  h3 { color: #93c5fd; }
+.t-blue.clickable:hover  { border-color: rgba(79,156,249,0.35); }
+.t-blue  .formation-icon { background: rgba(79,156,249,0.12); }
+
+.t-purple .mod-icon-wrap { background: rgba(167,139,250,0.12); }
+.t-purple h3 { color: #c4b5fd; }
+.t-purple.clickable:hover { border-color: rgba(167,139,250,0.35); }
+.t-purple .formation-icon { background: rgba(167,139,250,0.12); }
+
+.t-green .mod-icon-wrap { background: rgba(52,211,153,0.12); }
+.t-green h3 { color: #6ee7b7; }
+.t-green.clickable:hover  { border-color: rgba(52,211,153,0.35); }
+.t-green .formation-icon  { background: rgba(52,211,153,0.12); }
+
+.t-orange .mod-icon-wrap { background: rgba(251,146,60,0.12); }
+.t-orange h3 { color: #fdba74; }
+.t-orange.clickable:hover { border-color: rgba(251,146,60,0.35); }
+.t-orange .formation-icon { background: rgba(251,146,60,0.12); }
+
+.t-pink .mod-icon-wrap { background: rgba(244,114,182,0.12); }
+.t-pink h3 { color: #f9a8d4; }
+.t-pink.clickable:hover   { border-color: rgba(244,114,182,0.35); }
+.t-pink .formation-icon   { background: rgba(244,114,182,0.12); }
+
+/* TAG COLORS */
+.tc-blue  { color:#60a5fa; border-color:rgba(96,165,250,0.3);  background:rgba(96,165,250,0.07); }
+.tc-purple{ color:#c4b5fd; border-color:rgba(196,181,253,0.3); background:rgba(196,181,253,0.07); }
+.tc-green { color:#6ee7b7; border-color:rgba(110,231,183,0.3); background:rgba(110,231,183,0.07); }
+.tc-orange{ color:#fdba74; border-color:rgba(253,186,116,0.3); background:rgba(253,186,116,0.07); }
+.tc-pink  { color:#f9a8d4; border-color:rgba(249,168,212,0.3); background:rgba(249,168,212,0.07); }
+.tc-muted { color:#5a7494; border-color:rgba(90,116,148,0.3);  background:rgba(90,116,148,0.05); }
+
+/* STATUS COLORS */
+.s-done { color:#34d399; border-color:rgba(52,211,153,0.35);  background:rgba(52,211,153,0.08); }
+.s-new  { color:#4f9cf9; border-color:rgba(79,156,249,0.35);  background:rgba(79,156,249,0.08); }
+.s-soon { color:#5a7494; border-color:rgba(90,116,148,0.3);   background:rgba(90,116,148,0.05); }
+
+/* FOOTER */
 footer {
-  border-top: 1px solid var(--border);
-  padding: 24px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  background: var(--s1);
+  border-top: 1px solid var(--border); padding: 22px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; background: var(--s1);
 }
-.footer-left {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--muted);
-}
-.footer-right {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.footer-right a {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--muted);
-  text-decoration: none;
-  background: var(--s2);
-  border: 1px solid var(--border);
-  padding: 4px 12px;
-  border-radius: 6px;
+.fl { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+.fr { display: flex; gap: 8px; }
+.fr a {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--muted); text-decoration: none; background: var(--s2);
+  border: 1px solid var(--border); padding: 4px 12px; border-radius: 6px;
   transition: all 0.2s;
 }
-.footer-right a:hover { color: var(--accent); border-color: var(--accent); }
-
-code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  background: var(--s2);
-  border: 1px solid var(--border);
-  padding: 1px 6px;
-  border-radius: 4px;
-  color: var(--orange);
-}
+.fr a:hover { color: #4f9cf9; border-color: #4f9cf9; }
 </style>
 </head>
 <body>
 
-<div class="orb1"></div>
-<div class="orb2"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
 
 <div class="page">
 
   <nav>
-    <div class="nav-logo">
-      <div class="dot"></div>
-      devops-formation
-    </div>
-    <span class="nav-tag">brekken07 · GitHub Pages</span>
+    <div class="nav-logo"><div class="nav-dot"></div>formation · brekken07</div>
+    <span class="nav-tag">GitHub Pages</span>
   </nav>
 
-  <!-- HERO -->
   <div class="hero">
-    <div class="hero-eyebrow">🚀 PARCOURS DE FORMATION</div>
-    <h1>
-      <span class="line1">Apprendre le DevOps</span><br>
-      <span class="line2">par la pratique</span>
-    </h1>
+    <div class="eyebrow">📚 PORTAIL DE FORMATION</div>
+    <h1>Apprendre<br><em>par la pratique</em></h1>
     <p>Un parcours progressif construit module par module. Chaque leçon est conçue pour être manipulée, pas juste lue.</p>
-    <div class="hero-stats">
-      <div class="stat">
-        <span class="stat-num" id="statModules">2</span>
-        <span class="stat-label">Modules disponibles</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">13</span>
-        <span class="stat-label">Leçons au total</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num">∞</span>
-        <span class="stat-label">Modules à venir</span>
-      </div>
+    <div class="stats">
+      <div class="stat"><span class="stat-n" id="statFormations">—</span><span class="stat-l">Formations</span></div>
+      <div class="stat"><span class="stat-n" id="statDispo">—</span><span class="stat-l">Modules dispos</span></div>
+      <div class="stat"><span class="stat-n" id="statTotal">—</span><span class="stat-l">Modules au total</span></div>
     </div>
   </div>
 
-  <!-- MODULES -->
-  <div class="modules-section">
-
-    <div class="section-header">
-      <h2>📚 Modules disponibles</h2>
-    </div>
-
-    <div class="modules-grid">
-
-      <!-- MODULE 1 -->
-      <a class="mod-card theme-blue" href="cicd-github-guide-v2.html">
-        <div class="mod-card-top">
-          <div class="mod-num">MODULE 01</div>
-          <div class="mod-icon">⚙️</div>
-          <span class="status-badge status-done">✓ TERMINÉ</span>
-          <h3>CI/CD avec GitHub Actions</h3>
-          <p>Construis un vrai pipeline automatisé de zéro — tests, linting, déploiement continu.</p>
-        </div>
-        <div class="mod-card-bottom">
-          <div class="mod-tags">
-            <span class="tag" style="color:#60a5fa;border-color:rgba(96,165,250,0.3);background:rgba(96,165,250,0.07)">GIT</span>
-            <span class="tag" style="color:#34d399;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.07)">CI</span>
-            <span class="tag" style="color:#a78bfa;border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.07)">CD</span>
-            <span class="tag" style="color:#fbbf24;border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.07)">7 étapes</span>
-          </div>
-          <span class="mod-arrow">→</span>
-        </div>
-      </a>
-
-      <!-- MODULE 2 -->
-      <a class="mod-card theme-purple" href="module2-git-pratique.html">
-        <div class="mod-card-top">
-          <div class="mod-num">MODULE 02</div>
-          <div class="mod-icon">🌿</div>
-          <span class="status-badge status-new">● NOUVEAU</span>
-          <h3>Git Pratique</h3>
-          <p>Ancrage par la manipulation — corrections d'erreurs, branches, conflits, stash.</p>
-        </div>
-        <div class="mod-card-bottom">
-          <div class="mod-tags">
-            <span class="tag" style="color:#c4b5fd;border-color:rgba(196,181,253,0.3);background:rgba(196,181,253,0.07)">BRANCHES</span>
-            <span class="tag" style="color:#f87171;border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.07)">RESCUE</span>
-            <span class="tag" style="color:#fbbf24;border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.07)">6 leçons</span>
-          </div>
-          <span class="mod-arrow">→</span>
-        </div>
-      </a>
-
-      <!-- MODULE 3 — À VENIR -->
-      <div class="mod-card theme-orange locked">
-        <div class="mod-card-top">
-          <div class="mod-num">MODULE 03</div>
-          <div class="mod-icon">🐳</div>
-          <span class="status-badge status-soon">BIENTÔT</span>
-          <h3>Docker</h3>
-          <p>Conteneuriser ton application Python et intégrer Docker dans le pipeline CI/CD.</p>
-        </div>
-        <div class="mod-card-bottom">
-          <div class="mod-tags">
-            <span class="tag" style="color:#fb923c;border-color:rgba(251,146,60,0.3);background:rgba(251,146,60,0.07)">DOCKER</span>
-            <span class="tag" style="color:#fb923c;border-color:rgba(251,146,60,0.3);background:rgba(251,146,60,0.07)">CONTAINERS</span>
-          </div>
-          <span class="mod-arrow">🔒</span>
-        </div>
-      </div>
-
-      <!-- MODULE 4 — À VENIR -->
-      <div class="mod-card theme-green locked">
-        <div class="mod-card-top">
-          <div class="mod-num">MODULE 04</div>
-          <div class="mod-icon">⚡</div>
-          <span class="status-badge status-soon">BIENTÔT</span>
-          <h3>Workflows avancés</h3>
-          <p>Secrets GitHub, jobs multiples, conditions, environments staging/production.</p>
-        </div>
-        <div class="mod-card-bottom">
-          <div class="mod-tags">
-            <span class="tag" style="color:#34d399;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.07)">SECRETS</span>
-            <span class="tag" style="color:#34d399;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.07)">ACTIONS</span>
-          </div>
-          <span class="mod-arrow">🔒</span>
-        </div>
-      </div>
-
-      <!-- MODULE 5 — À VENIR -->
-      <div class="mod-card theme-pink locked">
-        <div class="mod-card-top">
-          <div class="mod-num">MODULE 05</div>
-          <div class="mod-icon">☸️</div>
-          <span class="status-badge status-soon">BIENTÔT</span>
-          <h3>Introduction Kubernetes</h3>
-          <p>Déployer des conteneurs à l'échelle avec K8s — pods, services, déploiements.</p>
-        </div>
-        <div class="mod-card-bottom">
-          <div class="mod-tags">
-            <span class="tag" style="color:#f9a8d4;border-color:rgba(249,168,212,0.3);background:rgba(249,168,212,0.07)">K8S</span>
-            <span class="tag" style="color:#f9a8d4;border-color:rgba(249,168,212,0.3);background:rgba(249,168,212,0.07)">PODS</span>
-          </div>
-          <span class="mod-arrow">🔒</span>
-        </div>
-      </div>
-
-      <!-- CARTE + VENIR -->
-      <div class="coming-soon-card">
-        <div class="cs-icon">➕</div>
-        <span class="cs-label">MODULES À VENIR</span>
-        <p>De nouveaux modules seront ajoutés au fur et à mesure de la formation.</p>
-      </div>
-
-    </div>
+  <div class="formations" id="formations">
+    <div class="loading"><div class="spin"></div>Chargement des modules...</div>
   </div>
 
   <footer>
-    <span class="footer-left">Formation DevOps · <code>brekken07</code> · GitHub Pages</span>
-    <div class="footer-right">
-      <a href="https://github.com/brekken07/formation-devops" target="_blank">🐙 Repo GitHub</a>
-      <a href="https://brekken07.github.io/hello-pipeline/" target="_blank">🧪 hello-pipeline</a>
+    <span class="fl">Formation · brekken07 · GitHub Pages</span>
+    <div class="fr">
+      <a href="https://github.com/brekken07/formation" target="_blank">🐙 Repo GitHub</a>
     </div>
   </footer>
 
 </div>
 
+<script>
+const JSON_PATH = 'modules.json';
+
+const MODULE_ICONS = {
+  devops:  ['⚙️','🌿','🐳','⚡','☸️','🔧','📊'],
+  linux:   ['🐧','💻','🔐','📁','🌐','⚙️'],
+  default: ['📦','📘','🛠️','🔬','📡']
+};
+
+const TAG_COLOR = {
+  blue:'tc-blue', purple:'tc-purple', green:'tc-green',
+  orange:'tc-orange', pink:'tc-pink'
+};
+
+async function load() {
+  try {
+    const res = await fetch(JSON_PATH + '?v=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    document.getElementById('formations').innerHTML = `
+      <div class="error-box">
+        <h3>⚠️ Impossible de charger les modules</h3>
+        <p>Vérifie que <code>modules.json</code> est bien dans le même dossier que <code>index.html</code>.</p>
+        <p>${e.message}</p>
+      </div>`;
+  }
+}
+
+function render(data) {
+  const formations = data.formations || [];
+  let totalDispo = 0, totalAll = 0;
+  formations.forEach(f => f.modules.forEach(m => {
+    totalAll++;
+    if (m.status !== 'soon') totalDispo++;
+  }));
+  document.getElementById('statFormations').textContent = formations.length;
+  document.getElementById('statDispo').textContent = totalDispo;
+  document.getElementById('statTotal').textContent = totalAll;
+  document.getElementById('formations').innerHTML = formations.map(renderFormation).join('');
+}
+
+function renderFormation(f) {
+  const theme = f.color || 'blue';
+  const tc = TAG_COLOR[theme] || 'tc-blue';
+  const icons = MODULE_ICONS[f.id] || MODULE_ICONS.default;
+  const dispo = f.modules.filter(m => m.status !== 'soon').length;
+  const cards = f.modules.map((m, i) => renderCard(m, i, theme, tc, icons[i] || '📦', f.id)).join('');
+  return `
+    <div class="formation-block">
+      <div class="formation-header">
+        <div class="formation-icon t-${theme}">${f.icon}</div>
+        <div class="formation-meta">
+          <h2>${f.title}</h2>
+          <p>${f.description}</p>
+        </div>
+        <span class="formation-count">${dispo} / ${f.modules.length} modules</span>
+      </div>
+      <div class="modules-grid">${cards}</div>
+    </div>`;
+}
+
+function renderCard(m, i, theme, tc, icon, formationId) {
+  const num = String(i + 1).padStart(2, '0');
+  const isClickable = (m.status === 'done' || m.status === 'new') && m.file;
+  const statusHtml = {
+    done: `<span class="status-badge s-done">✓ TERMINÉ</span>`,
+    new:  `<span class="status-badge s-new">● NOUVEAU</span>`,
+    soon: `<span class="status-badge s-soon">BIENTÔT</span>`
+  }[m.status] || '';
+  const tagsHtml = m.tags.map(t => `<span class="tag ${tc}">${t}</span>`).join('');
+  const href = isClickable ? `${formationId}/${m.file}` : '#';
+  return `
+    <a class="mod-card t-${theme} ${isClickable ? 'clickable' : 'locked'}"
+       ${isClickable ? `href="${href}"` : ''}>
+      <div class="card-top">
+        <div class="mod-num">MODULE ${num}</div>
+        <div class="mod-icon-wrap">${icon}</div>
+        ${statusHtml}
+        <h3>${m.title}</h3>
+        <p class="desc">${m.description}</p>
+      </div>
+      <div class="card-bottom">
+        <div class="tags">${tagsHtml}</div>
+        <span class="arrow">${isClickable ? '→' : '🔒'}</span>
+      </div>
+    </a>`;
+}
+
+load();
+</script>
 </body>
 </html>
