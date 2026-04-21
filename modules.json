@@ -1,0 +1,64 @@
+{
+  "formations": [
+    {
+      "id": "devops",
+      "title": "DevOps",
+      "icon": "🚀",
+      "description": "Du CI/CD à Kubernetes — construire, automatiser, déployer.",
+      "color": "blue",
+      "modules": [
+        {
+          "file": "module1_cicd-github-guide.html",
+          "title": "CI/CD avec GitHub Actions",
+          "description": "Construis un vrai pipeline automatisé de zéro — tests, linting, déploiement continu.",
+          "tags": ["GIT", "CI", "CD"],
+          "status": "done"
+        },
+        {
+          "file": "module2_git-pratique.html",
+          "title": "Git Pratique",
+          "description": "Ancrage par la manipulation — corrections d'erreurs, branches, conflits, stash.",
+          "tags": ["BRANCHES", "RESCUE", "STASH"],
+          "status": "new"
+        },
+        {
+          "file": "",
+          "title": "Docker",
+          "description": "Conteneuriser ton application Python et intégrer Docker dans le pipeline CI/CD.",
+          "tags": ["DOCKER", "CONTAINERS"],
+          "status": "soon"
+        },
+        {
+          "file": "",
+          "title": "Workflows avancés",
+          "description": "Secrets GitHub, jobs multiples, conditions, environments staging/production.",
+          "tags": ["SECRETS", "ACTIONS"],
+          "status": "soon"
+        },
+        {
+          "file": "",
+          "title": "Introduction Kubernetes",
+          "description": "Déployer des conteneurs à l'échelle avec K8s — pods, services, déploiements.",
+          "tags": ["K8S", "PODS"],
+          "status": "soon"
+        }
+      ]
+    },
+    {
+      "id": "linux",
+      "title": "Linux / LPIC-1",
+      "icon": "🐧",
+      "description": "Maîtriser Linux de la ligne de commande à l'administration système.",
+      "color": "green",
+      "modules": [
+        {
+          "file": "",
+          "title": "À venir",
+          "description": "Les modules Linux seront ajoutés prochainement.",
+          "tags": [],
+          "status": "soon"
+        }
+      ]
+    }
+  ]
+}
