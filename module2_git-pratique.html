@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 2 — Git Pratique</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #13111a;
+  --s1: #1c1928;
+  --s2: #252235;
+  --s3: #2e2a40;
+  --border: #3a3550;
+  --border2: #4a4568;
+  --text: #ede9fe;
+  --muted: #7c7a8e;
+  --accent: #a78bfa;
+  --green: #6ee7b7;
+  --orange: #fbbf24;
+  --red: #f87171;
+  --blue: #60a5fa;
+  --pink: #f472b6;
+  --teal: #2dd4bf;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #13111a 0%, #1c1928 50%, #13111a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 50px 24px 42px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(167,139,250,0.1) 0%, transparent 65%);
+  pointer-events: none;
+}
+.mod-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.35);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  letter-spacing: 1.5px;
+}
+header h1 {
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 800;
+  background: linear-gradient(135deg, #ede9fe 0%, #a78bfa 50%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+header p {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 520px;
+  margin: 0 auto 26px;
+}
+.mod-pills {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.mpill {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* PROGRESS */
+.prog-bar {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(19,17,26,0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.pl { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.pt { flex: 1; height: 5px; background: var(--s2); border-radius: 10px; overflow: hidden; }
+.pf { height: 100%; background: linear-gradient(90deg, var(--accent), var(--pink)); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.pp { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); white-space: nowrap; }
+
+/* CONTAINER */
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* DOTS NAV */
+.dnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+.dn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--s1);
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.dn:hover { border-color: var(--accent); color: var(--accent); }
+.dn.done { border-color: var(--green); background: rgba(110,231,183,0.1); color: var(--green); }
+.dn.open { border-color: var(--accent); background: rgba(167,139,250,0.12); color: var(--accent); }
+
+/* CARD */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.25s;
+}
+.card.open { border-color: var(--accent); }
+.card.done { border-color: rgba(110,231,183,0.35); }
+
+.card-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.card-head:hover { background: rgba(255,255,255,0.02); }
+
+.cnum {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
+  flex-shrink: 0; background: var(--s2); border: 2px solid var(--border);
+  color: var(--muted); transition: all 0.2s;
+}
+.card.open .cnum { background: rgba(167,139,250,0.15); border-color: var(--accent); color: var(--accent); }
+.card.done .cnum { background: rgba(110,231,183,0.15); border-color: var(--green); color: var(--green); }
+
+.cmeta { flex: 1; }
+.cmeta h3 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.cmeta p { font-size: 12px; color: var(--muted); }
+
+.cbadge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 3px 9px; border-radius: 5px; border: 1px solid; white-space: nowrap;
+}
+.b-memo { color: var(--blue); border-color: rgba(96,165,250,0.35); background: rgba(96,165,250,0.08); }
+.b-tp { color: var(--orange); border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.08); }
+.b-rescue { color: var(--red); border-color: rgba(248,113,113,0.35); background: rgba(248,113,113,0.08); }
+.b-pro { color: var(--teal); border-color: rgba(45,212,191,0.35); background: rgba(45,212,191,0.08); }
+
+.chev { color: var(--muted); font-size: 11px; transition: transform 0.3s; flex-shrink: 0; }
+.card-head.op .chev { transform: rotate(180deg); }
+
+/* BODY */
+.cbody { display: none; border-top: 1px solid var(--border); padding: 26px 22px 20px; }
+.cbody.vis { display: block; }
+
+/* GOAL */
+.goal {
+  display: flex; gap: 12px;
+  background: rgba(167,139,250,0.05);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 22px;
+}
+.goal .gi { font-size: 20px; flex-shrink: 0; }
+.goal p { font-size: 14px; color: #c4b5fd; }
+.goal strong { color: var(--accent); }
+
+/* SECTION TITLE */
+.st {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.st::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+p { margin-bottom: 10px; }
+
+/* CODE */
+.cw { background: #0c0a14; border: 1px solid var(--border); border-radius: 10px; margin: 10px 0 16px; overflow: hidden; }
+.ch { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--s2); border-bottom: 1px solid var(--border); }
+.cl { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.cpb {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 3px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; transition: all 0.2s;
+}
+.cpb:hover { color: var(--text); border-color: var(--accent); }
+.cpb.ok { color: var(--green); border-color: var(--green); }
+pre {
+  padding: 16px; overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.7; color: #ede9fe;
+}
+.c { color: #5a5475; font-style: italic; }
+.k { color: #f472b6; }
+.s { color: #6ee7b7; }
+.n { color: #93c5fd; }
+.w { color: #fbbf24; }
+
+/* INFO BOXES */
+.box {
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: 14px; display: flex; gap: 10px;
+  align-items: flex-start; line-height: 1.6;
+}
+.box .bi { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.tip { background: rgba(110,231,183,0.05); border: 1px solid rgba(110,231,183,0.2); }
+.tip p { color: #6ee7b7; }
+.warn { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2); }
+.warn p { color: #fbbf24; }
+.info { background: rgba(96,165,250,0.05); border: 1px solid rgba(96,165,250,0.2); }
+.info p { color: #93c5fd; }
+.danger { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.2); }
+.danger p { color: #f87171; }
+
+/* CHECKLIST */
+.cl-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 16px; }
+.cl-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+.chkb {
+  width: 20px; height: 20px; border: 2px solid var(--border2); border-radius: 5px;
+  flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all 0.2s;
+}
+.chkb.on { background: var(--green); border-color: var(--green); color: #13111a; }
+.cl-list li.struck span { color: var(--muted); text-decoration: line-through; }
+
+/* SCHEMA GIT */
+.git-schema {
+  background: #0c0a14;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 12px 0 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 2;
+}
+.gs-branch { color: var(--accent); font-weight: 700; }
+.gs-commit { color: var(--green); }
+.gs-arrow { color: var(--border2); }
+.gs-label { color: var(--muted); }
+.gs-head { color: var(--orange); font-weight: 700; }
+.gs-remote { color: var(--blue); }
+
+/* QUESTION */
+.qblock {
+  background: rgba(251,191,36,0.04);
+  border: 1px solid rgba(251,191,36,0.25);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 20px 0;
+}
+.qlabel {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 700; color: var(--orange);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.qtext { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+.qhint { font-size: 13px; color: var(--muted); margin-bottom: 14px; font-style: italic; }
+.rbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);
+  color: var(--orange); padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.rbtn:hover { background: rgba(251,191,36,0.18); }
+.abox {
+  display: none; margin-top: 14px;
+  background: rgba(110,231,183,0.04);
+  border: 1px solid rgba(110,231,183,0.2);
+  border-radius: 8px; padding: 14px 16px;
+}
+.abox.show { display: block; }
+.alabel {
+  font-size: 10px; font-weight: 700; color: var(--green);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.aexpl { font-size: 14px; color: #a7f3d0; margin-top: 8px; line-height: 1.6; }
+
+/* SCENARIO */
+.scenario {
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+  margin: 12px 0 16px;
+  font-size: 14px;
+}
+.scenario .sc-label {
+  font-size: 10px; font-weight: 700; color: var(--orange);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.scenario p { color: var(--text); margin: 0; }
+
+/* MEMO TABLE */
+.memo-table {
+  width: 100%; border-collapse: collapse;
+  margin: 12px 0 16px; font-size: 13px;
+}
+.memo-table th {
+  background: var(--s2); color: var(--muted);
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+  padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+}
+.memo-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.memo-table tr:last-child td { border-bottom: none; }
+.memo-table tr:hover td { background: rgba(255,255,255,0.02); }
+.cmd { font-family: 'JetBrains Mono', monospace; color: var(--orange); font-size: 12px; }
+.desc { color: var(--text); }
+.memo-table .cat { color: var(--accent); font-weight: 700; font-size: 12px; background: rgba(167,139,250,0.08); }
+
+/* DONE */
+.done-w { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.dbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(110,231,183,0.08); border: 1px solid rgba(110,231,183,0.3);
+  color: var(--green); padding: 10px 22px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.dbtn:hover { background: rgba(110,231,183,0.15); }
+.dbtn.undo { background: rgba(248,113,113,0.06); border-color: rgba(248,113,113,0.3); color: var(--red); }
+
+/* FOOTER */
+.cfoot {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  background: var(--s2);
+}
+.fnav {
+  background: var(--s3); border: 1px solid var(--border);
+  color: var(--text); padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.fnav:hover { border-color: var(--accent); color: var(--accent); }
+.fnav.p { background: rgba(167,139,250,0.1); border-color: var(--accent); color: var(--accent); }
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--s2); border: 1px solid var(--border);
+  padding: 1px 6px; border-radius: 4px; font-size: 12px; color: var(--orange);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="mod-badge">📦 MODULE 2 · GIT PRATIQUE</div>
+  <h1>Maîtriser Git par la pratique</h1>
+  <p>Les commandes essentielles ancrées par des situations réelles — pas de la lecture, de la manipulation.</p>
+  <div class="mod-pills">
+    <div class="mpill">🔁 Ancrage du Module 1</div>
+    <div class="mpill">🛠️ Situations réelles</div>
+    <div class="mpill">🚨 Gestion des erreurs</div>
+    <div class="mpill">⚡ Commandes avancées</div>
+  </div>
+</header>
+
+<div class="prog-bar">
+  <span class="pl">PROGRESSION</span>
+  <div class="pt"><div class="pf" id="pf"></div></div>
+  <span class="pp" id="pp">0 / 6</span>
+</div>
+
+<div class="wrap">
+  <div class="dnav" id="dnav"></div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 1 — Le cycle Git au quotidien
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c1">
+    <div class="card-head" onclick="tog(1)">
+      <div class="cnum">1</div>
+      <div class="cmeta">
+        <h3>Le cycle Git au quotidien</h3>
+        <p>Les 5 commandes que tu utiliseras chaque jour</p>
+      </div>
+      <span class="cbadge b-memo">MÉMO</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b1">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> ancrer le cycle de travail Git de base. Comprendre ce qui se passe à chaque étape — pas juste copier des commandes.</p></div>
+      </div>
+
+      <div class="st">Le cycle de base</div>
+      <p>À chaque session de travail, tu répètes toujours le même cycle :</p>
+      <div class="git-schema">
+        <span class="gs-label">Fichiers modifiés</span><br>
+        &nbsp;&nbsp;<span class="gs-arrow">↓</span> <span class="w">git add .</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gs-label">← mise en zone de préparation (staging)</span><br>
+        &nbsp;&nbsp;<span class="gs-arrow">↓</span> <span class="w">git commit -m "..."</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="gs-label">← photo de l'état actuel</span><br>
+        &nbsp;&nbsp;<span class="gs-arrow">↓</span> <span class="w">git push</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gs-label">← envoi vers GitHub</span>
+      </div>
+
+      <div class="st">Les commandes d'état — tes yeux</div>
+      <p>Avant de faire quoi que ce soit, tu regardes toujours où tu en es :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Quelle branche ? Quels fichiers modifiés ?</span>
+git status
+
+<span class="c"># Historique des commits (q pour quitter)</span>
+git log --oneline
+
+<span class="c"># Version compacte avec les branches</span>
+git log --oneline --graph --all</pre>
+      </div>
+
+      <div class="st">Mémo — les 5 commandes du quotidien</div>
+      <table class="memo-table">
+        <tr><th>Commande</th><th>Ce qu'elle fait</th></tr>
+        <tr><td class="cmd">git status</td><td class="desc">Affiche l'état de tes fichiers (modifiés, stagés, non suivis)</td></tr>
+        <tr><td class="cmd">git add .</td><td class="desc">Prépare tous les fichiers modifiés pour le prochain commit</td></tr>
+        <tr><td class="cmd">git add fichier.py</td><td class="desc">Prépare un seul fichier spécifique</td></tr>
+        <tr><td class="cmd">git commit -m "msg"</td><td class="desc">Crée le commit avec un message descriptif</td></tr>
+        <tr><td class="cmd">git push</td><td class="desc">Envoie les commits locaux vers GitHub</td></tr>
+      </table>
+
+      <div class="st">Exercice — manipule sur hello-pipeline</div>
+      <p>Ouvre ton projet <code>hello-pipeline</code> et exécute ces commandes dans l'ordre :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — dans hello-pipeline/</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Regarde l'état actuel</span>
+git status
+
+<span class="c"># 2. Regarde l'historique de tes commits</span>
+git log --oneline
+
+<span class="c"># 3. Regarde l'historique avec les branches</span>
+git log --oneline --graph --all</pre>
+      </div>
+      <div class="box tip"><span class="bi">👀</span><p>Tu dois voir tous les commits que tu as faits dans le Module 1. Le dernier doit être sur <code>main</code> avec <code>HEAD</code> pointant dessus. Prends le temps de lire ce que ça affiche — tu vas le voir souvent.</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Quelle commande utilises-tu pour voir l'état de tes fichiers <em>avant</em> de faire un commit ? Et que signifie un fichier affiché en rouge vs en vert ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>git status</code> affiche l'état. <strong>Rouge</strong> = fichier modifié mais pas encore préparé (pas encore dans le staging). <strong>Vert</strong> = fichier préparé avec <code>git add</code>, prêt à être commité.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(1)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav p" onclick="go(2)">Leçon suivante →</button></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 2 — Corriger une erreur de commit
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c2">
+    <div class="card-head" onclick="tog(2)">
+      <div class="cnum">2</div>
+      <div class="cmeta">
+        <h3>Corriger une erreur de commit</h3>
+        <p>Tu as commité trop vite — voilà comment t'en sortir</p>
+      </div>
+      <span class="cbadge b-rescue">RESCUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b2">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> savoir corriger les erreurs les plus fréquentes après un commit. Ça arrive à tout le monde — même aux seniors.</p></div>
+      </div>
+
+      <div class="st">Cas 1 — Mauvais message de commit</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation</div>
+        <p>Tu viens de faire <code>git commit -m "truc"</code> et tu réalises que le message est nul. Le commit n'est pas encore pushé.</p>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — modifier le dernier message</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># --amend modifie le dernier commit (message + contenu)</span>
+git commit --amend -m "feat: nouveau message correct"
+
+<span class="c"># Vérifie que le message a bien changé</span>
+git log --oneline</pre>
+      </div>
+      <div class="box warn"><span class="bi">⚠️</span><p><code>--amend</code> ne fonctionne que si le commit <strong>n'a pas encore été pushé</strong> sur GitHub. Si tu l'as déjà pushé, ne l'amende pas — fais un nouveau commit correctif.</p></div>
+
+      <div class="st">Cas 2 — Fichier oublié dans le commit</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation</div>
+        <p>Tu as commité mais tu as oublié d'inclure un fichier. Le commit n'est pas encore pushé.</p>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Prépare le fichier oublié</span>
+git add fichier_oublie.py
+
+<span class="c"># Ajoute-le au dernier commit sans changer le message</span>
+git commit --amend --no-edit</pre>
+      </div>
+
+      <div class="st">Cas 3 — Annuler le staging d'un fichier</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation</div>
+        <p>Tu as fait <code>git add .</code> mais tu réalises qu'un fichier ne devrait pas être dans ce commit.</p>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Retire un fichier du staging (sans supprimer tes modifications)</span>
+git restore --staged fichier.py
+
+<span class="c"># Vérifie : le fichier repasse en rouge dans git status</span>
+git status</pre>
+      </div>
+
+      <div class="st">Exercice — pratique les 3 cas</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — sur hello-pipeline</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Ajoute une ligne de commentaire dans app.py</span>
+<span class="c">#    (par exemple : # Module 2 - exercice Git)</span>
+
+<span class="c"># 2. Fais un commit avec un mauvais message</span>
+git add app.py
+git commit -m "oups"
+
+<span class="c"># 3. Corrige le message</span>
+git commit --amend -m "docs: add comment in app.py"
+
+<span class="c"># 4. Vérifie le résultat</span>
+git log --oneline</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu as fait <code>git add .</code> et tu veux retirer <code>tests/test_app.py</code> du staging sans perdre tes modifications. Quelle commande utilises-tu ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre>git restore --staged tests/test_app.py</pre>
+          </div>
+          <p class="aexpl">Tes modifications dans le fichier sont conservées, il est juste retiré de la zone de staging. Il repassera en rouge dans <code>git status</code>.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(2)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(1)">← Précédent</button>
+      <button class="fnav p" onclick="go(3)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 3 — Gérer les branches comme un pro
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c3">
+    <div class="card-head" onclick="tog(3)">
+      <div class="cnum">3</div>
+      <div class="cmeta">
+        <h3>Gérer les branches</h3>
+        <p>Créer, naviguer, nettoyer — le workflow quotidien</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b3">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> être à l'aise avec les branches — les créer, naviguer entre elles, voir leur état, et les supprimer quand elles sont mergées.</p></div>
+      </div>
+
+      <div class="st">Visualiser les branches</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lister toutes les branches locales (astérisque = branche active)</span>
+git branch
+
+<span class="c"># Lister aussi les branches distantes (sur GitHub)</span>
+git branch -a
+
+<span class="c"># Voir le dernier commit de chaque branche</span>
+git branch -v</pre>
+      </div>
+
+      <div class="st">Créer et naviguer</div>
+      <table class="memo-table">
+        <tr><th>Commande</th><th>Ce qu'elle fait</th></tr>
+        <tr><td class="cmd">git checkout -b nom</td><td class="desc">Crée une branche ET bascule dessus (le plus courant)</td></tr>
+        <tr><td class="cmd">git checkout nom</td><td class="desc">Bascule sur une branche existante</td></tr>
+        <tr><td class="cmd">git switch nom</td><td class="desc">Même chose que checkout (syntaxe moderne)</td></tr>
+        <tr><td class="cmd">git switch -c nom</td><td class="desc">Crée + bascule (syntaxe moderne de checkout -b)</td></tr>
+      </table>
+      <div class="box info"><span class="bi">💡</span><p><code>checkout</code> et <code>switch</code> font la même chose. Tu verras les deux en entreprise — retiens les deux.</p></div>
+
+      <div class="st">Supprimer une branche après merge</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Supprimer une branche locale mergée</span>
+git branch -d feature/ma-branche
+
+<span class="c"># Supprimer la branche distante sur GitHub</span>
+git push origin --delete feature/ma-branche
+
+<span class="c"># Nettoyer les références aux branches distantes supprimées</span>
+git fetch --prune</pre>
+      </div>
+      <div class="box tip"><span class="bi">🧹</span><p>Bonne habitude : supprime tes branches après chaque merge. Un repo avec 50 branches mortes devient vite illisible.</p></div>
+
+      <div class="st">Exercice — créer, travailler, nettoyer</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — sur hello-pipeline</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Crée une branche d'exercice</span>
+git checkout -b feature/git-practice
+
+<span class="c"># 2. Ajoute un fichier README.md simple</span>
+<span class="c">#    Contenu : # Hello Pipeline</span>
+<span class="c">#              Projet d'apprentissage CI/CD</span>
+
+<span class="c"># 3. Commite</span>
+git add README.md
+git commit -m "docs: add README"
+
+<span class="c"># 4. Reviens sur main</span>
+git checkout main
+
+<span class="c"># 5. Merge la branche localement (sans PR cette fois)</span>
+git merge feature/git-practice
+
+<span class="c"># 6. Supprime la branche locale devenue inutile</span>
+git branch -d feature/git-practice
+
+<span class="c"># 7. Pousse tout sur GitHub</span>
+git push</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu es sur la branche <code>feature/test</code> et tu veux revenir sur <code>main</code>. Quelle commande utilises-tu ? Et comment vérifies-tu ensuite que tu es bien sur <code>main</code> ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre>git checkout main
+<span class="c"># ou</span>
+git switch main
+
+<span class="c"># Vérification</span>
+git branch  <span class="c"># l'astérisque doit être sur main</span>
+<span class="c"># ou</span>
+git status  <span class="c"># affiche "On branch main"</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(3)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(2)">← Précédent</button>
+      <button class="fnav p" onclick="go(4)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 4 — Résoudre un conflit de merge
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c4">
+    <div class="card-head" onclick="tog(4)">
+      <div class="cnum">4</div>
+      <div class="cmeta">
+        <h3>Résoudre un conflit de merge</h3>
+        <p>La situation qui fait peur — démystifiée</p>
+      </div>
+      <span class="cbadge b-rescue">RESCUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b4">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre pourquoi un conflit apparaît et savoir le résoudre calmement. C'est la chose qui fait le plus peur aux débutants — mais c'est en fait très simple une fois qu'on a compris le principe.</p></div>
+      </div>
+
+      <div class="st">Pourquoi un conflit ?</div>
+      <p>Un conflit se produit quand <strong>deux branches ont modifié la même ligne du même fichier</strong>. Git ne sait pas laquelle garder — il te demande de choisir.</p>
+      <div class="git-schema">
+        <span class="gs-branch">main</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gs-commit">●</span><span class="gs-arrow">——</span><span class="gs-commit">●</span> <span class="gs-label">modifie ligne 5 de app.py</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gs-arrow"> ↘</span><br>
+        <span class="gs-branch">feature/x</span> &nbsp;<span class="gs-commit">●</span> <span class="gs-label">modifie aussi ligne 5 de app.py</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gs-arrow">↗</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gs-head">⚡ CONFLIT</span> <span class="gs-label">— Git ne peut pas décider</span>
+      </div>
+
+      <div class="st">À quoi ressemble un conflit dans un fichier</div>
+      <p>Quand Git détecte un conflit, il modifie le fichier concerné pour te montrer les deux versions :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">— exemple de conflit dans app.py —</span></div>
+        <pre><span class="k"><<<<<<< HEAD</span>
+<span class="c">    return f"Hello, {name}! Version main 🚀"</span>
+<span class="k">=======</span>
+<span class="c">    return f"Bonjour, {name}! Version feature 🎉"</span>
+<span class="k">>>>>>>> feature/x</span></pre>
+      </div>
+      <p><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> = ce qui est sur ta branche actuelle<br>
+      <code>======</code> = séparateur<br>
+      <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/x</code> = ce qui vient de la branche à merger</p>
+
+      <div class="st">Comment résoudre — 4 étapes</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Git te dit quels fichiers sont en conflit</span>
+git status
+<span class="c">#    → "both modified: app.py"</span>
+
+<span class="c"># 2. Ouvre le fichier, supprime les marqueurs <<<<, ====, >>>>
+#    et garde uniquement la version que tu veux conserver</span>
+
+<span class="c"># 3. Marque le conflit comme résolu</span>
+git add app.py
+
+<span class="c"># 4. Finalise le merge</span>
+git commit -m "fix: resolve merge conflict in app.py"</pre>
+      </div>
+      <div class="box tip"><span class="bi">💡</span><p>VS Code colore automatiquement les conflits et affiche des boutons cliquables : <strong>"Accept Current Change"</strong>, <strong>"Accept Incoming Change"</strong>, <strong>"Accept Both"</strong>. En pratique, c'est plus confortable que d'éditer à la main.</p></div>
+
+      <div class="st">Exercice — provoquer et résoudre un conflit</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — simulation complète</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Sur main, modifie la ligne de retour de greet() dans app.py</span>
+<span class="c">#    return f"Hello, {name}! Version A 🚀"</span>
+git add app.py && git commit -m "feat: version A"
+
+<span class="c"># 2. Crée une branche et modifie la MÊME ligne différemment</span>
+git checkout -b feature/conflict-test
+<span class="c">#    return f"Hello, {name}! Version B 🎉"</span>
+git add app.py && git commit -m "feat: version B"
+
+<span class="c"># 3. Reviens sur main et tente de merger</span>
+git checkout main
+git merge feature/conflict-test
+<span class="c">#    → CONFLICT ! Git t'arrête</span>
+
+<span class="c"># 4. Ouvre app.py, choisis la version que tu veux, supprime les marqueurs</span>
+
+<span class="c"># 5. Résous le conflit</span>
+git add app.py
+git commit -m "fix: resolve conflict, keep version A"
+
+<span class="c"># 6. Nettoie</span>
+git branch -d feature/conflict-test</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Après avoir résolu manuellement un conflit dans un fichier (tu as supprimé les marqueurs et gardé la bonne version), quelle est la séquence de commandes pour finaliser le merge ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre><span class="c"># Marquer le fichier comme résolu</span>
+git add app.py
+
+<span class="c"># Finaliser le merge avec un commit</span>
+git commit -m "fix: resolve merge conflict"</pre>
+          </div>
+          <p class="aexpl">La clé : <code>git add</code> ne sert pas seulement à préparer un commit ordinaire — il sert aussi à dire à Git "j'ai résolu ce conflit, tu peux continuer".</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(4)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(3)">← Précédent</button>
+      <button class="fnav p" onclick="go(5)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 5 — Récupérer et synchroniser
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c5">
+    <div class="card-head" onclick="tog(5)">
+      <div class="cnum">5</div>
+      <div class="cmeta">
+        <h3>Récupérer et synchroniser</h3>
+        <p>fetch, pull, stash — travailler en équipe sans casser</p>
+      </div>
+      <span class="cbadge b-pro">PRO</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b5">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> savoir synchroniser ton travail local avec GitHub, et gérer la situation où tu as des modifications en cours mais tu dois changer de contexte.</p></div>
+      </div>
+
+      <div class="st">fetch vs pull — quelle différence ?</div>
+      <table class="memo-table">
+        <tr><th>Commande</th><th>Ce qu'elle fait</th></tr>
+        <tr><td class="cmd">git fetch</td><td class="desc">Télécharge les changements distants <strong>sans les appliquer</strong>. Tu peux les inspecter avant.</td></tr>
+        <tr><td class="cmd">git pull</td><td class="desc">Télécharge ET applique les changements. Équivaut à fetch + merge.</td></tr>
+        <tr><td class="cmd">git pull --rebase</td><td class="desc">Télécharge et rejoue tes commits par-dessus. Historique plus propre.</td></tr>
+      </table>
+      <div class="box info"><span class="bi">💡</span><p>En équipe, prends l'habitude de faire <code>git fetch</code> avant de travailler, pour voir si des collègues ont pushé des changements. Ensuite tu décides si tu veux merger ou rebaser.</p></div>
+
+      <div class="st">git stash — mettre son travail de côté</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation fréquente</div>
+        <p>Tu es en train de modifier des fichiers, mais un collègue te demande de regarder un bug urgent sur une autre branche. Tu ne veux pas commiter un travail inachevé.</p>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Mets ton travail en cours de côté (dans une "remise")</span>
+git stash
+
+<span class="c"># Maintenant tu peux changer de branche</span>
+git checkout main
+
+<span class="c"># ... tu fais ce que tu as à faire ...</span>
+
+<span class="c"># Reviens sur ta branche et récupère ton travail</span>
+git checkout ma-branche
+git stash pop   <span class="c"># récupère et supprime le stash</span>
+
+<span class="c"># Lister les stashs en attente</span>
+git stash list</pre>
+      </div>
+
+      <div class="st">Exercice — synchronisation complète</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Simule le stash : modifie app.py sans commiter</span>
+<span class="c"># (ajoute juste un commentaire)</span>
+
+<span class="c"># 1. Vérifie l'état</span>
+git status  <span class="c"># → fichier modifié</span>
+
+<span class="c"># 2. Mets en stash</span>
+git stash
+
+<span class="c"># 3. Vérifie l'état</span>
+git status  <span class="c"># → rien à commiter (le stash a tout rangé)</span>
+
+<span class="c"># 4. Liste les stashs</span>
+git stash list  <span class="c"># → stash@{0}: WIP on main: ...</span>
+
+<span class="c"># 5. Récupère ton travail</span>
+git stash pop
+
+<span class="c"># 6. Vérifie que ta modification est revenue</span>
+git status</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Quelle est la différence entre <code>git fetch</code> et <code>git pull</code> ? Dans quel cas préfères-tu utiliser <code>fetch</code> plutôt que <code>pull</code> ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>git fetch</code> récupère les changements distants sans les appliquer — tu peux inspecter ce qui a changé avant de décider. <code>git pull</code> récupère ET applique directement.<br><br>On préfère <code>fetch</code> quand on veut voir ce qu'ont fait les collègues avant de merger, pour éviter les mauvaises surprises.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(5)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(4)">← Précédent</button>
+      <button class="fnav p" onclick="go(6)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 6 — Mémo & récap interactif
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c6">
+    <div class="card-head" onclick="tog(6)">
+      <div class="cnum">6</div>
+      <div class="cmeta">
+        <h3>Mémo final & récapitulatif</h3>
+        <p>Toutes les commandes en un coup d'œil + quiz de clôture</p>
+      </div>
+      <span class="cbadge b-memo">MÉMO</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b6">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> avoir une référence complète à consulter quand tu reprends après une pause. Teste-toi sur le quiz final pour mesurer où tu en es.</p></div>
+      </div>
+
+      <div class="st">Toutes les commandes du module</div>
+      <table class="memo-table">
+        <tr><th colspan="2" class="cat">📋 État & historique</th></tr>
+        <tr><td class="cmd">git status</td><td class="desc">État des fichiers (modifiés, stagés, non suivis)</td></tr>
+        <tr><td class="cmd">git log --oneline</td><td class="desc">Historique compact des commits</td></tr>
+        <tr><td class="cmd">git log --oneline --graph --all</td><td class="desc">Historique avec visualisation des branches</td></tr>
+        <tr><td class="cmd">git diff</td><td class="desc">Voir les modifications non stagées</td></tr>
+
+        <tr><th colspan="2" class="cat">📦 Commits</th></tr>
+        <tr><td class="cmd">git add .</td><td class="desc">Stager tous les fichiers modifiés</td></tr>
+        <tr><td class="cmd">git add fichier</td><td class="desc">Stager un fichier spécifique</td></tr>
+        <tr><td class="cmd">git restore --staged fichier</td><td class="desc">Retirer un fichier du staging</td></tr>
+        <tr><td class="cmd">git commit -m "msg"</td><td class="desc">Créer un commit</td></tr>
+        <tr><td class="cmd">git commit --amend -m "msg"</td><td class="desc">Corriger le dernier commit (non pushé)</td></tr>
+
+        <tr><th colspan="2" class="cat">🌿 Branches</th></tr>
+        <tr><td class="cmd">git branch</td><td class="desc">Lister les branches locales</td></tr>
+        <tr><td class="cmd">git branch -a</td><td class="desc">Lister branches locales + distantes</td></tr>
+        <tr><td class="cmd">git checkout -b nom</td><td class="desc">Créer + basculer sur une branche</td></tr>
+        <tr><td class="cmd">git checkout nom</td><td class="desc">Basculer sur une branche existante</td></tr>
+        <tr><td class="cmd">git merge nom</td><td class="desc">Fusionner une branche dans la branche active</td></tr>
+        <tr><td class="cmd">git branch -d nom</td><td class="desc">Supprimer une branche locale mergée</td></tr>
+        <tr><td class="cmd">git push origin --delete nom</td><td class="desc">Supprimer une branche distante</td></tr>
+
+        <tr><th colspan="2" class="cat">🔄 Synchronisation</th></tr>
+        <tr><td class="cmd">git push</td><td class="desc">Envoyer les commits vers GitHub</td></tr>
+        <tr><td class="cmd">git pull</td><td class="desc">Récupérer et appliquer les changements distants</td></tr>
+        <tr><td class="cmd">git fetch</td><td class="desc">Récupérer sans appliquer</td></tr>
+        <tr><td class="cmd">git fetch --prune</td><td class="desc">Nettoyer les branches distantes supprimées</td></tr>
+
+        <tr><th colspan="2" class="cat">📌 Stash</th></tr>
+        <tr><td class="cmd">git stash</td><td class="desc">Mettre les modifications en cours de côté</td></tr>
+        <tr><td class="cmd">git stash pop</td><td class="desc">Récupérer les modifications mises de côté</td></tr>
+        <tr><td class="cmd">git stash list</td><td class="desc">Lister les stashs en attente</td></tr>
+      </table>
+
+      <div class="st">Quiz de clôture — 3 questions</div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 1 / 3</div>
+        <div class="qtext">Tu reprends après le week-end. Avant de faire quoi que ce soit, quelles sont les 2 commandes que tu lances en premier pour savoir où tu en es ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre><span class="c"># Voir sur quelle branche tu es et l'état des fichiers</span>
+git status
+
+<span class="c"># Voir l'historique et où en sont les branches</span>
+git log --oneline --graph --all</pre>
+          </div>
+          <p class="aexpl">C'est le réflexe à avoir systématiquement : status + log avant de toucher quoi que ce soit.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 2 / 3</div>
+        <div class="qtext">Tu travailles sur <code>feature/mon-truc</code> et tu reçois un message urgent : "il y a un bug en prod sur main, regarde ça tout de suite !". Tu as des modifications non commitées. Que fais-tu ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre><span class="c"># 1. Mettre les modifications de côté</span>
+git stash
+
+<span class="c"># 2. Aller sur main pour corriger le bug</span>
+git checkout main
+git pull  <span class="c"># s'assurer d'avoir la dernière version</span>
+
+<span class="c"># ... corriger le bug, commiter, pusher ...</span>
+
+<span class="c"># 3. Revenir sur sa branche et récupérer son travail</span>
+git checkout feature/mon-truc
+git stash pop</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 3 / 3</div>
+        <div class="qtext">Tu viens de merger ta PR sur GitHub. Quelles commandes lances-tu localement pour que ton dossier soit à jour, et pour nettoyer la branche qui n'est plus utile ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre><span class="c"># 1. Revenir sur main et récupérer le merge</span>
+git checkout main
+git pull
+
+<span class="c"># 2. Supprimer la branche locale</span>
+git branch -d feature/ma-branche
+
+<span class="c"># 3. Nettoyer les références distantes</span>
+git fetch --prune</pre>
+          </div>
+          <p class="aexpl">GitHub propose souvent de supprimer la branche distante directement après le merge via un bouton. Dans ce cas <code>fetch --prune</code> suffit pour nettoyer les références locales.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(6)">🎉 Module 2 terminé !</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(5)">← Précédent</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOTAL = 6;
+const doneSet = new Set();
+const openSet = new Set();
+
+function buildNav() {
+  const nav = document.getElementById('dnav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dn' + (doneSet.has(i) ? ' done' : '') + (openSet.has(i) ? ' open' : '');
+    d.textContent = i;
+    d.onclick = () => go(i);
+    nav.appendChild(d);
+  }
+}
+
+function updProg() {
+  const pct = (doneSet.size / TOTAL) * 100;
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pp').textContent = doneSet.size + ' / ' + TOTAL;
+}
+
+function tog(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  const isOpen = body.classList.contains('vis');
+  if (isOpen) {
+    body.classList.remove('vis');
+    head.classList.remove('op');
+    openSet.delete(n);
+    if (!doneSet.has(n)) card.classList.remove('open');
+  } else {
+    body.classList.add('vis');
+    head.classList.add('op');
+    openSet.add(n);
+    if (!doneSet.has(n)) card.classList.add('open');
+  }
+  buildNav();
+}
+
+function go(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  if (!body.classList.contains('vis')) {
+    body.classList.add('vis');
+    head.classList.add('op');
+    openSet.add(n);
+    if (!doneSet.has(n)) card.classList.add('open');
+  }
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  buildNav();
+}
+
+function mkDone(n) {
+  const btn = document.querySelector('#b' + n + ' .dbtn');
+  const card = document.getElementById('c' + n);
+  if (doneSet.has(n)) {
+    doneSet.delete(n);
+    btn.textContent = n === 6 ? '🎉 Module 2 terminé !' : '✓ Leçon terminée';
+    btn.classList.remove('undo');
+    card.classList.remove('done');
+    if (openSet.has(n)) card.classList.add('open');
+  } else {
+    doneSet.add(n);
+    btn.textContent = '↩ Marquer comme non terminée';
+    btn.classList.add('undo');
+    card.classList.remove('open');
+    card.classList.add('done');
+  }
+  updProg();
+  buildNav();
+}
+
+function cp(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copié';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function rev(btn) {
+  btn.nextElementSibling.classList.add('show');
+  btn.style.display = 'none';
+}
+
+buildNav();
+updProg();
+tog(1);
+</script>
+</body>
+</html>

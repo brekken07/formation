@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI/CD avec GitHub Actions — TP Fil Rouge</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --bg: #0e1117;
+  --surface: #161c27;
+  --surface2: #1e2635;
+  --surface3: #252d3d;
+  --border: #2d3748;
+  --border2: #3d4a5c;
+  --text: #e2e8f0;
+  --muted: #718096;
+  --accent: #63b3ed;
+  --green: #68d391;
+  --orange: #f6ad55;
+  --red: #fc8181;
+  --purple: #b794f4;
+  --yellow: #f6e05e;
+  --teal: #4fd1c5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(160deg, #0e1117 0%, #161c27 40%, #1a1f2e 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 52px 24px 44px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 500px; height: 200px;
+  background: radial-gradient(ellipse, rgba(99,179,237,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(104,211,145,0.1);
+  border: 1px solid rgba(104,211,145,0.3);
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  letter-spacing: 1.5px;
+}
+header h1 {
+  font-size: clamp(24px, 4vw, 40px);
+  font-weight: 900;
+  background: linear-gradient(135deg, #e2e8f0 20%, #63b3ed 60%, #b794f4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+header .subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 500px;
+  margin: 0 auto 26px;
+}
+.tech-stack {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.tech-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+}
+
+/* ── PROGRESS ── */
+.progress-bar-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(14,17,23,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.prog-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.prog-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 10px; overflow: hidden; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--accent)); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.prog-pct { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); white-space: nowrap; }
+
+/* ── CONTAINER ── */
+.container { max-width: 860px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* ── STEP DOTS NAV ── */
+.dots-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+.dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.dot:hover { border-color: var(--accent); color: var(--accent); }
+.dot.is-done { border-color: var(--green); background: rgba(104,211,145,0.1); color: var(--green); }
+.dot.is-open { border-color: var(--accent); background: rgba(99,179,237,0.12); color: var(--accent); }
+
+/* ── STEP CARD ── */
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.25s;
+}
+.step-card.is-open { border-color: var(--accent); }
+.step-card.is-done { border-color: rgba(104,211,145,0.35); }
+
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.step-head:hover { background: rgba(255,255,255,0.02); }
+
+.step-num {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.is-open .step-num { background: rgba(99,179,237,0.15); border-color: var(--accent); color: var(--accent); }
+.is-done .step-num { background: rgba(104,211,145,0.15); border-color: var(--green); color: var(--green); }
+
+.step-info { flex: 1; }
+.step-info h3 { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
+.step-info p { font-size: 12px; color: var(--muted); }
+
+.step-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.b-git { color: var(--orange); border-color: rgba(246,173,85,0.35); background: rgba(246,173,85,0.08); }
+.b-ci { color: var(--accent); border-color: rgba(99,179,237,0.35); background: rgba(99,179,237,0.08); }
+.b-cd { color: var(--purple); border-color: rgba(183,148,244,0.35); background: rgba(183,148,244,0.08); }
+.b-quality { color: var(--yellow); border-color: rgba(246,224,94,0.35); background: rgba(246,224,94,0.08); }
+.b-pro { color: var(--teal); border-color: rgba(79,209,197,0.35); background: rgba(79,209,197,0.08); }
+
+.chevron { color: var(--muted); font-size: 11px; transition: transform 0.3s; flex-shrink: 0; }
+.step-head.opened .chevron { transform: rotate(180deg); }
+
+/* ── STEP BODY ── */
+.step-body {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 26px 22px 20px;
+}
+.step-body.visible { display: block; }
+
+/* ── CONTENT TYPES ── */
+.goal-box {
+  display: flex;
+  gap: 12px;
+  background: rgba(99,179,237,0.05);
+  border: 1px solid rgba(99,179,237,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+}
+.goal-box .gi { font-size: 20px; flex-shrink: 0; }
+.goal-box div p { font-size: 14px; color: #a8d4ff; }
+.goal-box div strong { color: var(--accent); }
+
+.section-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 22px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+p { margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+
+/* ── CODE ── */
+.code-wrap {
+  background: #070b11;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 10px 0 16px;
+  overflow: hidden;
+}
+.code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.code-lang { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.copy-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.2s;
+}
+.copy-btn:hover { color: var(--text); border-color: var(--accent); }
+.copy-btn.ok { color: var(--green); border-color: var(--green); }
+pre {
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  tab-size: 2;
+}
+.c { color: #718096; font-style: italic; }
+.k { color: #fc8181; }
+.s { color: #9ae6b4; }
+.f { color: #d6bcfa; }
+.n { color: #90cdf4; }
+.yk { color: #90cdf4; }
+.yv { color: #9ae6b4; }
+.ya { color: #f6ad55; }
+.num { color: #fbb6ce; }
+
+/* ── BOXES ── */
+.box {
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.6;
+}
+.box .bi { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.box-tip { background: rgba(104,211,145,0.05); border: 1px solid rgba(104,211,145,0.2); }
+.box-tip p { color: #9ae6b4; }
+.box-warn { background: rgba(246,173,85,0.05); border: 1px solid rgba(246,173,85,0.2); }
+.box-warn p { color: #f6ad55; }
+.box-info { background: rgba(183,148,244,0.05); border: 1px solid rgba(183,148,244,0.2); }
+.box-info p { color: #d6bcfa; }
+.box-error { background: rgba(252,129,129,0.05); border: 1px solid rgba(252,129,129,0.2); }
+.box-error p { color: #fc8181; }
+
+/* ── FILE TREE ── */
+.file-tree {
+  background: #070b11;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 10px 0 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 2;
+}
+.ft-dir { color: var(--accent); }
+.ft-file { color: var(--text); }
+.ft-new { color: var(--green); }
+.ft-comment { color: var(--muted); font-size: 11px; }
+
+/* ── CHECKLIST ── */
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 16px; }
+.checklist li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+.chk {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border2);
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+.chk.on { background: var(--green); border-color: var(--green); color: #0e1117; }
+.checklist li.struck span { color: var(--muted); text-decoration: line-through; }
+
+/* ── QUESTION BLOCK ── */
+.question-block {
+  background: rgba(183,148,244,0.05);
+  border: 1px solid rgba(183,148,244,0.25);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 20px 0;
+}
+.question-block .q-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.question-block .q-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(183,148,244,0.1);
+  border: 1px solid rgba(183,148,244,0.3);
+  color: var(--purple);
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
+}
+.reveal-btn:hover { background: rgba(183,148,244,0.18); }
+.answer-box {
+  display: none;
+  margin-top: 14px;
+  background: rgba(104,211,145,0.04);
+  border: 1px solid rgba(104,211,145,0.2);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.answer-box.shown { display: block; }
+.answer-box .a-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── DONE BUTTON ── */
+.done-wrap { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.done-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(104,211,145,0.08);
+  border: 1px solid rgba(104,211,145,0.3);
+  color: var(--green);
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
+}
+.done-btn:hover { background: rgba(104,211,145,0.15); }
+.done-btn.undo { background: rgba(252,129,129,0.06); border-color: rgba(252,129,129,0.3); color: var(--red); }
+
+/* ── FOOTER NAV ── */
+.step-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+.fnav {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.2s;
+}
+.fnav:hover { border-color: var(--accent); color: var(--accent); }
+.fnav.primary { background: rgba(99,179,237,0.1); border-color: var(--accent); color: var(--accent); }
+
+/* ── PIPELINE SCHEMA ── */
+.pipeline {
+  display: flex;
+  align-items: center;
+  background: #070b11;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 12px 0 16px;
+  overflow-x: auto;
+  gap: 2px;
+}
+.ps { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 72px; }
+.ps-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.ps-label { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-align: center; line-height: 1.3; }
+.pa { color: var(--border2); font-size: 16px; padding: 0 2px; margin-bottom: 16px; }
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--orange);
+}
+
+/* ── INTENTIONAL ERROR TAG ── */
+.intentional-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(252,129,129,0.08);
+  border: 1px solid rgba(252,129,129,0.3);
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">🚀 TP FIL ROUGE · NIVEAU DÉBUTANT</div>
+  <h1>CI/CD avec GitHub Actions</h1>
+  <p class="subtitle">Construis un vrai pipeline automatisé de zéro, étape par étape. Aucun prérequis Git ou Python nécessaire.</p>
+  <div class="tech-stack">
+    <div class="tech-pill">🐍 Python 3</div>
+    <div class="tech-pill">🐙 GitHub</div>
+    <div class="tech-pill">⚙️ GitHub Actions</div>
+    <div class="tech-pill">🚀 GitHub Pages</div>
+  </div>
+</header>
+
+<div class="progress-bar-wrap">
+  <span class="prog-label">PROGRESSION</span>
+  <div class="prog-track"><div class="prog-fill" id="pgFill"></div></div>
+  <span class="prog-pct" id="pgTxt">0 / 7</span>
+</div>
+
+<div class="container">
+  <div class="dots-nav" id="dotsNav"></div>
+
+  <!-- ══════════════════════════════════════════════════
+       ÉTAPE 1 — Git & GitHub
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="card-1">
+    <div class="step-head" onclick="toggle(1)">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <h3>Installer Git et créer ton compte GitHub</h3>
+        <p>Les fondations — sans ça, rien n'est possible</p>
+      </div>
+      <span class="step-badge b-git">GIT</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="step-body" id="body-1">
+
+      <div class="goal-box">
+        <span class="gi">🎯</span>
+        <div>
+          <p><strong>Ce que tu vas faire :</strong> installer Git sur ta machine, le configurer avec ton nom et email, puis créer un compte GitHub gratuit. À la fin de cette étape, tu seras prêt à travailler.</p>
+        </div>
+      </div>
+
+      <div class="section-title">1 — Installer Git</div>
+      <p>Ouvre un terminal et vérifie d'abord si Git est déjà installé :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash — terminal</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>git --version</pre>
+      </div>
+      <p>Si une version s'affiche (ex: <code>git version 2.43.0</code>), Git est déjà installé, passe à l'étape suivante. Sinon :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash — Ubuntu / Debian</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>sudo apt update && sudo apt install git -y</pre>
+      </div>
+      <div class="box box-info"><span class="bi">💻</span><p>Sur <strong>Windows</strong> : télécharge "Git for Windows" sur git-scm.com et installe-le avec les options par défaut.<br>Sur <strong>macOS</strong> : tape <code>brew install git</code> dans le terminal.</p></div>
+
+      <div class="section-title">2 — Configurer ton identité Git</div>
+      <p>Git a besoin de savoir qui tu es pour "signer" chaque modification que tu feras. C'est obligatoire avant de pouvoir créer ton premier commit :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash — remplace avec tes vraies infos</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>git config --global user.name "Ton Prénom Nom"
+git config --global user.email "ton.email@exemple.com"
+git config --global init.defaultBranch main</pre>
+      </div>
+      <div class="box box-tip"><span class="bi">💡</span><p>Utilise exactement le même email que celui que tu vas utiliser pour créer ton compte GitHub. C'est important pour que tes contributions soient bien associées à ton profil.</p></div>
+
+      <div class="section-title">3 — Créer ton compte GitHub</div>
+      <ul class="checklist">
+        <li><div class="chk" onclick="chk(this)"></div><span>Va sur <strong>github.com</strong> et crée un compte gratuit</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Vérifie ton adresse email (GitHub envoie un mail de confirmation)</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Connecte-toi à ton compte — tu es prêt !</span></li>
+      </ul>
+
+      <div class="section-title">4 — Générer une clé SSH</div>
+      <p>La clé SSH permet à Git (sur ta machine) de se connecter à GitHub sans te demander un mot de passe à chaque commande. C'est un peu comme une carte d'identité numérique :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash — génération de la clé</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Génère une paire de clés (publique + privée)</span>
+ssh-keygen -t ed25519 -C "ton.email@exemple.com"
+
+<span class="c"># Appuie 3 fois sur Entrée pour valider les options par défaut
+# (emplacement du fichier et pas de mot de passe sur la clé)</span>
+
+<span class="c"># Affiche ta clé PUBLIQUE — c'est celle-ci qu'on va donner à GitHub</span>
+cat ~/.ssh/id_ed25519.pub</pre>
+      </div>
+      <p>Copie entièrement la ligne qui s'affiche (elle commence par <code>ssh-ed25519</code>), puis dans GitHub : <strong>Settings → SSH and GPG keys → New SSH key</strong> → colle ta clé et valide.</p>
+
+      <div class="box box-tip"><span class="bi">🔐</span><p>Ne confonds pas les deux fichiers créés : <code>id_ed25519</code> est ta clé <strong>privée</strong> (ne jamais la partager), <code>id_ed25519.pub</code> est ta clé <strong>publique</strong> (celle qu'on donne à GitHub).</p></div>
+
+      <div class="done-wrap">
+        <button class="done-btn" onclick="markDone(1)">✓ Étape terminée</button>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="fnav primary" onclick="goto(2)">Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ÉTAPE 2 — Projet Python + premier commit
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="card-2">
+    <div class="step-head" onclick="toggle(2)">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <h3>Créer le projet Python et le mettre sur GitHub</h3>
+        <p>Structure des fichiers, premier commit, premier push</p>
+      </div>
+      <span class="step-badge b-git">GIT</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="step-body" id="body-2">
+
+      <div class="goal-box">
+        <span class="gi">🎯</span>
+        <div>
+          <p><strong>Ce que tu vas faire :</strong> créer une mini-application Python avec ses tests, initialiser un dépôt Git local, puis pousser tout ça sur GitHub. Tu feras ton tout premier commit !</p>
+        </div>
+      </div>
+
+      <div class="section-title">1 — Créer la structure du projet</div>
+      <p>Dans ton terminal, crée un dossier pour le projet et navigue dedans :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Crée le dossier principal et le sous-dossier tests</span>
+mkdir hello-pipeline
+cd hello-pipeline
+mkdir tests</pre>
+      </div>
+      <p>Voici la structure complète que tu vas créer dans cette étape :</p>
+      <div class="file-tree">
+        <span class="ft-dir">hello-pipeline/</span><br>
+        &nbsp;&nbsp;├── <span class="ft-new">app.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← l'application principale</span><br>
+        &nbsp;&nbsp;├── <span class="ft-new">conftest.py</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← fichier vide, aide pytest à trouver app.py</span><br>
+        &nbsp;&nbsp;├── <span class="ft-new">requirements.txt</span> <span class="ft-comment">← liste des dépendances Python</span><br>
+        &nbsp;&nbsp;├── <span class="ft-new">.gitignore</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← fichiers que Git doit ignorer</span><br>
+        &nbsp;&nbsp;└── <span class="ft-new">tests/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="ft-new">test_app.py</span> &nbsp;&nbsp;<span class="ft-comment">← les tests automatiques</span>
+      </div>
+
+      <div class="section-title">2 — Créer app.py</div>
+      <p>C'est l'application elle-même. Crée le fichier <code>app.py</code> à la racine du projet avec ce contenu exact :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">python — app.py (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="k">def</span> <span class="f">greet</span>(name: str) -> str:
+    <span class="s">"""Retourne un message de bienvenue."""</span>
+    <span class="k">if not</span> name:
+        <span class="k">raise</span> <span class="f">ValueError</span>(<span class="s">"Le nom ne peut pas être vide"</span>)
+    <span class="k">return</span> <span class="s">f"Hello, {name}! Pipeline is alive 🚀"</span>
+
+
+<span class="k">def</span> <span class="f">add</span>(a: int, b: int) -> int:
+    <span class="s">"""Additionne deux nombres."""</span>
+    <span class="k">return</span> a + b
+
+
+<span class="k">def</span> <span class="f">multiply</span>(a: int, b: int) -> int:
+    <span class="s">"""Multiplie deux nombres."""</span>
+    <span class="k">return</span> a * b
+
+
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    <span class="f">print</span>(<span class="f">greet</span>(<span class="s">"DevOps"</span>))
+    <span class="f">print</span>(<span class="s">f"2 + 3 = {<span class="f">add</span>(2, 3)}"</span>)</pre>
+      </div>
+      <div class="box box-info"><span class="bi">📌</span><p>Note les <strong>2 lignes vides</strong> entre chaque fonction — c'est obligatoire en Python (règle PEP8). Le linter que tu installeras plus tard vérifiera ça automatiquement.</p></div>
+
+      <div class="section-title">3 — Créer tests/test_app.py</div>
+      <p>Ce fichier contient les tests automatiques. Chaque fonction <code>test_*</code> vérifie qu'une partie de ton application fonctionne correctement :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">python — tests/test_app.py (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="k">import</span> pytest
+<span class="k">from</span> app <span class="k">import</span> greet, add, multiply  <span class="c"># on importe les 3 fonctions</span>
+
+
+<span class="k">def</span> <span class="f">test_greet_normal</span>():
+    <span class="k">assert</span> <span class="f">greet</span>(<span class="s">"Titi"</span>) == <span class="s">"Hello, Titi! Pipeline is alive 🚀"</span>
+
+
+<span class="k">def</span> <span class="f">test_greet_empty_raises</span>():
+    <span class="k">with</span> pytest.<span class="f">raises</span>(ValueError):
+        <span class="f">greet</span>(<span class="s">""</span>)
+
+
+<span class="k">def</span> <span class="f">test_add</span>():
+    <span class="k">assert</span> <span class="f">add</span>(<span class="num">2</span>, <span class="num">3</span>) == <span class="num">5</span>
+    <span class="k">assert</span> <span class="f">add</span>(<span class="num">-1</span>, <span class="num">1</span>) == <span class="num">0</span>
+
+
+<span class="k">def</span> <span class="f">test_multiply</span>():
+    <span class="k">assert</span> <span class="f">multiply</span>(<span class="num">3</span>, <span class="num">4</span>) == <span class="num">12</span>
+    <span class="k">assert</span> <span class="f">multiply</span>(<span class="num">0</span>, <span class="num">99</span>) == <span class="num">0</span></pre>
+      </div>
+
+      <div class="section-title">4 — Créer conftest.py, requirements.txt et .gitignore</div>
+      <p><strong>conftest.py</strong> — crée ce fichier à la racine, laisse-le <strong>complètement vide</strong>. Sa seule présence indique à pytest où est la racine du projet, ce qui lui permet de trouver <code>app.py</code> quand il lance les tests.</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash — crée un fichier vide</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>touch conftest.py</pre>
+      </div>
+      <p><strong>requirements.txt</strong> — liste les outils Python nécessaires au projet :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">txt — requirements.txt (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>pytest==8.1.1
+flake8==7.0.0</pre>
+      </div>
+      <p><strong>.gitignore</strong> — liste les fichiers/dossiers que Git ne doit pas versionner :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">txt — .gitignore (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>__pycache__/
+*.pyc
+.pytest_cache/
+.venv/</pre>
+      </div>
+
+      <div class="section-title">5 — Initialiser Git et faire le premier commit</div>
+      <p>Un <strong>commit</strong> c'est comme une photo de l'état de tes fichiers à un instant T. Git conserve l'historique de toutes ces photos. Voici les commandes dans l'ordre :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash — dans le dossier hello-pipeline</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Initialise un dépôt Git dans ce dossier</span>
+git init
+
+<span class="c"># 2. Affiche l'état de tes fichiers (tous en rouge = pas encore suivis)</span>
+git status
+
+<span class="c"># 3. Ajoute tous les fichiers dans la zone de préparation ("staging")</span>
+git add .
+
+<span class="c"># 4. Vérifie que tout est bien prêt (tout en vert maintenant)</span>
+git status
+
+<span class="c"># 5. Crée le commit avec un message descriptif</span>
+git commit -m "feat: initial project structure"</pre>
+      </div>
+      <div class="box box-tip"><span class="bi">📸</span><p>Le message après <code>-m</code> décrit ce que contient le commit. La convention est d'utiliser un préfixe : <code>feat:</code> pour une nouvelle fonctionnalité, <code>fix:</code> pour une correction, <code>ci:</code> pour les pipelines.</p></div>
+
+      <div class="section-title">6 — Créer le repo GitHub et pousser</div>
+      <ul class="checklist">
+        <li><div class="chk" onclick="chk(this)"></div><span>Sur GitHub, clique sur le bouton vert <strong>New</strong> (ou le <strong>+</strong> en haut à droite → New repository)</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Nom du repository : <code>hello-pipeline</code></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Visibilité : <strong>Public</strong></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span><strong>Ne coche rien</strong> dans "Initialize this repository" — tu as déjà du code</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Clique <strong>Create repository</strong></span></li>
+      </ul>
+      <p>GitHub t'affiche alors les commandes à lancer. Copie et exécute celles-ci (remplace <code>TON_USERNAME</code> par ton vrai nom d'utilisateur GitHub) :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lie ton repo local au repo distant GitHub</span>
+git remote add origin git@github.com:TON_USERNAME/hello-pipeline.git
+
+<span class="c"># Pousse ton code sur GitHub (-u mémorise la destination pour les prochains push)</span>
+git push -u origin main</pre>
+      </div>
+      <div class="box box-tip"><span class="bi">✅</span><p>Rafraîchis la page de ton repo sur GitHub — tu dois voir tes 5 fichiers apparaître. Félicitations, c'est ton premier push !</p></div>
+
+      <div class="done-wrap">
+        <button class="done-btn" onclick="markDone(2)">✓ Étape terminée</button>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="fnav" onclick="goto(1)">← Précédent</button>
+      <button class="fnav primary" onclick="goto(3)">Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ÉTAPE 3 — Premier workflow CI
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="card-3">
+    <div class="step-head" onclick="toggle(3)">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <h3>Premier workflow CI — tests automatiques</h3>
+        <p>GitHub Actions lance les tests à chaque push</p>
+      </div>
+      <span class="step-badge b-ci">CI</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="step-body" id="body-3">
+
+      <div class="goal-box">
+        <span class="gi">🎯</span>
+        <div>
+          <p><strong>Ce que tu vas faire :</strong> créer ton premier fichier de workflow GitHub Actions. À chaque fois que tu feras un <code>git push</code>, GitHub lancera automatiquement les tests Python sur une machine virtuelle dans le cloud.</p>
+        </div>
+      </div>
+
+      <div class="section-title">Comment fonctionne GitHub Actions ?</div>
+      <p>GitHub lit les fichiers <code>.yml</code> placés dans un dossier précis de ton repo (<code>.github/workflows/</code>). Ces fichiers décrivent des <strong>workflows</strong> : une suite d'étapes automatiques à exécuter.</p>
+      <div class="pipeline">
+        <div class="ps"><div class="ps-icon" style="background:rgba(99,179,237,0.15)">📤</div><div class="ps-label">git push</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(246,173,85,0.15)">⚙️</div><div class="ps-label">Actions déclenché</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(104,211,145,0.15)">🐍</div><div class="ps-label">Setup Python</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(104,211,145,0.15)">📦</div><div class="ps-label">Install deps</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(104,211,145,0.15)">🧪</div><div class="ps-label">pytest</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(104,211,145,0.15)">✅</div><div class="ps-label">Résultat</div></div>
+      </div>
+
+      <div class="section-title">1 — Créer le dossier workflows</div>
+      <p>Ce dossier doit s'appeler <strong>exactement</strong> <code>.github/workflows</code> (avec le point devant). C'est l'emplacement standard que GitHub reconnaît :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash — dans hello-pipeline/</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>mkdir -p .github/workflows</pre>
+      </div>
+      <p>Voici où ce nouveau dossier se situe dans ton projet :</p>
+      <div class="file-tree">
+        <span class="ft-dir">hello-pipeline/</span><br>
+        &nbsp;&nbsp;├── app.py<br>
+        &nbsp;&nbsp;├── conftest.py<br>
+        &nbsp;&nbsp;├── requirements.txt<br>
+        &nbsp;&nbsp;├── .gitignore<br>
+        &nbsp;&nbsp;├── <span class="ft-new">.github/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← nouveau</span><br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="ft-new">workflows/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← nouveau</span><br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="ft-new">ci.yml</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← à créer juste après</span><br>
+        &nbsp;&nbsp;└── tests/<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── test_app.py
+      </div>
+
+      <div class="section-title">2 — Créer le fichier ci.yml</div>
+      <p>Crée le fichier <code>.github/workflows/ci.yml</code> avec ce contenu exact. <strong>Attention au YAML : l'indentation doit être exactement comme ci-dessous</strong> (utilise des espaces, jamais des tabulations) :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">yaml — .github/workflows/ci.yml (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="yk">name:</span> <span class="yv">CI — Tests Python</span>
+
+<span class="c"># Ce workflow se déclenche à chaque push sur main</span>
+<span class="c"># et à chaque fois qu'une Pull Request cible main</span>
+<span class="yk">on:</span>
+  <span class="yk">push:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+  <span class="yk">pull_request:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+
+<span class="yk">jobs:</span>
+  <span class="c">  # "test" est le nom du job — il sera visible dans l'onglet Actions</span>
+  <span class="yk">  test:</span>
+    <span class="c">    # GitHub crée une machine virtuelle Ubuntu temporaire</span>
+    <span class="yk">    runs-on:</span> <span class="yv">ubuntu-latest</span>
+
+    <span class="yk">    steps:</span>
+      <span class="c">      # Étape 1 : télécharge le code de ton repo sur la VM</span>
+      <span class="ya">      - name:</span> <span class="yv">Checkout code</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/checkout@v4</span>
+
+      <span class="c">      # Étape 2 : installe Python 3.11 sur la VM</span>
+      <span class="ya">      - name:</span> <span class="yv">Setup Python</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/setup-python@v5</span>
+        <span class="yk">        with:</span>
+          <span class="yk">          python-version:</span> <span class="yv">'3.11'</span>
+
+      <span class="c">      # Étape 3 : installe pytest et flake8 (listés dans requirements.txt)</span>
+      <span class="ya">      - name:</span> <span class="yv">Install dependencies</span>
+        <span class="yk">        run:</span> <span class="yv">pip install -r requirements.txt</span>
+
+      <span class="c">      # Étape 4 : lance les tests avec pytest</span>
+      <span class="ya">      - name:</span> <span class="yv">Run tests</span>
+        <span class="yk">        run:</span> <span class="yv">pytest tests/ -v</span></pre>
+      </div>
+      <div class="box box-warn"><span class="bi">⚠️</span><p>En YAML, <strong>l'indentation compte énormément</strong>. Chaque niveau d'indentation représente une hiérarchie. N'utilise que des espaces (jamais la touche Tab). Si quelque chose ne s'aligne pas, le pipeline plantera avec une erreur de parsing.</p></div>
+
+      <div class="section-title">3 — Pousser le workflow sur GitHub</div>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>git add .github/
+git commit -m "ci: add automated test workflow"
+git push</pre>
+      </div>
+      <div class="box box-tip"><span class="bi">👀</span><p>Sur GitHub, clique sur l'onglet <strong>Actions</strong> de ton repo. Tu verras le workflow tourner en temps réel avec un cercle orange. Clique dessus pour voir les logs de chaque étape. Quand tout est vert : bravo !</p></div>
+
+      <div class="done-wrap">
+        <button class="done-btn" onclick="markDone(3)">✓ Étape terminée</button>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="fnav" onclick="goto(2)">← Précédent</button>
+      <button class="fnav primary" onclick="goto(4)">Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ÉTAPE 4 — Linting (qualité de code)
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="card-4">
+    <div class="step-head" onclick="toggle(4)">
+      <div class="step-num">4</div>
+      <div class="step-info">
+        <h3>Ajouter le contrôle qualité — Linting</h3>
+        <p>Flake8 analyse ton code avant chaque merge</p>
+      </div>
+      <span class="step-badge b-quality">QUALITÉ</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="step-body" id="body-4">
+
+      <div class="goal-box">
+        <span class="gi">🎯</span>
+        <div>
+          <p><strong>Ce que tu vas faire :</strong> ajouter une étape de <strong>linting</strong> dans le pipeline CI. Flake8 va analyser ton code Python à chaque push pour détecter les erreurs de style et les bugs potentiels, avant même d'exécuter les tests.</p>
+        </div>
+      </div>
+
+      <div class="section-title">C'est quoi le linting ?</div>
+      <p>Un <strong>linter</strong> est un outil qui lit ton code sans l'exécuter, et signale tout ce qui ne respecte pas les standards. En Python, le standard s'appelle <strong>PEP8</strong>. Par exemple :</p>
+      <ul class="checklist">
+        <li><div class="chk" onclick="chk(this)"></div><span>2 lignes vides entre chaque fonction (E302)</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Pas de variables déclarées mais jamais utilisées (F841)</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Pas d'imports inutiles (F401)</span></li>
+      </ul>
+      <p>En CI, si flake8 trouve un problème, le pipeline s'arrête et bloque le merge. C'est ton filet de sécurité qualité.</p>
+
+      <div class="section-title">1 — Mettre à jour ci.yml</div>
+      <p>Tu vas modifier le fichier <code>.github/workflows/ci.yml</code> existant. Voici le fichier <strong>complet tel qu'il doit être</strong> après modification — remplace tout le contenu :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">yaml — .github/workflows/ci.yml (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="yk">name:</span> <span class="yv">CI — Tests Python</span>
+
+<span class="yk">on:</span>
+  <span class="yk">push:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+  <span class="yk">pull_request:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+
+<span class="yk">jobs:</span>
+  <span class="yk">  test:</span>
+    <span class="yk">    runs-on:</span> <span class="yv">ubuntu-latest</span>
+
+    <span class="yk">    steps:</span>
+      <span class="ya">      - name:</span> <span class="yv">Checkout code</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/checkout@v4</span>
+
+      <span class="ya">      - name:</span> <span class="yv">Setup Python</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/setup-python@v5</span>
+        <span class="yk">        with:</span>
+          <span class="yk">          python-version:</span> <span class="yv">'3.11'</span>
+
+      <span class="ya">      - name:</span> <span class="yv">Install dependencies</span>
+        <span class="yk">        run:</span> <span class="yv">pip install -r requirements.txt</span>
+
+      <span class="c">      # NOUVEAU : analyse du style et des erreurs Python</span>
+      <span class="c">      # Le "|" permet d'écrire plusieurs commandes shell sur plusieurs lignes</span>
+      <span class="c">      # IMPORTANT : pas de commentaires à l'intérieur du bloc run: |</span>
+      <span class="ya">      - name:</span> <span class="yv">Lint with flake8</span>
+        <span class="yk">        run:</span> <span class="yv">|</span>
+          <span class="yv">          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics</span>
+          <span class="yv">          flake8 . --count --max-line-length=120 --statistics</span>
+
+      <span class="ya">      - name:</span> <span class="yv">Run tests</span>
+        <span class="yk">        run:</span> <span class="yv">pytest tests/ -v</span></pre>
+      </div>
+      <div class="box box-warn"><span class="bi">⚠️</span><p>À l'intérieur d'un bloc <code>run: |</code>, <strong>ne mets jamais de commentaires <code>#</code></strong>. GitHub les interprète comme des commandes shell à exécuter et le pipeline plante. Les commentaires doivent toujours être en dehors du bloc <code>run</code>.</p></div>
+
+      <div class="section-title">2 — Tester volontairement une erreur</div>
+      <div class="intentional-error">🧪 ERREUR INTENTIONNELLE — objectif pédagogique</div>
+      <p>Pour comprendre ce que fait le linter, on va volontairement introduire une erreur dans <code>app.py</code>. Ajoute cette ligne n'importe où dans le fichier (par exemple juste avant le <code>if __name__</code>) :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">python — ligne à ajouter temporairement dans app.py</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre>variable_inutile = "je ne sers à rien"  <span class="c"># F841 : variable jamais utilisée</span></pre>
+      </div>
+      <p>Pousse ce changement et observe le pipeline passer en rouge dans l'onglet Actions. Flake8 va signaler l'erreur <code>F841</code>. Ensuite, supprime cette ligne, repousse, et regarde le pipeline repasser au vert.</p>
+      <div class="box box-tip"><span class="bi">🧠</span><p>Ce cycle <strong>rouge → correction → vert</strong> est le quotidien d'un DevOps. Le pipeline est ton filet de sécurité : il détecte les problèmes avant qu'ils n'arrivent en production.</p></div>
+
+      <div class="done-wrap">
+        <button class="done-btn" onclick="markDone(4)">✓ Étape terminée</button>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="fnav" onclick="goto(3)">← Précédent</button>
+      <button class="fnav primary" onclick="goto(5)">Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ÉTAPE 5 — Branches & Pull Requests
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="card-5">
+    <div class="step-head" onclick="toggle(5)">
+      <div class="step-num">5</div>
+      <div class="step-info">
+        <h3>Branches et Pull Requests</h3>
+        <p>Le workflow Git professionnel — on commence à être autonome</p>
+      </div>
+      <span class="step-badge b-pro">PRO</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="step-body" id="body-5">
+
+      <div class="goal-box">
+        <span class="gi">🎯</span>
+        <div>
+          <p><strong>Ce que tu vas faire :</strong> travailler sur une branche séparée, créer une Pull Request sur GitHub, et voir la CI valider automatiquement ton code avant la fusion sur <code>main</code>. À partir d'ici, on commence à te poser des questions pour consolider tes acquis.</p>
+        </div>
+      </div>
+
+      <div class="section-title">Pourquoi les branches ?</div>
+      <p>En équipe, on ne développe <strong>jamais</strong> directement sur <code>main</code>. Chaque nouvelle fonctionnalité vit sur sa propre branche. Ainsi <code>main</code> reste toujours stable, et le code est validé avant d'y être intégré.</p>
+
+      <div class="section-title">1 — Créer une branche et basculer dessus</div>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">bash</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Crée la branche ET bascule dessus en une seule commande</span>
+git checkout -b feature/add-subtract-function
+
+<span class="c"># Vérifie que tu es bien sur la nouvelle branche (astérisque = branche active)</span>
+git branch</pre>
+      </div>
+
+      <div class="section-title">2 — Ajouter une nouvelle fonction</div>
+      <p>Tu vas ajouter une fonction <code>subtract</code> dans <code>app.py</code>. Voici le fichier <strong>complet</strong> :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">python — app.py (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="k">def</span> <span class="f">greet</span>(name: str) -> str:
+    <span class="s">"""Retourne un message de bienvenue."""</span>
+    <span class="k">if not</span> name:
+        <span class="k">raise</span> <span class="f">ValueError</span>(<span class="s">"Le nom ne peut pas être vide"</span>)
+    <span class="k">return</span> <span class="s">f"Hello, {name}! Pipeline is alive 🚀"</span>
+
+
+<span class="k">def</span> <span class="f">add</span>(a: int, b: int) -> int:
+    <span class="s">"""Additionne deux nombres."""</span>
+    <span class="k">return</span> a + b
+
+
+<span class="k">def</span> <span class="f">multiply</span>(a: int, b: int) -> int:
+    <span class="s">"""Multiplie deux nombres."""</span>
+    <span class="k">return</span> a * b
+
+
+<span class="k">def</span> <span class="f">subtract</span>(a: int, b: int) -> int:
+    <span class="s">"""Soustrait b de a."""</span>
+    <span class="k">return</span> a - b
+
+
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    <span class="f">print</span>(<span class="f">greet</span>(<span class="s">"DevOps"</span>))
+    <span class="f">print</span>(<span class="s">f"2 + 3 = {<span class="f">add</span>(2, 3)}"</span>)</pre>
+      </div>
+      <p>Et voici <code>tests/test_app.py</code> <strong>complet</strong> avec le test de <code>subtract</code> :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">python — tests/test_app.py (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="k">import</span> pytest
+<span class="k">from</span> app <span class="k">import</span> greet, add, multiply, subtract
+
+
+<span class="k">def</span> <span class="f">test_greet_normal</span>():
+    <span class="k">assert</span> <span class="f">greet</span>(<span class="s">"Titi"</span>) == <span class="s">"Hello, Titi! Pipeline is alive 🚀"</span>
+
+
+<span class="k">def</span> <span class="f">test_greet_empty_raises</span>():
+    <span class="k">with</span> pytest.<span class="f">raises</span>(ValueError):
+        <span class="f">greet</span>(<span class="s">""</span>)
+
+
+<span class="k">def</span> <span class="f">test_add</span>():
+    <span class="k">assert</span> <span class="f">add</span>(<span class="num">2</span>, <span class="num">3</span>) == <span class="num">5</span>
+    <span class="k">assert</span> <span class="f">add</span>(<span class="num">-1</span>, <span class="num">1</span>) == <span class="num">0</span>
+
+
+<span class="k">def</span> <span class="f">test_multiply</span>():
+    <span class="k">assert</span> <span class="f">multiply</span>(<span class="num">3</span>, <span class="num">4</span>) == <span class="num">12</span>
+    <span class="k">assert</span> <span class="f">multiply</span>(<span class="num">0</span>, <span class="num">99</span>) == <span class="num">0</span>
+
+
+<span class="k">def</span> <span class="f">test_subtract</span>():
+    <span class="k">assert</span> <span class="f">subtract</span>(<span class="num">10</span>, <span class="num">3</span>) == <span class="num">7</span>
+    <span class="k">assert</span> <span class="f">subtract</span>(<span class="num">0</span>, <span class="num">5</span>) == <span class="num">-5</span></pre>
+      </div>
+
+      <!-- QUESTION 1 -->
+      <div class="question-block">
+        <div class="q-label">🧠 Question — pratique</div>
+        <div class="q-text">Tes fichiers sont modifiés. Quelles commandes Git utilises-tu pour préparer un commit avec un message approprié, puis pour pousser ta branche sur GitHub ?</div>
+        <button class="reveal-btn" onclick="reveal(this)">💡 Voir la réponse</button>
+        <div class="answer-box">
+          <div class="a-label">✅ Réponse</div>
+          <div class="code-wrap" style="margin:0">
+            <div class="code-head"><span class="code-lang">bash</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+            <pre>git add app.py tests/test_app.py
+git commit -m "feat: add subtract function"
+
+<span class="c"># -u est nécessaire car cette branche n'existe pas encore sur GitHub</span>
+git push -u origin feature/add-subtract-function</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">3 — Créer la Pull Request sur GitHub</div>
+      <ul class="checklist">
+        <li><div class="chk" onclick="chk(this)"></div><span>Sur GitHub, une bannière jaune apparaît : <strong>Compare &amp; pull request</strong> — clique dessus</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Titre : <code>feat: add subtract function</code></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Clique <strong>Create pull request</strong></span></li>
+      </ul>
+      <div class="box box-tip"><span class="bi">✨</span><p>Observe la section <strong>Checks</strong> en bas de la PR : la CI se déclenche automatiquement sur ta branche ! GitHub exige que tous les checks soient verts avant d'autoriser le merge.</p></div>
+
+      <div class="section-title">4 — Merger la Pull Request</div>
+
+      <!-- QUESTION 2 -->
+      <div class="question-block">
+        <div class="q-label">🧠 Question — pratique</div>
+        <div class="q-text">La CI est verte sur ta PR. Tu merges sur GitHub via le bouton "Merge pull request". Quelle commande Git dois-tu ensuite lancer localement pour que ton dossier <code>hello-pipeline</code> soit à jour avec le <code>main</code> distant ?</div>
+        <button class="reveal-btn" onclick="reveal(this)">💡 Voir la réponse</button>
+        <div class="answer-box">
+          <div class="a-label">✅ Réponse</div>
+          <div class="code-wrap" style="margin:0">
+            <div class="code-head"><span class="code-lang">bash</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+            <pre><span class="c"># Retourner sur la branche main</span>
+git checkout main
+
+<span class="c"># Récupérer les derniers changements depuis GitHub</span>
+git pull origin main</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="done-wrap">
+        <button class="done-btn" onclick="markDone(5)">✓ Étape terminée</button>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="fnav" onclick="goto(4)">← Précédent</button>
+      <button class="fnav primary" onclick="goto(6)">Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ÉTAPE 6 — CD vers GitHub Pages
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="card-6">
+    <div class="step-head" onclick="toggle(6)">
+      <div class="step-num">6</div>
+      <div class="step-info">
+        <h3>Déploiement automatique — CD vers GitHub Pages</h3>
+        <p>Publier un rapport de tests à chaque merge sur main</p>
+      </div>
+      <span class="step-badge b-cd">CD</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="step-body" id="body-6">
+
+      <div class="goal-box">
+        <span class="gi">🎯</span>
+        <div>
+          <p><strong>Ce que tu vas faire :</strong> créer un second workflow qui génère un rapport HTML des tests et le déploie automatiquement sur GitHub Pages à chaque push sur <code>main</code>. C'est ton premier vrai déploiement continu !</p>
+        </div>
+      </div>
+
+      <div class="section-title">1 — Activer GitHub Pages</div>
+      <ul class="checklist">
+        <li><div class="chk" onclick="chk(this)"></div><span>Dans ton repo GitHub : <strong>Settings → Pages</strong> (dans le menu gauche)</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Sous "Build and deployment" → Source : sélectionne <strong>GitHub Actions</strong></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Sauvegarde</span></li>
+      </ul>
+
+      <div class="section-title">2 — Créer le workflow de déploiement</div>
+      <p>Crée un <strong>nouveau fichier</strong> <code>.github/workflows/deploy.yml</code> (ne modifie pas <code>ci.yml</code>) :</p>
+      <div class="code-wrap">
+        <div class="code-head"><span class="code-lang">yaml — .github/workflows/deploy.yml (fichier complet)</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+        <pre><span class="yk">name:</span> <span class="yv">CD — Deploy Test Report</span>
+
+<span class="c"># Se déclenche uniquement sur les pushs directs sur main</span>
+<span class="c"># (donc après un merge de Pull Request)</span>
+<span class="yk">on:</span>
+  <span class="yk">push:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+
+<span class="c"># Permissions nécessaires pour déployer sur GitHub Pages</span>
+<span class="yk">permissions:</span>
+  <span class="yk">  contents:</span> <span class="yv">read</span>
+  <span class="yk">  pages:</span> <span class="yv">write</span>
+  <span class="yk">  id-token:</span> <span class="yv">write</span>
+
+<span class="yk">jobs:</span>
+  <span class="yk">  deploy:</span>
+    <span class="yk">    runs-on:</span> <span class="yv">ubuntu-latest</span>
+    <span class="yk">    environment:</span>
+      <span class="yk">      name:</span> <span class="yv">github-pages</span>
+      <span class="yk">      url:</span> <span class="yv">${{ steps.deployment.outputs.page_url }}</span>
+
+    <span class="yk">    steps:</span>
+      <span class="ya">      - name:</span> <span class="yv">Checkout code</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/checkout@v4</span>
+
+      <span class="ya">      - name:</span> <span class="yv">Setup Python</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/setup-python@v5</span>
+        <span class="yk">        with:</span>
+          <span class="yk">          python-version:</span> <span class="yv">'3.11'</span>
+
+      <span class="c">      # Installe pytest + le plugin qui génère un rapport HTML</span>
+      <span class="ya">      - name:</span> <span class="yv">Install dependencies</span>
+        <span class="yk">        run:</span> <span class="yv">pip install -r requirements.txt pytest-html</span>
+
+      <span class="c">      # Lance les tests ET génère le rapport dans le dossier public/</span>
+      <span class="ya">      - name:</span> <span class="yv">Run tests and generate HTML report</span>
+        <span class="yk">        run:</span> <span class="yv">|</span>
+          <span class="yv">          mkdir -p public</span>
+          <span class="yv">          pytest tests/ -v --html=public/index.html --self-contained-html</span>
+
+      <span class="c">      # Prépare le dossier public/ comme artifact Pages</span>
+      <span class="ya">      - name:</span> <span class="yv">Upload Pages artifact</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/upload-pages-artifact@v3</span>
+        <span class="yk">        with:</span>
+          <span class="yk">          path:</span> <span class="yv">./public</span>
+
+      <span class="c">      # Déploie sur GitHub Pages</span>
+      <span class="ya">      - name:</span> <span class="yv">Deploy to GitHub Pages</span>
+        <span class="yk">        id:</span> <span class="yv">deployment</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/deploy-pages@v4</span></pre>
+      </div>
+
+      <!-- QUESTION 3 -->
+      <div class="question-block">
+        <div class="q-label">🧠 Question — pratique</div>
+        <div class="q-text">Tu viens de créer le fichier <code>deploy.yml</code>. Quelles commandes Git utilises-tu pour l'ajouter au dépôt avec un commit approprié, puis le pousser sur GitHub ?</div>
+        <button class="reveal-btn" onclick="reveal(this)">💡 Voir la réponse</button>
+        <div class="answer-box">
+          <div class="a-label">✅ Réponse</div>
+          <div class="code-wrap" style="margin:0">
+            <div class="code-head"><span class="code-lang">bash</span><button class="copy-btn" onclick="cp(this)">Copier</button></div>
+            <pre>git add .github/workflows/deploy.yml
+git commit -m "cd: deploy test report to GitHub Pages"
+git push</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="box box-tip"><span class="bi">🌐</span><p>Après le déploiement (environ 1-2 minutes), ton rapport sera accessible à l'URL : <code>https://TON_USERNAME.github.io/hello-pipeline/</code></p></div>
+      <div class="box box-info"><span class="bi">🧠</span><p>Tu viens de réaliser un vrai CD : chaque push sur main déclenche automatiquement un build, des tests, et une publication. C'est exactement ce qui se passe dans les entreprises.</p></div>
+
+      <div class="done-wrap">
+        <button class="done-btn" onclick="markDone(6)">✓ Étape terminée</button>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="fnav" onclick="goto(5)">← Précédent</button>
+      <button class="fnav primary" onclick="goto(7)">Étape suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ÉTAPE 7 — Protection de main
+  ══════════════════════════════════════════════════ -->
+  <div class="step-card" id="card-7">
+    <div class="step-head" onclick="toggle(7)">
+      <div class="step-num">7</div>
+      <div class="step-info">
+        <h3>Protéger main — Branch Protection Rules</h3>
+        <p>Impossible de merger sans CI verte — comme en prod</p>
+      </div>
+      <span class="step-badge b-pro">PRO</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="step-body" id="body-7">
+
+      <div class="goal-box">
+        <span class="gi">🎯</span>
+        <div>
+          <p><strong>Ce que tu vas faire :</strong> configurer des règles sur <code>main</code> pour qu'il soit techniquement impossible de merger du code sans CI verte et sans Pull Request. C'est la dernière brique de ton pipeline.</p>
+        </div>
+      </div>
+
+      <div class="section-title">Configurer les règles de protection</div>
+      <ul class="checklist">
+        <li><div class="chk" onclick="chk(this)"></div><span>GitHub → ton repo → <strong>Settings → Branches</strong></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Clique <strong>Add branch protection rule</strong></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Branch name pattern : <code>main</code></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Coche <strong>Require a pull request before merging</strong></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Coche <strong>Require status checks to pass before merging</strong> et sélectionne le job <code>test</code></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Coche <strong>Require branches to be up to date before merging</strong></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Clique <strong>Create</strong> pour sauvegarder</span></li>
+      </ul>
+      <div class="box box-warn"><span class="bi">🔒</span><p>Désormais, <strong>personne</strong> ne peut pousser directement sur <code>main</code> sans passer par une PR avec la CI verte. Même toi en tant qu'admin ! C'est la pratique standard dans toutes les équipes professionnelles.</p></div>
+
+      <div class="section-title">Récapitulatif — Ce que tu as construit</div>
+      <div class="pipeline">
+        <div class="ps"><div class="ps-icon" style="background:rgba(99,179,237,0.15)">👨‍💻</div><div class="ps-label">Dev sur<br>une branche</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(246,173,85,0.15)">🔀</div><div class="ps-label">Pull<br>Request</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(246,224,94,0.15)">🔍</div><div class="ps-label">CI : lint<br>+ tests</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(104,211,145,0.15)">✅</div><div class="ps-label">Merge<br>sur main</div></div>
+        <div class="pa">→</div>
+        <div class="ps"><div class="ps-icon" style="background:rgba(183,148,244,0.15)">🚀</div><div class="ps-label">CD : déploiement<br>automatique</div></div>
+      </div>
+
+      <!-- QUESTION FINALE -->
+      <div class="question-block">
+        <div class="q-label">🧠 Question de synthèse</div>
+        <div class="q-text">Explique dans tes propres mots la différence entre CI et CD, et donne un exemple concret de chacun tiré de ce TP.</div>
+        <button class="reveal-btn" onclick="reveal(this)">💡 Voir la réponse</button>
+        <div class="answer-box">
+          <div class="a-label">✅ Réponse</div>
+          <p style="color:#9ae6b4; font-size:14px;"><strong>CI (Intégration Continue) :</strong> automatise la vérification du code à chaque push. Dans ce TP : GitHub Actions lance flake8 et pytest à chaque fois qu'on pousse du code ou qu'on ouvre une Pull Request.</p>
+          <br>
+          <p style="color:#9ae6b4; font-size:14px;"><strong>CD (Déploiement Continu) :</strong> automatise la livraison du code validé vers un environnement. Dans ce TP : après chaque merge sur main, le workflow deploy.yml génère un rapport HTML et le publie automatiquement sur GitHub Pages sans aucune intervention humaine.</p>
+        </div>
+      </div>
+
+      <div class="section-title">Pour aller plus loin</div>
+      <ul class="checklist">
+        <li><div class="chk" onclick="chk(this)"></div><span>Ajouter la couverture de tests avec <code>pytest-cov</code> et un badge dans le README</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Conteneuriser l'application avec <strong>Docker</strong></span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Utiliser les <strong>secrets GitHub</strong> pour stocker des variables sensibles dans les workflows</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Explorer les <strong>environments</strong> GitHub (staging / production) avec des approbations manuelles</span></li>
+        <li><div class="chk" onclick="chk(this)"></div><span>Découvrir <strong>ArgoCD</strong> + Kubernetes pour un déploiement cloud-native</span></li>
+      </ul>
+
+      <div class="done-wrap">
+        <button class="done-btn" onclick="markDone(7)">🎉 TP terminé !</button>
+      </div>
+    </div>
+    <div class="step-footer">
+      <button class="fnav" onclick="goto(6)">← Précédent</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+const TOTAL = 7;
+const doneSet = new Set();
+const openSet = new Set();
+
+function buildNav() {
+  const nav = document.getElementById('dotsNav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (doneSet.has(i) ? ' is-done' : '') + (openSet.has(i) ? ' is-open' : '');
+    d.textContent = i;
+    d.onclick = () => goto(i);
+    nav.appendChild(d);
+  }
+}
+
+function updateProgress() {
+  const pct = (doneSet.size / TOTAL) * 100;
+  document.getElementById('pgFill').style.width = pct + '%';
+  document.getElementById('pgTxt').textContent = doneSet.size + ' / ' + TOTAL;
+}
+
+function toggle(n) {
+  const body = document.getElementById('body-' + n);
+  const card = document.getElementById('card-' + n);
+  const head = card.querySelector('.step-head');
+  const isOpen = body.classList.contains('visible');
+  if (isOpen) {
+    body.classList.remove('visible');
+    head.classList.remove('opened');
+    openSet.delete(n);
+    if (!doneSet.has(n)) card.classList.remove('is-open');
+  } else {
+    body.classList.add('visible');
+    head.classList.add('opened');
+    openSet.add(n);
+    if (!doneSet.has(n)) card.classList.add('is-open');
+  }
+  buildNav();
+}
+
+function goto(n) {
+  const body = document.getElementById('body-' + n);
+  const card = document.getElementById('card-' + n);
+  const head = card.querySelector('.step-head');
+  if (!body.classList.contains('visible')) {
+    body.classList.add('visible');
+    head.classList.add('opened');
+    openSet.add(n);
+    if (!doneSet.has(n)) card.classList.add('is-open');
+  }
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  buildNav();
+}
+
+function markDone(n) {
+  const btn = document.querySelector('#body-' + n + ' .done-btn');
+  const card = document.getElementById('card-' + n);
+  if (doneSet.has(n)) {
+    doneSet.delete(n);
+    btn.textContent = n === 7 ? '🎉 TP terminé !' : '✓ Étape terminée';
+    btn.classList.remove('undo');
+    card.classList.remove('is-done');
+    if (openSet.has(n)) card.classList.add('is-open');
+  } else {
+    doneSet.add(n);
+    btn.textContent = '↩ Marquer comme non terminée';
+    btn.classList.add('undo');
+    card.classList.remove('is-open');
+    card.classList.add('is-done');
+  }
+  updateProgress();
+  buildNav();
+}
+
+function chk(el) {
+  el.classList.toggle('on');
+  el.parentElement.classList.toggle('struck');
+}
+
+function cp(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copié';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function reveal(btn) {
+  const answer = btn.nextElementSibling;
+  answer.classList.add('shown');
+  btn.style.display = 'none';
+}
+
+// Init
+buildNav();
+updateProgress();
+toggle(1);
+</script>
+</body>
+</html>
