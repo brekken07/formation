@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3 — Docker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #07111f;
+  --s1: #0b1929;
+  --s2: #0f2035;
+  --s3: #132640;
+  --border: #1a3351;
+  --border2: #1f3d61;
+  --text: #ddeeff;
+  --muted: #4a7099;
+  --accent: #2496ed;
+  --green: #4ade80;
+  --orange: #fb923c;
+  --red: #f87171;
+  --purple: #a78bfa;
+  --yellow: #facc15;
+  --teal: #22d3ee;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(36,150,237,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(36,150,237,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+.orb { position: fixed; border-radius: 50%; filter: blur(140px); pointer-events: none; z-index: 0; opacity: 0.6; }
+.orb1 { width: 600px; height: 400px; background: rgba(36,150,237,0.09); top: -120px; left: 50%; transform: translateX(-50%); }
+.orb2 { width: 350px; height: 350px; background: rgba(34,211,238,0.06); bottom: 0; right: -80px; }
+
+.page { position: relative; z-index: 1; }
+
+/* ── HEADER ── */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 54px 24px 44px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(36,150,237,0.05) 0%, transparent 100%);
+}
+.mod-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(36,150,237,0.1); border: 1px solid rgba(36,150,237,0.3);
+  color: var(--accent); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 20px; letter-spacing: 2px;
+}
+header h1 {
+  font-size: clamp(28px, 4.5vw, 46px); font-weight: 900;
+  background: linear-gradient(135deg, #ddeeff 10%, #2496ed 55%, #22d3ee 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 12px; line-height: 1.15;
+}
+header p { color: var(--muted); font-size: 15px; max-width: 520px; margin: 0 auto 28px; }
+.tech-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tpill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--s2); border: 1px solid var(--border);
+  padding: 5px 13px; border-radius: 20px; font-size: 12px;
+  font-family: 'JetBrains Mono', monospace; color: var(--muted);
+}
+
+/* ── PROGRESS ── */
+.prog {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(7,17,31,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+}
+.pl { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.pt { flex: 1; height: 5px; background: var(--s2); border-radius: 10px; overflow: hidden; }
+.pf { height: 100%; background: linear-gradient(90deg, var(--accent), var(--teal)); border-radius: 10px; transition: width .5s ease; width: 0%; }
+.pp { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); white-space: nowrap; }
+
+/* ── WRAP ── */
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* ── DOTS NAV ── */
+.dnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+.dn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--s1);
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.dn:hover { border-color: var(--accent); color: var(--accent); }
+.dn.done { border-color: var(--green); background: rgba(74,222,128,.1); color: var(--green); }
+.dn.open { border-color: var(--accent); background: rgba(36,150,237,.12); color: var(--accent); }
+
+/* ── CARD ── */
+.card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; margin-bottom: 12px;
+  overflow: hidden; transition: border-color .25s;
+}
+.card.open { border-color: var(--accent); }
+.card.done { border-color: rgba(74,222,128,.35); }
+
+.card-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; cursor: pointer; user-select: none; transition: background .15s;
+}
+.card-head:hover { background: rgba(255,255,255,.02); }
+
+.cnum {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
+  flex-shrink: 0; background: var(--s2); border: 2px solid var(--border);
+  color: var(--muted); transition: all .2s;
+}
+.card.open .cnum { background: rgba(36,150,237,.15); border-color: var(--accent); color: var(--accent); }
+.card.done .cnum { background: rgba(74,222,128,.15); border-color: var(--green); color: var(--green); }
+
+.cmeta { flex: 1; }
+.cmeta h3 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.cmeta p  { font-size: 12px; color: var(--muted); }
+
+.cbadge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 3px 9px; border-radius: 5px; border: 1px solid; white-space: nowrap;
+}
+.b-concept { color: var(--teal);   border-color: rgba(34,211,238,.35);  background: rgba(34,211,238,.07); }
+.b-tp      { color: var(--accent); border-color: rgba(36,150,237,.35);  background: rgba(36,150,237,.07); }
+.b-cicd    { color: var(--purple); border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.07); }
+.b-pro     { color: var(--green);  border-color: rgba(74,222,128,.35);  background: rgba(74,222,128,.07); }
+.b-rescue  { color: var(--orange); border-color: rgba(251,146,60,.35);  background: rgba(251,146,60,.07); }
+
+.chev { color: var(--muted); font-size: 11px; transition: transform .3s; flex-shrink: 0; }
+.card-head.op .chev { transform: rotate(180deg); }
+
+/* ── BODY ── */
+.cbody { display: none; border-top: 1px solid var(--border); padding: 26px 22px 20px; }
+.cbody.vis { display: block; }
+
+/* ── GOAL ── */
+.goal {
+  display: flex; gap: 12px;
+  background: rgba(36,150,237,.05); border: 1px solid rgba(36,150,237,.2);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 22px;
+}
+.goal .gi { font-size: 20px; flex-shrink: 0; }
+.goal p { font-size: 14px; color: #93c9f7; }
+.goal strong { color: var(--accent); }
+
+/* ── SECTION TITLE ── */
+.st {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1.5px; margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.st::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+p { margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+
+/* ── CODE ── */
+.cw { background: #040d18; border: 1px solid var(--border); border-radius: 10px; margin: 10px 0 16px; overflow: hidden; }
+.ch { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--s2); border-bottom: 1px solid var(--border); }
+.cl { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.cpb {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 3px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; transition: all .2s;
+}
+.cpb:hover { color: var(--text); border-color: var(--accent); }
+.cpb.ok { color: var(--green); border-color: var(--green); }
+pre {
+  padding: 16px; overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #ddeeff;
+}
+.c  { color: #2d5878; font-style: italic; }
+.k  { color: #f472b6; }
+.s  { color: #86efac; }
+.kw { color: #67e8f9; }
+.n  { color: #93c5fd; }
+.dk { color: #60a5fa; font-weight: 600; }  /* dockerfile keyword */
+.dv { color: #86efac; }                     /* dockerfile value */
+.yk { color: #93c5fd; }
+.yv { color: #86efac; }
+.ya { color: #fb923c; }
+
+/* ── BOXES ── */
+.box {
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: 14px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6;
+}
+.box .bi { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.tip  { background: rgba(74,222,128,.05);  border: 1px solid rgba(74,222,128,.2); }
+.tip p  { color: #86efac; }
+.warn { background: rgba(251,146,60,.05);  border: 1px solid rgba(251,146,60,.2); }
+.warn p { color: #fdba74; }
+.info { background: rgba(34,211,238,.05);  border: 1px solid rgba(34,211,238,.2); }
+.info p { color: #67e8f9; }
+.note { background: rgba(167,139,250,.05); border: 1px solid rgba(167,139,250,.2); }
+.note p { color: #c4b5fd; }
+
+/* ── SCHEMA ── */
+.schema {
+  background: #040d18; border: 1px solid var(--border); border-radius: 10px;
+  padding: 20px; margin: 12px 0 16px; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; line-height: 2.2; overflow-x: auto;
+}
+.sa { color: var(--accent); font-weight: 700; }
+.sg { color: var(--green); }
+.sm { color: var(--muted); }
+.so { color: var(--orange); }
+.st2 { color: var(--teal); }
+.sarr { color: var(--border2); }
+
+/* ── FILE TREE ── */
+.ftree {
+  background: #040d18; border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px; margin: 10px 0 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 2;
+}
+.fd { color: var(--accent); }
+.ff { color: var(--text); }
+.fn2 { color: var(--green); }
+.fc { color: var(--muted); font-size: 11px; }
+
+/* ── CHECKLIST ── */
+.clist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 16px; }
+.clist li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+.chkb {
+  width: 20px; height: 20px; border: 2px solid var(--border2); border-radius: 5px;
+  flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all .2s;
+}
+.chkb.on { background: var(--green); border-color: var(--green); color: #07111f; }
+.clist li.struck span { color: var(--muted); text-decoration: line-through; }
+
+/* ── QUESTION ── */
+.qblock {
+  background: rgba(250,204,21,.04); border: 1px solid rgba(250,204,21,.25);
+  border-radius: 12px; padding: 18px 20px; margin: 20px 0;
+}
+.qlabel {
+  display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;
+  color: var(--yellow); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.qtext { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+.rbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(250,204,21,.1); border: 1px solid rgba(250,204,21,.3);
+  color: var(--yellow); padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+}
+.rbtn:hover { background: rgba(250,204,21,.18); }
+.abox { display: none; margin-top: 14px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 14px 16px; }
+.abox.show { display: block; }
+.alabel { font-size: 10px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.aexpl { font-size: 14px; color: #86efac; margin-top: 8px; line-height: 1.6; }
+
+/* ── INTENTIONAL ERROR ── */
+.ierr {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.3);
+  color: var(--red); font-size: 11px; font-weight: 700;
+  padding: 4px 12px; border-radius: 6px; margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── DONE ── */
+.done-w { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.dbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.3);
+  color: var(--green); padding: 10px 22px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+}
+.dbtn:hover { background: rgba(74,222,128,.15); }
+.dbtn.undo { background: rgba(248,113,113,.06); border-color: rgba(248,113,113,.3); color: var(--red); }
+
+/* ── FOOTER NAV ── */
+.cfoot {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border); background: var(--s2);
+}
+.fnav {
+  background: var(--s3); border: 1px solid var(--border); color: var(--text);
+  padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+}
+.fnav:hover { border-color: var(--accent); color: var(--accent); }
+.fnav.p { background: rgba(36,150,237,.1); border-color: var(--accent); color: var(--accent); }
+
+code {
+  font-family: 'JetBrains Mono', monospace; background: var(--s2);
+  border: 1px solid var(--border); padding: 1px 6px;
+  border-radius: 4px; font-size: 12px; color: var(--orange);
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="page">
+
+<header>
+  <div class="mod-badge">🐳 MODULE 3 · DOCKER</div>
+  <h1>Conteneuriser avec Docker</h1>
+  <p>Emballer ton application Python dans un conteneur, comprendre les concepts fondamentaux, et intégrer Docker dans ton pipeline CI/CD.</p>
+  <div class="tech-pills">
+    <div class="tpill">🐳 Docker</div>
+    <div class="tpill">📦 Conteneurs</div>
+    <div class="tpill">🖼️ Images</div>
+    <div class="tpill">⚙️ GitHub Actions</div>
+  </div>
+</header>
+
+<div class="prog">
+  <span class="pl">PROGRESSION</span>
+  <div class="pt"><div class="pf" id="pf"></div></div>
+  <span class="pp" id="pp">0 / 6</span>
+</div>
+
+<div class="wrap">
+  <div class="dnav" id="dnav"></div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 1 — C'est quoi Docker ?
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c1">
+    <div class="card-head" onclick="tog(1)">
+      <div class="cnum">1</div>
+      <div class="cmeta">
+        <h3>C'est quoi Docker ?</h3>
+        <p>Le problème qu'il résout et les concepts clés</p>
+      </div>
+      <span class="cbadge b-concept">CONCEPT</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b1">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre pourquoi Docker existe et la différence entre une image et un conteneur — les deux concepts fondamentaux sur lesquels tout repose.</p></div>
+      </div>
+
+      <div class="st">Le problème avant Docker</div>
+      <p>Tu as sûrement déjà entendu : <em>"Ça marche sur ma machine !"</em>. C'est le problème classique :</p>
+      <div class="schema">
+        <span class="so">Développeur A</span> &nbsp;→ Python 3.11, Ubuntu 22 &nbsp;&nbsp;<span class="sg">✓ fonctionne</span><br>
+        <span class="so">Développeur B</span> &nbsp;→ Python 3.9,  Windows 11 &nbsp;&nbsp;<span class="sarr">⚠️ erreur bizarre</span><br>
+        <span class="so">Serveur prod</span> &nbsp;&nbsp;→ Python 3.8,  CentOS 7 &nbsp;&nbsp;&nbsp;&nbsp;<span class="sarr">💥 plante complètement</span>
+      </div>
+      <p>Docker résout ça en embarquant <strong>l'application + tout son environnement</strong> dans une boîte hermétique — le <strong>conteneur</strong>. Cette boîte tourne de façon identique partout.</p>
+
+      <div class="st">Image vs Conteneur — la distinction clé</div>
+      <div class="schema">
+        <span class="sa">Image Docker</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sm">= la recette, le moule (lecture seule)</span><br>
+        <span class="sarr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ docker run</span><br>
+        <span class="st2">Conteneur Docker</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sm">= l'instance en cours d'exécution (vivant)</span>
+      </div>
+      <p>Analogie : l'image est comme un <strong>fichier .iso</strong> — tu peux l'utiliser pour démarrer autant de machines virtuelles (conteneurs) que tu veux. Chaque conteneur est indépendant.</p>
+
+      <div class="st">Docker vs Machine Virtuelle</div>
+      <div class="schema">
+        <span class="so">Machine Virtuelle</span>&nbsp;&nbsp;<span class="sm">= OS complet (plusieurs Go, démarre en minutes)</span><br>
+        <span class="sg">Conteneur Docker</span> &nbsp;&nbsp;<span class="sm">= partage le noyau Linux (quelques Mo, démarre en secondes)</span>
+      </div>
+      <div class="box info"><span class="bi">💡</span><p>Docker ne virtualise pas le matériel — il isole juste les processus. C'est pour ça qu'un conteneur démarre en moins d'une seconde là où une VM met plusieurs minutes.</p></div>
+
+      <div class="st">Installer Docker</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — Ubuntu/Debian</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Installation en une commande (script officiel Docker)</span>
+curl -fsSL https://get.docker.com | sh
+
+<span class="c"># Ajouter ton utilisateur au groupe docker (évite de taper sudo)</span>
+sudo usermod -aG docker $USER
+
+<span class="c"># Déconnecte-toi et reconnecte-toi, puis vérifie</span>
+docker --version
+docker run hello-world</pre>
+      </div>
+      <div class="box tip"><span class="bi">✅</span><p>Si <code>docker run hello-world</code> affiche un message "Hello from Docker!", l'installation est réussie.</p></div>
+      <div class="box warn"><span class="bi">💻</span><p>Sur <strong>Windows/macOS</strong> : installe <strong>Docker Desktop</strong> depuis docker.com — il inclut une interface graphique et tout le nécessaire.</p></div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(1)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav p" onclick="go(2)">Leçon suivante →</button></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 2 — Le Dockerfile
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c2">
+    <div class="card-head" onclick="tog(2)">
+      <div class="cnum">2</div>
+      <div class="cmeta">
+        <h3>Écrire un Dockerfile</h3>
+        <p>La recette pour construire ton image</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b2">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> écrire ton premier Dockerfile pour conteneuriser <code>hello-pipeline</code>. Comprendre chaque instruction — pas juste copier.</p></div>
+      </div>
+
+      <div class="st">C'est quoi un Dockerfile ?</div>
+      <p>Un <strong>Dockerfile</strong> est un fichier texte qui décrit comment construire une image Docker. Chaque ligne est une instruction. Docker les exécute dans l'ordre pour créer l'image couche par couche.</p>
+
+      <div class="st">Créer le Dockerfile</div>
+      <p>À la racine de <code>hello-pipeline</code>, crée un fichier nommé exactement <code>Dockerfile</code> (sans extension) :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">Dockerfile — hello-pipeline/ (fichier complet)</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># FROM : image de base — on part d'une image Python officielle</span>
+<span class="c"># "slim" = version allégée (moins de poids, idéale pour la prod)</span>
+<span class="dk">FROM</span> <span class="dv">python:3.11-slim</span>
+
+<span class="c"># WORKDIR : définit le dossier de travail dans le conteneur</span>
+<span class="c"># Toutes les commandes suivantes s'exécutent depuis ce dossier</span>
+<span class="dk">WORKDIR</span> <span class="dv">/app</span>
+
+<span class="c"># COPY : copie les fichiers depuis ta machine vers le conteneur</span>
+<span class="c"># On copie requirements.txt EN PREMIER (optimisation du cache)</span>
+<span class="dk">COPY</span> <span class="dv">requirements.txt .</span>
+
+<span class="c"># RUN : exécute une commande lors de la construction de l'image</span>
+<span class="c"># --no-cache-dir évite de stocker le cache pip dans l'image</span>
+<span class="dk">RUN</span> <span class="dv">pip install --no-cache-dir -r requirements.txt</span>
+
+<span class="c"># COPY : copie maintenant tout le reste du code</span>
+<span class="dk">COPY</span> <span class="dv">. .</span>
+
+<span class="c"># CMD : commande lancée quand on démarre un conteneur</span>
+<span class="c"># C'est le point d'entrée de ton application</span>
+<span class="dk">CMD</span> <span class="dv">["python", "app.py"]</span></pre>
+      </div>
+
+      <div class="box info"><span class="bi">🧱</span><p><strong>Pourquoi copier requirements.txt avant le reste du code ?</strong> Docker met en cache chaque couche. Si tu modifies app.py, Docker réutilise le cache jusqu'à la couche COPY requirements.txt et ne réinstalle pas les dépendances. Ça accélère considérablement les builds.</p></div>
+
+      <div class="st">Créer le .dockerignore</div>
+      <p>Comme <code>.gitignore</code> pour Git, <code>.dockerignore</code> liste les fichiers à ne pas copier dans l'image :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">.dockerignore — fichier complet</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre>__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.git/
+.github/
+*.md</pre>
+      </div>
+
+      <div class="st">Structure du projet maintenant</div>
+      <div class="ftree">
+        <span class="fd">hello-pipeline/</span><br>
+        &nbsp;&nbsp;├── <span class="fn2">Dockerfile</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fc">← nouveau</span><br>
+        &nbsp;&nbsp;├── <span class="fn2">.dockerignore</span> &nbsp;&nbsp;<span class="fc">← nouveau</span><br>
+        &nbsp;&nbsp;├── <span class="ff">app.py</span><br>
+        &nbsp;&nbsp;├── <span class="ff">conftest.py</span><br>
+        &nbsp;&nbsp;├── <span class="ff">requirements.txt</span><br>
+        &nbsp;&nbsp;├── <span class="ff">.gitignore</span><br>
+        &nbsp;&nbsp;├── <span class="ff">.github/workflows/</span><br>
+        &nbsp;&nbsp;└── <span class="ff">tests/test_app.py</span>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(2)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(1)">← Précédent</button>
+      <button class="fnav p" onclick="go(3)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 3 — Build & Run
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c3">
+    <div class="card-head" onclick="tog(3)">
+      <div class="cnum">3</div>
+      <div class="cmeta">
+        <h3>Construire et lancer ton conteneur</h3>
+        <p>docker build, docker run — les commandes essentielles</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b3">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> construire ton image depuis le Dockerfile et lancer ton premier conteneur. À la fin de cette leçon, ton application Python tourne dans Docker.</p></div>
+      </div>
+
+      <div class="st">Construire l'image</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — dans hello-pipeline/</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># docker build : construit l'image depuis le Dockerfile</span>
+<span class="c"># -t : donne un nom (tag) à l'image — ici "hello-pipeline"</span>
+<span class="c"># .  : le contexte de build (dossier courant)</span>
+docker build -t hello-pipeline .
+
+<span class="c"># Vérifie que l'image apparaît dans la liste</span>
+docker images</pre>
+      </div>
+      <p>Tu verras Docker télécharger l'image de base <code>python:3.11-slim</code> puis exécuter chaque instruction du Dockerfile. C'est normal que ça prenne un peu de temps la première fois.</p>
+
+      <div class="st">Lancer un conteneur</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># docker run : crée et démarre un conteneur depuis l'image</span>
+docker run hello-pipeline
+
+<span class="c"># Tu dois voir :</span>
+<span class="c"># Hello, DevOps! Pipeline is alive 🚀</span>
+<span class="c"># 2 + 3 = 5</span></pre>
+      </div>
+
+      <div class="st">Les commandes Docker du quotidien</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — gestion des conteneurs et images</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lister les conteneurs en cours d'exécution</span>
+docker ps
+
+<span class="c"># Lister tous les conteneurs (y compris arrêtés)</span>
+docker ps -a
+
+<span class="c"># Lister les images disponibles</span>
+docker images
+
+<span class="c"># Supprimer un conteneur arrêté</span>
+docker rm NOM_OU_ID
+
+<span class="c"># Supprimer une image</span>
+docker rmi hello-pipeline
+
+<span class="c"># Supprimer tous les conteneurs arrêtés et images inutilisées</span>
+docker system prune</pre>
+      </div>
+
+      <div class="st">Lancer les tests dans le conteneur</div>
+      <p>On peut aussi exécuter une commande différente au démarrage du conteneur, en écrasant le <code>CMD</code> du Dockerfile :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lance pytest au lieu de app.py</span>
+docker run hello-pipeline pytest tests/ -v</pre>
+      </div>
+      <div class="box tip"><span class="bi">✅</span><p>Si les 5 tests passent dans le conteneur, ton image est valide. L'application fonctionne de façon identique dans Docker et sur ta machine.</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Quelle est la différence entre <code>docker build</code> et <code>docker run</code> ? Que produit chacune de ces commandes ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>docker build</code> lit le Dockerfile et produit une <strong>image</strong> — c'est la recette figée, stockée localement.<br><br><code>docker run</code> prend une image existante et crée une <strong>instance en cours d'exécution</strong> : le conteneur. Un même <code>docker build</code> peut donner naissance à plusieurs conteneurs via plusieurs <code>docker run</code>.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(3)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(2)">← Précédent</button>
+      <button class="fnav p" onclick="go(4)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 4 — Docker dans le pipeline CI
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c4">
+    <div class="card-head" onclick="tog(4)">
+      <div class="cnum">4</div>
+      <div class="cmeta">
+        <h3>Docker dans le pipeline CI</h3>
+        <p>Construire et tester l'image automatiquement à chaque push</p>
+      </div>
+      <span class="cbadge b-cicd">CI/CD</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b4">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> mettre à jour le workflow CI pour qu'il construise l'image Docker et lance les tests à l'intérieur du conteneur. Plus de dépendance Python locale — tout se passe dans Docker.</p></div>
+      </div>
+
+      <div class="st">Pourquoi tester dans Docker en CI ?</div>
+      <p>Jusqu'ici, la CI installait Python et les dépendances directement sur la machine virtuelle GitHub. Avec Docker, on teste dans l'environnement exact qui partira en production — c'est plus fiable.</p>
+      <div class="schema">
+        <span class="sm">Avant :</span> &nbsp;VM GitHub → <span class="so">install Python</span> → <span class="so">install deps</span> → pytest<br>
+        <span class="sm">Après :</span> &nbsp;VM GitHub → <span class="sg">docker build</span> → <span class="sg">docker run pytest</span>
+      </div>
+
+      <div class="st">Mettre à jour ci.yml</div>
+      <p>Remplace le contenu de <code>.github/workflows/ci.yml</code> par ceci :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">yaml — .github/workflows/ci.yml (fichier complet)</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="yk">name:</span> <span class="yv">CI — Docker Build & Test</span>
+
+<span class="yk">on:</span>
+  <span class="yk">push:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+  <span class="yk">pull_request:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+
+<span class="yk">jobs:</span>
+  <span class="yk">  build-and-test:</span>
+    <span class="yk">    runs-on:</span> <span class="yv">ubuntu-latest</span>
+
+    <span class="yk">    steps:</span>
+      <span class="ya">      - name:</span> <span class="yv">Checkout code</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/checkout@v4</span>
+
+      <span class="c">      # Construit l'image Docker depuis le Dockerfile</span>
+      <span class="ya">      - name:</span> <span class="yv">Build Docker image</span>
+        <span class="yk">        run:</span> <span class="yv">docker build -t hello-pipeline .</span>
+
+      <span class="c">      # Lance le linter dans le conteneur</span>
+      <span class="ya">      - name:</span> <span class="yv">Lint with flake8</span>
+        <span class="yk">        run:</span> <span class="yv">|</span>
+          <span class="yv">          docker run hello-pipeline flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics</span>
+          <span class="yv">          docker run hello-pipeline flake8 . --count --max-line-length=120 --statistics</span>
+
+      <span class="c">      # Lance les tests dans le conteneur</span>
+      <span class="ya">      - name:</span> <span class="yv">Run tests</span>
+        <span class="yk">        run:</span> <span class="yv">docker run hello-pipeline pytest tests/ -v</span></pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu viens de modifier <code>ci.yml</code> et le <code>Dockerfile</code>. Quelles commandes Git utilises-tu pour commiter ces deux fichiers ensemble et les pousser sur GitHub ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre>git add Dockerfile .dockerignore .github/workflows/ci.yml
+git commit -m "feat: add Dockerfile and update CI to use Docker"
+git push</pre>
+          </div>
+          <p class="aexpl">On peut aussi faire <code>git add .</code> pour tout stager d'un coup, mais lister les fichiers explicitement est une meilleure pratique — ça évite d'embarquer accidentellement des fichiers non souhaités.</p>
+        </div>
+      </div>
+
+      <div class="box tip"><span class="bi">👀</span><p>Dans l'onglet Actions, tu verras maintenant une étape <strong>"Build Docker image"</strong> avant les tests. C'est le signe que Docker est bien intégré dans ton pipeline.</p></div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(4)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(3)">← Précédent</button>
+      <button class="fnav p" onclick="go(5)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 5 — Publier sur GitHub Container Registry
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c5">
+    <div class="card-head" onclick="tog(5)">
+      <div class="cnum">5</div>
+      <div class="cmeta">
+        <h3>Publier l'image sur GitHub Container Registry</h3>
+        <p>Stocker et versionner ton image Docker dans GitHub</p>
+      </div>
+      <span class="cbadge b-cicd">CI/CD</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b5">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> créer un second workflow CD qui construit l'image et la publie automatiquement sur <strong>GitHub Container Registry (GHCR)</strong> à chaque merge sur main. N'importe qui pourra ensuite la télécharger avec <code>docker pull</code>.</p></div>
+      </div>
+
+      <div class="st">C'est quoi un registry ?</div>
+      <p>Un <strong>registry</strong> est un serveur de stockage d'images Docker — comme GitHub pour le code, mais pour les images. GitHub en propose un gratuit intégré à ton compte : <strong>ghcr.io</strong>.</p>
+      <div class="schema">
+        <span class="sm">Ton pipeline :</span><br>
+        <span class="sa">git push</span> <span class="sarr">→</span> <span class="sg">CI : build + test</span> <span class="sarr">→</span> <span class="st2">CD : docker push ghcr.io</span><br><br>
+        <span class="sm">N'importe où ensuite :</span><br>
+        <span class="so">docker pull ghcr.io/brekken07/hello-pipeline:latest</span>
+      </div>
+
+      <div class="st">Créer le workflow de publication</div>
+      <p>Crée <code>.github/workflows/docker-publish.yml</code> :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">yaml — .github/workflows/docker-publish.yml (fichier complet)</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="yk">name:</span> <span class="yv">CD — Publish Docker Image</span>
+
+<span class="yk">on:</span>
+  <span class="yk">push:</span>
+    <span class="yk">branches:</span> <span class="yv">[ main ]</span>
+
+<span class="c"># Permissions pour écrire dans le registry GitHub</span>
+<span class="yk">permissions:</span>
+  <span class="yk">  contents:</span> <span class="yv">read</span>
+  <span class="yk">  packages:</span> <span class="yv">write</span>
+
+<span class="yk">jobs:</span>
+  <span class="yk">  publish:</span>
+    <span class="yk">    runs-on:</span> <span class="yv">ubuntu-latest</span>
+
+    <span class="yk">    steps:</span>
+      <span class="ya">      - name:</span> <span class="yv">Checkout code</span>
+        <span class="yk">        uses:</span> <span class="yv">actions/checkout@v4</span>
+
+      <span class="c">      # Connexion au registry GitHub (utilise un token automatique)</span>
+      <span class="ya">      - name:</span> <span class="yv">Login to GitHub Container Registry</span>
+        <span class="yk">        uses:</span> <span class="yv">docker/login-action@v3</span>
+        <span class="yk">        with:</span>
+          <span class="yk">          registry:</span> <span class="yv">ghcr.io</span>
+          <span class="yk">          username:</span> <span class="yv">${{ github.actor }}</span>
+          <span class="yk">          password:</span> <span class="yv">${{ secrets.GITHUB_TOKEN }}</span>
+
+      <span class="c">      # Construit ET pousse l'image vers ghcr.io</span>
+      <span class="ya">      - name:</span> <span class="yv">Build and push image</span>
+        <span class="yk">        uses:</span> <span class="yv">docker/build-push-action@v5</span>
+        <span class="yk">        with:</span>
+          <span class="yk">          context:</span> <span class="yv">.</span>
+          <span class="yk">          push:</span> <span class="yv">true</span>
+          <span class="c">          # Format : ghcr.io/username/nom-repo:tag</span>
+          <span class="yk">          tags:</span> <span class="yv">ghcr.io/${{ github.repository_owner }}/hello-pipeline:latest</span></pre>
+      </div>
+
+      <div class="box info"><span class="bi">🔑</span><p><code>secrets.GITHUB_TOKEN</code> est un token créé automatiquement par GitHub pour chaque workflow — tu n'as rien à configurer. C'est différent des secrets que tu créerais manuellement.</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Après avoir pushé ce nouveau workflow, comment vérifies-tu que l'image a bien été publiée sur GitHub Container Registry ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Dans ton profil GitHub, clique sur l'onglet <strong>Packages</strong> — tu dois voir <code>hello-pipeline</code> apparaître. En cliquant dessus, tu verras les versions disponibles et la commande <code>docker pull</code> correspondante.<br><br>Tu peux aussi vérifier dans l'onglet <strong>Actions</strong> que le workflow <code>CD — Publish Docker Image</code> est passé au vert.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(5)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(4)">← Précédent</button>
+      <button class="fnav p" onclick="go(6)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 6 — Récap & quiz
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c6">
+    <div class="card-head" onclick="tog(6)">
+      <div class="cnum">6</div>
+      <div class="cmeta">
+        <h3>Récapitulatif & quiz de clôture</h3>
+        <p>Ce que tu as construit + 3 questions de synthèse</p>
+      </div>
+      <span class="cbadge b-pro">SYNTHÈSE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b6">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> consolider tout ce que tu as appris dans ce module avec un récap visuel et 3 questions de synthèse.</p></div>
+      </div>
+
+      <div class="st">Ce que tu as construit</div>
+      <div class="schema">
+        <span class="sm">git push</span><br>
+        <span class="sarr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓</span><br>
+        <span class="sa">CI : build-and-test</span><br>
+        <span class="sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── docker build -t hello-pipeline .</span><br>
+        <span class="sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── docker run flake8 (lint)</span><br>
+        <span class="sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── docker run pytest (tests)</span><br>
+        <span class="sarr">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ (si vert)</span><br>
+        <span class="st2">CD : docker-publish</span><br>
+        <span class="sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── push → ghcr.io/brekken07/hello-pipeline:latest</span>
+      </div>
+
+      <div class="st">Mémo des commandes Docker essentielles</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — référence rapide</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Construire une image</span>
+docker build -t nom-image .
+
+<span class="c"># Lancer un conteneur</span>
+docker run nom-image
+
+<span class="c"># Lancer avec une commande différente du CMD</span>
+docker run nom-image commande
+
+<span class="c"># Lancer en mode interactif (terminal dans le conteneur)</span>
+docker run -it nom-image bash
+
+<span class="c"># Lister les images</span>
+docker images
+
+<span class="c"># Lister les conteneurs actifs</span>
+docker ps
+
+<span class="c"># Lister tous les conteneurs</span>
+docker ps -a
+
+<span class="c"># Supprimer un conteneur arrêté</span>
+docker rm ID
+
+<span class="c"># Supprimer une image</span>
+docker rmi nom-image
+
+<span class="c"># Nettoyer tout ce qui est inutilisé</span>
+docker system prune</pre>
+      </div>
+
+      <div class="st">Quiz de clôture</div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 1 / 3</div>
+        <div class="qtext">Dans un Dockerfile, pourquoi copie-t-on <code>requirements.txt</code> en premier, avant de copier le reste du code ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Pour exploiter le <strong>cache de Docker</strong>. Chaque instruction crée une couche mise en cache. Si on copie requirements.txt en premier et qu'on ne le modifie pas, Docker réutilise le cache jusqu'à cette couche et ne réinstalle pas les dépendances à chaque build. Ça fait passer un build de 2 minutes à quelques secondes.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 2 / 3</div>
+        <div class="qtext">Tu veux ouvrir un terminal interactif à l'intérieur d'un conteneur <code>hello-pipeline</code> pour déboguer. Quelle commande utilises-tu ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre>docker run -it hello-pipeline bash</pre>
+          </div>
+          <p class="aexpl"><code>-i</code> garde l'entrée standard ouverte, <code>-t</code> alloue un pseudo-terminal. Ensemble ils permettent une session interactive. Tu te retrouves dans le shell du conteneur, dans le dossier <code>/app</code>.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 3 / 3</div>
+        <div class="qtext">Dans le pipeline, le workflow <code>CI</code> et le workflow <code>CD</code> se déclenchent tous les deux sur <code>push: branches: [main]</code>. Quelle est la différence de rôle entre les deux ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><strong>CI (build-and-test)</strong> : vérifie que le code est correct — il build l'image et lance les tests. Son rôle est de <em>valider</em>. Il tourne aussi sur les Pull Requests.<br><br><strong>CD (docker-publish)</strong> : publie l'image validée vers le registry. Son rôle est de <em>livrer</em>. Il ne tourne que sur main — uniquement après qu'un code validé y a été mergé.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(6)">🎉 Module 3 terminé !</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav" onclick="go(5)">← Précédent</button></div>
+  </div>
+
+</div><!-- /wrap -->
+</div><!-- /page -->
+
+<script>
+const TOTAL = 6;
+const doneSet = new Set();
+const openSet = new Set();
+
+function buildNav() {
+  const nav = document.getElementById('dnav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dn' + (doneSet.has(i) ? ' done' : '') + (openSet.has(i) ? ' open' : '');
+    d.textContent = i;
+    d.onclick = () => go(i);
+    nav.appendChild(d);
+  }
+}
+
+function updProg() {
+  const pct = (doneSet.size / TOTAL) * 100;
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pp').textContent = doneSet.size + ' / ' + TOTAL;
+}
+
+function tog(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  const isOpen = body.classList.contains('vis');
+  if (isOpen) {
+    body.classList.remove('vis'); head.classList.remove('op');
+    openSet.delete(n); if (!doneSet.has(n)) card.classList.remove('open');
+  } else {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  buildNav();
+}
+
+function go(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  if (!body.classList.contains('vis')) {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  buildNav();
+}
+
+function mkDone(n) {
+  const btn = document.querySelector('#b' + n + ' .dbtn');
+  const card = document.getElementById('c' + n);
+  if (doneSet.has(n)) {
+    doneSet.delete(n);
+    btn.textContent = n === 6 ? '🎉 Module 3 terminé !' : '✓ Leçon terminée';
+    btn.classList.remove('undo'); card.classList.remove('done');
+    if (openSet.has(n)) card.classList.add('open');
+  } else {
+    doneSet.add(n);
+    btn.textContent = '↩ Marquer comme non terminée';
+    btn.classList.add('undo'); card.classList.remove('open'); card.classList.add('done');
+  }
+  updProg(); buildNav();
+}
+
+function cp(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copié'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function rev(btn) {
+  btn.nextElementSibling.classList.add('show');
+  btn.style.display = 'none';
+}
+
+buildNav(); updProg(); tog(1);
+</script>
+</body>
+</html>
