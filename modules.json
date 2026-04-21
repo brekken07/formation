@@ -22,11 +22,11 @@
           "status": "new"
         },
         {
-          "file": "",
+          "file": "module3-docker.html",
           "title": "Docker",
           "description": "Conteneuriser ton application Python et intégrer Docker dans le pipeline CI/CD.",
-          "tags": ["DOCKER", "CONTAINERS"],
-          "status": "soon"
+          "tags": ["DOCKER", "CONTAINERS", "GHCR"],
+          "status": "new"
         },
         {
           "file": "",
