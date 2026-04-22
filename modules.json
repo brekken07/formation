@@ -64,28 +64,28 @@
           "description": "Fiches de révision pour la certification LPIC 1 - 101-500.",
           "tags": ["UDEV", "KERNEL", "SHELL", "BOOT", "INIT", "REPO"],
           "status": "new"
-        }
+        },
 	{
           "file": "lpi-security-essentials-020-100 FR.html",
           "title": "Quizz Security Essentials FR",
           "description": "Quizz par catégories, puis complet en français.",
           "tags": ["SECURITY", "IDENTITY", "PRIVACY", "ENCRYPTION", "VULNERABILITY"],
           "status": "new"
-        }
+        },
 	{
           "file": "lpi-security-essentials-020-100 EN.html",
           "title": "Quizz Security Essentials EN",
           "description": "Quizz par catégories, puis complet en anglais.",
           "tags": ["SECURITY", "IDENTITY", "PRIVACY", "ENCRYPTION", "VULNERABILITY"],
           "status": "new"
-        }
+        },
 	{
           "file": "quiz-lpic1-101-500-FR.html",
           "title": "Quizz LPIC 1 - Examen 101-500 FR",
           "description": "Quizz LPIC 1 - Examen 101-500 en français.",
           "tags": ["SYSTEMD", "BOOT", "GRUB2", "PACKAGE", "FILESYSTEMS"],
           "status": "new"
-        }
+        },
 	{
           "file": "quiz-lpic1-101-500-FR.html",
           "title": "Quizz LPIC 1 - Examen 101-500 FR",
