@@ -87,9 +87,9 @@
           "status": "new"
         },
 	{
-          "file": "quiz-lpic1-101-500-FR.html",
-          "title": "Quizz LPIC 1 - Examen 101-500 FR",
-          "description": "Quizz LPIC 1 - Examen 101-500 en français.",
+          "file": "quiz-lpic1-101-500-EN.html",
+          "title": "Quizz LPIC 1 - Examen 101-500 EN",
+          "description": "Quizz LPIC 1 - Examen 101-500 en anglais.",
           "tags": ["SYSTEMD", "BOOT", "GRUB2", "PACKAGE", "FILESYSTEMS"],
           "status": "new"
         }
