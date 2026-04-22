@@ -14,7 +14,11 @@ formation/
 ├── modules.json            # ⚙️ Fichier de configuration des modules
 ├── devops/                 # Formation DevOps
 │   ├── cicd-github-guide-v2.html
-│   └── module2-git-pratique.html
+│   ├── module2-git-pratique.html
+|   └── etc...
+├── Linux/
+|   ├── LPIC 1
+|   └── etc...
 └── .github/
     └── workflows/
         └── deploy.yml      # Déploiement automatique sur GitHub Pages
@@ -29,7 +33,7 @@ formation/
 |--------|-------|--------|
 | 01 | CI/CD avec GitHub Actions | ✅ Terminé |
 | 02 | Git Pratique | 🆕 Nouveau |
-| 03 | Docker | 🔒 Bientôt |
+| 03 | Docker | 🆕 Nouveau |
 | 04 | Workflows avancés | 🔒 Bientôt |
 | 05 | Introduction Kubernetes | 🔒 Bientôt |
 
