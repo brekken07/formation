@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3 — Branches Git</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #0f0f1a;
+  --s1: #14142b;
+  --s2: #1a1a35;
+  --s3: #20203f;
+  --border: #2a2a55;
+  --border2: #35357a;
+  --text: #e8e8ff;
+  --muted: #6060a0;
+  --accent: #7c6fff;
+  --green: #4ade80;
+  --orange: #fb923c;
+  --red: #f87171;
+  --blue: #60a5fa;
+  --yellow: #facc15;
+  --pink: #f472b6;
+  --teal: #2dd4bf;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px; line-height: 1.75;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(124,111,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,111,255,0.03) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none; z-index: 0;
+}
+.orb { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; }
+.orb1 { width: 550px; height: 350px; background: rgba(124,111,255,0.09); top: -100px; left: 50%; transform: translateX(-50%); }
+.orb2 { width: 300px; height: 300px; background: rgba(244,114,182,0.06); bottom: 0; right: -60px; }
+
+.page { position: relative; z-index: 1; }
+
+/* HEADER */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 54px 24px 44px; text-align: center;
+  background: linear-gradient(180deg, rgba(124,111,255,0.06) 0%, transparent 100%);
+}
+.mod-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(124,111,255,0.1); border: 1px solid rgba(124,111,255,0.3);
+  color: var(--accent); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 20px; letter-spacing: 2px;
+}
+header h1 {
+  font-size: clamp(28px,4.5vw,46px); font-weight: 900;
+  background: linear-gradient(135deg, #e8e8ff 10%, #7c6fff 55%, #f472b6 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 12px; line-height: 1.15;
+}
+header p { color: var(--muted); font-size: 15px; max-width: 520px; margin: 0 auto 28px; }
+.tech-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tpill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--s2); border: 1px solid var(--border);
+  padding: 5px 13px; border-radius: 20px; font-size: 12px;
+  font-family: 'JetBrains Mono', monospace; color: var(--muted);
+}
+
+/* PROGRESS */
+.prog {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+}
+.pl { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.pt { flex: 1; height: 5px; background: var(--s2); border-radius: 10px; overflow: hidden; }
+.pf { height: 100%; background: linear-gradient(90deg, var(--accent), var(--pink)); border-radius: 10px; transition: width .5s ease; width: 0%; }
+.pp { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); white-space: nowrap; }
+
+/* WRAP */
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* DOTS NAV */
+.dnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+.dn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--s1);
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.dn:hover { border-color: var(--accent); color: var(--accent); }
+.dn.done { border-color: var(--green); background: rgba(74,222,128,.1); color: var(--green); }
+.dn.open { border-color: var(--accent); background: rgba(124,111,255,.12); color: var(--accent); }
+
+/* CARD */
+.card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; margin-bottom: 12px;
+  overflow: hidden; transition: border-color .25s;
+}
+.card.open { border-color: var(--accent); }
+.card.done { border-color: rgba(74,222,128,.35); }
+
+.card-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; cursor: pointer; user-select: none; transition: background .15s;
+}
+.card-head:hover { background: rgba(255,255,255,.02); }
+
+.cnum {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
+  flex-shrink: 0; background: var(--s2); border: 2px solid var(--border);
+  color: var(--muted); transition: all .2s;
+}
+.card.open .cnum { background: rgba(124,111,255,.15); border-color: var(--accent); color: var(--accent); }
+.card.done .cnum { background: rgba(74,222,128,.15); border-color: var(--green); color: var(--green); }
+
+.cmeta { flex: 1; }
+.cmeta h3 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.cmeta p  { font-size: 12px; color: var(--muted); }
+
+.cbadge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 3px 9px; border-radius: 5px; border: 1px solid; white-space: nowrap;
+}
+.b-concept { color: var(--teal);   border-color: rgba(45,212,191,.35);  background: rgba(45,212,191,.07); }
+.b-tp      { color: var(--blue);   border-color: rgba(96,165,250,.35);  background: rgba(96,165,250,.07); }
+.b-rescue  { color: var(--orange); border-color: rgba(251,146,60,.35);  background: rgba(251,146,60,.07); }
+.b-pro     { color: var(--green);  border-color: rgba(74,222,128,.35);  background: rgba(74,222,128,.07); }
+.b-synth   { color: var(--pink);   border-color: rgba(244,114,182,.35); background: rgba(244,114,182,.07); }
+
+.chev { color: var(--muted); font-size: 11px; transition: transform .3s; flex-shrink: 0; }
+.card-head.op .chev { transform: rotate(180deg); }
+
+/* BODY */
+.cbody { display: none; border-top: 1px solid var(--border); padding: 26px 22px 20px; }
+.cbody.vis { display: block; }
+
+/* GOAL */
+.goal {
+  display: flex; gap: 12px;
+  background: rgba(124,111,255,.05); border: 1px solid rgba(124,111,255,.2);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 22px;
+}
+.goal .gi { font-size: 20px; flex-shrink: 0; }
+.goal p { font-size: 14px; color: #b8b0ff; }
+.goal strong { color: var(--accent); }
+
+/* SECTION TITLE */
+.st {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1.5px; margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.st::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+p { margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+
+/* CODE */
+.cw { background: #09091a; border: 1px solid var(--border); border-radius: 10px; margin: 10px 0 16px; overflow: hidden; }
+.ch { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--s2); border-bottom: 1px solid var(--border); }
+.cl { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.cpb {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 3px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; transition: all .2s;
+}
+.cpb:hover { color: var(--text); border-color: var(--accent); }
+.cpb.ok { color: var(--green); border-color: var(--green); }
+pre {
+  padding: 16px; overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #e8e8ff;
+}
+.c  { color: #3a3a6a; font-style: italic; }
+.k  { color: #f472b6; }
+.s  { color: #86efac; }
+.n  { color: #93c5fd; }
+.w  { color: var(--orange); }
+
+/* BOXES */
+.box {
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: 14px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6;
+}
+.box .bi { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.tip  { background: rgba(74,222,128,.05);  border: 1px solid rgba(74,222,128,.2); }
+.tip p  { color: #86efac; }
+.warn { background: rgba(251,146,60,.05);  border: 1px solid rgba(251,146,60,.2); }
+.warn p { color: #fdba74; }
+.info { background: rgba(96,165,250,.05);  border: 1px solid rgba(96,165,250,.2); }
+.info p { color: #93c5fd; }
+.note { background: rgba(124,111,255,.05); border: 1px solid rgba(124,111,255,.2); }
+.note p { color: #b8b0ff; }
+
+/* BRANCH SCHEMA — élément central du module */
+.bschema {
+  background: #09091a; border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px 20px; margin: 12px 0 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  line-height: 2.4; overflow-x: auto;
+}
+.bc-main   { color: #60a5fa; font-weight: 700; }
+.bc-feat   { color: #f472b6; font-weight: 700; }
+.bc-fix    { color: #fb923c; font-weight: 700; }
+.bc-commit { color: #4ade80; }
+.bc-head   { color: #facc15; font-weight: 700; }
+.bc-merge  { color: #2dd4bf; }
+.bc-arrow  { color: #2a2a55; }
+.bc-label  { color: #6060a0; font-size: 11px; }
+.bc-origin { color: #a78bfa; }
+
+/* CHECKLIST */
+.clist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 16px; }
+.clist li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+.chkb {
+  width: 20px; height: 20px; border: 2px solid var(--border2); border-radius: 5px;
+  flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all .2s;
+}
+.chkb.on { background: var(--green); border-color: var(--green); color: #0f0f1a; }
+.clist li.struck span { color: var(--muted); text-decoration: line-through; }
+
+/* SCENARIO */
+.scenario {
+  background: var(--s2); border: 1px solid var(--border2);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 12px 0 16px; font-size: 14px;
+}
+.sc-label {
+  font-size: 10px; font-weight: 700; color: var(--orange);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* QUESTION */
+.qblock {
+  background: rgba(250,204,21,.04); border: 1px solid rgba(250,204,21,.25);
+  border-radius: 12px; padding: 18px 20px; margin: 20px 0;
+}
+.qlabel {
+  display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;
+  color: var(--yellow); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.qtext { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+.rbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(250,204,21,.1); border: 1px solid rgba(250,204,21,.3);
+  color: var(--yellow); padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+}
+.rbtn:hover { background: rgba(250,204,21,.18); }
+.abox { display: none; margin-top: 14px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 14px 16px; }
+.abox.show { display: block; }
+.alabel { font-size: 10px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.aexpl { font-size: 14px; color: #86efac; margin-top: 8px; line-height: 1.6; }
+
+/* DONE */
+.done-w { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.dbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.3);
+  color: var(--green); padding: 10px 22px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+}
+.dbtn:hover { background: rgba(74,222,128,.15); }
+.dbtn.undo { background: rgba(248,113,113,.06); border-color: rgba(248,113,113,.3); color: var(--red); }
+
+/* FOOTER NAV */
+.cfoot {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border); background: var(--s2);
+}
+.fnav {
+  background: var(--s3); border: 1px solid var(--border); color: var(--text);
+  padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+}
+.fnav:hover { border-color: var(--accent); color: var(--accent); }
+.fnav.p { background: rgba(124,111,255,.1); border-color: var(--accent); color: var(--accent); }
+
+code {
+  font-family: 'JetBrains Mono', monospace; background: var(--s2);
+  border: 1px solid var(--border); padding: 1px 6px;
+  border-radius: 4px; font-size: 12px; color: var(--orange);
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="page">
+
+<header>
+  <div class="mod-badge">🌿 MODULE 3 · BRANCHES GIT</div>
+  <h1>Maîtriser les branches Git</h1>
+  <p>Comprendre ce qu'est vraiment une branche, comment elle fonctionne en coulisse, et l'utiliser comme un professionnel.</p>
+  <div class="tech-pills">
+    <div class="tpill">🌿 Branches</div>
+    <div class="tpill">🔀 Merge</div>
+    <div class="tpill">♻️ Rebase</div>
+    <div class="tpill">🐙 GitHub Flow</div>
+    <div class="tpill">⚡ origin / HEAD</div>
+  </div>
+</header>
+
+<div class="prog">
+  <span class="pl">PROGRESSION</span>
+  <div class="pt"><div class="pf" id="pf"></div></div>
+  <span class="pp" id="pp">0 / 6</span>
+</div>
+
+<div class="wrap">
+  <div class="dnav" id="dnav"></div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 1 — Ce qu'est vraiment une branche
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c1">
+    <div class="card-head" onclick="tog(1)">
+      <div class="cnum">1</div>
+      <div class="cmeta">
+        <h3>Ce qu'est vraiment une branche</h3>
+        <p>Pas un dossier — un pointeur. Comprendre le mécanisme interne.</p>
+      </div>
+      <span class="cbadge b-concept">CONCEPT</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b1">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre ce qu'est une branche en interne — pas juste comment l'utiliser, mais pourquoi elle se comporte comme elle le fait. Ce module répond à toutes les questions que tu t'es posées.</p></div>
+      </div>
+
+      <div class="st">Une branche = un pointeur, pas un dossier</div>
+      <p>C'est la confusion la plus fréquente. Quand tu crées une branche, Git ne copie aucun fichier et ne crée aucun dossier. Il crée juste un <strong>petit fichier texte</strong> qui contient l'identifiant d'un commit.</p>
+      <div class="bschema">
+<span class="bc-label">Situation initiale — 3 commits sur main :</span>
+
+<span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span>  ← <span class="bc-main">main</span>  ← <span class="bc-head">HEAD</span>
+      </div>
+      <p>Quand tu fais <code>git checkout -b feature/login</code>, Git crée un nouveau pointeur qui pointe sur le même commit <code>C</code> :</p>
+      <div class="bschema">
+<span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span>  ← <span class="bc-main">main</span>
+                         ↑
+                    <span class="bc-feat">feature/login</span>  ← <span class="bc-head">HEAD</span>
+      </div>
+      <p>Ton dossier de travail n'a pas changé d'un bit. La seule chose qui a changé : <strong>HEAD pointe maintenant sur <code>feature/login</code></strong> au lieu de <code>main</code>.</p>
+
+      <div class="st">HEAD — c'est quoi ?</div>
+      <p><strong>HEAD</strong> est un pointeur spécial qui indique <em>"où tu es en ce moment"</em>. C'est comme un curseur dans ton historique Git. Il pointe toujours sur la branche active, qui elle-même pointe sur le dernier commit.</p>
+      <div class="bschema">
+<span class="bc-head">HEAD</span>  →  <span class="bc-feat">feature/login</span>  →  commit <span class="bc-commit">C</span>
+
+<span class="bc-label">HEAD est indirect : il pointe sur une branche, pas directement sur un commit</span>
+      </div>
+      <div class="box info"><span class="bi">💡</span><p>C'est pour ça que <code>git log</code> affiche <code>(HEAD -> feature/login)</code> — ça te dit exactement où tu es : sur la branche <code>feature/login</code>, au commit le plus récent.</p></div>
+
+      <div class="st">Ce qui se passe quand tu commites sur une branche</div>
+      <p>Tu fais un nouveau commit <code>D</code> sur <code>feature/login</code> :</p>
+      <div class="bschema">
+<span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span>  ← <span class="bc-main">main</span>
+                         <span class="bc-arrow">╲</span>
+                          <span class="bc-commit">D</span>  ← <span class="bc-feat">feature/login</span>  ← <span class="bc-head">HEAD</span>
+      </div>
+      <p><code>main</code> est resté sur <code>C</code>. <code>feature/login</code> a avancé sur <code>D</code>. Les deux branches ont maintenant des histoires différentes — c'est exactement le but.</p>
+
+      <div class="st">Vérifie en pratique</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — dans hello-pipeline</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Visualise graphiquement toutes tes branches et commits</span>
+git log --oneline --graph --all
+
+<span class="c"># Exemple de ce que tu verras :</span>
+<span class="c"># * a1b2c3d (HEAD -> main, origin/main) dernier commit</span>
+<span class="c"># * 9f8e7d6 commit précédent</span>
+<span class="c"># * 5c4b3a2 encore avant</span></pre>
+      </div>
+      <div class="box tip"><span class="bi">👁️</span><p>Sur GitHub, tu peux visualiser les branches dans <strong>ton repo → Insights → Network</strong>. C'est le graphe le plus parlant pour comprendre comment les branches divergent et convergent.</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu crées une branche <code>feature/test</code> depuis <code>main</code> sans faire aucun commit dessus. Combien de fichiers sont différents entre les deux branches à ce moment-là ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><strong>Zéro fichier différent.</strong> Les deux branches pointent sur le même commit — elles sont identiques. Une branche nouvellement créée est juste une copie du pointeur, pas des fichiers. La divergence ne commence qu'au premier commit fait sur l'une des deux branches.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(1)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav p" onclick="go(2)">Leçon suivante →</button></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 2 — origin, remote, local
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c2">
+    <div class="card-head" onclick="tog(2)">
+      <div class="cnum">2</div>
+      <div class="cmeta">
+        <h3>origin, remote, local — démystifiés</h3>
+        <p>Pourquoi il y a deux versions de chaque branche</p>
+      </div>
+      <span class="cbadge b-concept">CONCEPT</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b2">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre la relation entre ton repo local et GitHub, et pourquoi <code>origin/main</code> et <code>main</code> sont deux choses différentes.</p></div>
+      </div>
+
+      <div class="st">Local vs Remote</div>
+      <p>Quand tu travailles avec Git, tu as en réalité <strong>deux copies du repo</strong> :</p>
+      <div class="bschema">
+<span class="bc-label">Ta machine (local) :</span>
+<span class="bc-main">main</span>  →  commit <span class="bc-commit">C</span>   <span class="bc-label">← ce que tu vois dans ton dossier</span>
+
+<span class="bc-label">GitHub (remote) :</span>
+<span class="bc-origin">origin/main</span>  →  commit <span class="bc-commit">C</span>   <span class="bc-label">← la copie sur les serveurs GitHub</span>
+      </div>
+      <p>Tant que tu ne pushes pas, les deux peuvent diverger. C'est pour ça que <code>git status</code> peut afficher <em>"Your branch is ahead of 'origin/main' by 2 commits"</em> — tu as 2 commits locaux que GitHub ne connaît pas encore.</p>
+
+      <div class="st">origin — juste un alias</div>
+      <p><code>origin</code> est le <strong>surnom par défaut</strong> donné au serveur distant lors d'un <code>git clone</code>. Ce n'est ni une branche, ni un dossier — c'est juste un nom qui cache une URL.</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — voir ce que origin veut dire</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Affiche tous les remotes et leurs URLs</span>
+git remote -v
+
+<span class="c"># Résultat :</span>
+<span class="c"># origin  git@github.com:brekken07/hello-pipeline.git (fetch)</span>
+<span class="c"># origin  git@github.com:brekken07/hello-pipeline.git (push)</span>
+
+<span class="c"># Tu pourrais renommer origin en "github" si tu voulais</span>
+<span class="c"># git remote rename origin github</span>
+<span class="c"># Mais tout le monde utilise "origin" par convention</span></pre>
+      </div>
+
+      <div class="st">Le -u dans git push -u origin main</div>
+      <p>La première fois que tu pushes une nouvelle branche, tu dois dire à Git <em>"cette branche locale correspond à cette branche distante"</em>. C'est le rôle de <code>-u</code> (ou <code>--set-upstream</code>) :</p>
+      <div class="bschema">
+<span class="bc-label">Sans -u (première fois) :</span>
+git push origin <span class="bc-feat">feature/login</span>
+<span class="bc-label">→ crée la branche sur GitHub mais Git ne mémorise pas le lien</span>
+
+<span class="bc-label">Avec -u (première fois) :</span>
+git push <span class="bc-head">-u</span> origin <span class="bc-feat">feature/login</span>
+<span class="bc-label">→ crée la branche ET mémorise que local/feature/login ↔ origin/feature/login</span>
+<span class="bc-label">→ les prochains git push / git pull fonctionnent sans arguments</span>
+      </div>
+      <div class="box tip"><span class="bi">💡</span><p>Après un <code>git push -u</code>, tu peux faire juste <code>git push</code> et <code>git pull</code> sans préciser la destination — Git sait où aller.</p></div>
+
+      <div class="st">Visualiser local ET remote</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Voir toutes les branches locales ET distantes</span>
+git branch -a
+
+<span class="c"># Résultat (exemple) :</span>
+<span class="c">#   feature/login          ← locale</span>
+<span class="c"># * main                   ← locale active (astérisque)</span>
+<span class="c">#   remotes/origin/main    ← distante (GitHub)</span>
+<span class="c">#   remotes/origin/feature/login  ← distante (GitHub)</span></pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu fais 3 commits en local sur <code>main</code> sans pousser. Que t'affiche <code>git status</code> ? Et quelle commande utilises-tu pour envoyer ces commits sur GitHub ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>git status</code> affiche : <em>"Your branch is ahead of 'origin/main' by 3 commits"</em> — ton <code>main</code> local est en avance de 3 commits sur le <code>main</code> de GitHub.</p>
+          <div class="cw" style="margin-top:10px;margin-bottom:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre>git push
+<span class="c"># ou explicitement :</span>
+git push origin main</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(2)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(1)">← Précédent</button>
+      <button class="fnav p" onclick="go(3)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 3 — Merge vs Rebase
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c3">
+    <div class="card-head" onclick="tog(3)">
+      <div class="cnum">3</div>
+      <div class="cmeta">
+        <h3>Merge vs Rebase</h3>
+        <p>Deux façons de réunir des branches — quand utiliser laquelle</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b3">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre la différence entre <code>merge</code> et <code>rebase</code> visuellement, et savoir lequel utiliser selon la situation. C'est une question qu'on pose souvent en entretien DevOps.</p></div>
+      </div>
+
+      <div class="st">La situation de départ</div>
+      <p>Tu as travaillé sur <code>feature/login</code> pendant que <code>main</code> avançait de son côté :</p>
+      <div class="bschema">
+<span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span> <span class="bc-arrow">──</span> <span class="bc-commit">D</span>  ← <span class="bc-main">main</span>
+         <span class="bc-arrow">╲</span>
+          <span class="bc-commit">E</span> <span class="bc-arrow">──</span> <span class="bc-commit">F</span>  ← <span class="bc-feat">feature/login</span>  ← <span class="bc-head">HEAD</span>
+      </div>
+      <p>Tu veux intégrer le travail de <code>feature/login</code> dans <code>main</code>. Deux approches possibles :</p>
+
+      <div class="st">Option 1 — git merge</div>
+      <p>Crée un nouveau commit de fusion (<strong>merge commit</strong>) qui réunit les deux histoires :</p>
+      <div class="bschema">
+<span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span> <span class="bc-arrow">──</span> <span class="bc-commit">D</span> <span class="bc-arrow">────────</span> <span class="bc-merge">M</span>  ← <span class="bc-main">main</span>
+         <span class="bc-arrow">╲</span>                           <span class="bc-arrow">╱</span>
+          <span class="bc-commit">E</span> <span class="bc-arrow">──────────────</span> <span class="bc-commit">F</span> <span class="bc-arrow">──</span>
+<span class="bc-label">M = merge commit (conserve tout l'historique, montre quand les branches ont divergé)</span>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Se placer sur main et merger feature/login</span>
+git checkout main
+git merge feature/login</pre>
+      </div>
+
+      <div class="st">Option 2 — git rebase</div>
+      <p>Rejoue les commits de <code>feature/login</code> <em>par-dessus</em> le dernier commit de <code>main</code>. L'historique devient linéaire :</p>
+      <div class="bschema">
+<span class="bc-label">Avant rebase :</span>
+<span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span> <span class="bc-arrow">──</span> <span class="bc-commit">D</span>  ← <span class="bc-main">main</span>
+         <span class="bc-arrow">╲</span>
+          <span class="bc-commit">E</span> <span class="bc-arrow">──</span> <span class="bc-commit">F</span>  ← <span class="bc-feat">feature/login</span>
+
+<span class="bc-label">Après rebase :</span>
+<span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span> <span class="bc-arrow">──</span> <span class="bc-commit">D</span> <span class="bc-arrow">──</span> <span class="bc-commit">E'</span> <span class="bc-arrow">──</span> <span class="bc-commit">F'</span>  ← <span class="bc-feat">feature/login</span>
+<span class="bc-label">E' et F' sont des copies de E et F, repositionnées après D</span>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Sur feature/login, on se rebase sur main</span>
+git checkout feature/login
+git rebase main
+
+<span class="c"># Puis on merge (fast-forward, pas de merge commit)</span>
+git checkout main
+git merge feature/login</pre>
+      </div>
+
+      <div class="st">Quand utiliser lequel ?</div>
+      <div class="bschema">
+<span class="bc-main">git merge</span>   <span class="bc-label">→ Pull Requests sur GitHub, préserve l'historique réel</span>
+<span class="bc-feat">git rebase</span>  <span class="bc-label">→ Mettre à jour ta branche avant de la merger, historique propre</span>
+
+<span class="bc-label">Règle d'or : ne jamais rebase une branche déjà pushée et partagée</span>
+<span class="bc-label">            (ça réécrit l'historique et perturbe les autres)</span>
+      </div>
+      <div class="box warn"><span class="bi">⚠️</span><p><code>rebase</code> réécrit l'historique — il crée de nouveaux commits (<code>E'</code>, <code>F'</code>). Ne l'utilise jamais sur une branche que d'autres personnes ont déjà récupérée. Sur ta branche locale perso, c'est parfait.</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Quelle est la différence principale entre un <code>merge</code> et un <code>rebase</code> dans le résultat visible dans <code>git log</code> ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><strong>Merge</strong> : crée un commit de fusion supplémentaire, l'historique montre clairement les deux branches qui se rejoignent — <code>git log --graph</code> affiche une forme en losange.<br><br><strong>Rebase</strong> : l'historique est linéaire, comme si la branche avait toujours été développée après <code>main</code>. Plus lisible, mais l'historique réel est perdu.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(3)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(2)">← Précédent</button>
+      <button class="fnav p" onclick="go(4)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 4 — Le GitHub Flow
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c4">
+    <div class="card-head" onclick="tog(4)">
+      <div class="cnum">4</div>
+      <div class="cmeta">
+        <h3>Le GitHub Flow — workflow professionnel</h3>
+        <p>La méthode utilisée dans les vraies équipes</p>
+      </div>
+      <span class="cbadge b-pro">PRO</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b4">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> mettre en pratique le workflow complet utilisé en entreprise — de la création de la branche jusqu'au merge sur main, en passant par la Pull Request et la CI.</p></div>
+      </div>
+
+      <div class="st">Le GitHub Flow en 5 étapes</div>
+      <div class="bschema">
+<span class="bc-label">1.</span> <span class="bc-main">main</span> est toujours stable et déployable
+   <span class="bc-arrow">↓</span>
+<span class="bc-label">2.</span> Crée une branche pour chaque nouvelle fonctionnalité ou correction
+   <span class="bc-arrow">↓</span>
+<span class="bc-label">3.</span> Commite et pousse régulièrement sur ta branche
+   <span class="bc-arrow">↓</span>
+<span class="bc-label">4.</span> Ouvre une Pull Request → la CI valide automatiquement
+   <span class="bc-arrow">↓</span>
+<span class="bc-label">5.</span> Merge sur main → déploiement automatique (CD)
+      </div>
+
+      <div class="st">Conventions de nommage des branches</div>
+      <p>En équipe, tout le monde nomme ses branches selon des préfixes — ça permet de savoir au premier coup d'œil à quoi sert une branche :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">— conventions standard —</span></div>
+        <pre><span class="n">feature/</span>nom-fonctionnalite   <span class="c"># nouvelle fonctionnalité</span>
+<span class="w">fix/</span>nom-bug                  <span class="c"># correction de bug</span>
+<span class="k">hotfix/</span>correction-urgente    <span class="c"># correction urgente en prod</span>
+<span class="s">docs/</span>mise-a-jour-readme      <span class="c"># documentation</span>
+<span class="s">chore/</span>mise-a-jour-deps       <span class="c"># maintenance, dépendances</span>
+<span class="s">refactor/</span>renommer-fonctions  <span class="c"># refactoring sans nouvelle feature</span></pre>
+      </div>
+
+      <div class="st">Exercice — workflow complet sur hello-pipeline</div>
+      <p>Mets en pratique le GitHub Flow complet :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — workflow complet</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. S'assurer d'être à jour sur main</span>
+git checkout main
+git pull
+
+<span class="c"># 2. Créer une branche avec une convention de nommage</span>
+git checkout -b feature/add-divide-function
+
+<span class="c"># 3. Ajouter une fonction divide() dans app.py</span>
+<span class="c">#    def divide(a: int, b: int) -> float:</span>
+<span class="c">#        """Divise a par b."""</span>
+<span class="c">#        if b == 0:</span>
+<span class="c">#            raise ValueError("Division par zéro impossible")</span>
+<span class="c">#        return a / b</span>
+
+<span class="c"># 4. Ajouter le test dans test_app.py</span>
+<span class="c">#    from app import greet, add, multiply, subtract, divide</span>
+<span class="c">#</span>
+<span class="c">#    def test_divide():</span>
+<span class="c">#        assert divide(10, 2) == 5.0</span>
+<span class="c">#        assert divide(9, 3) == 3.0</span>
+<span class="c">#</span>
+<span class="c">#    def test_divide_by_zero():</span>
+<span class="c">#        with pytest.raises(ValueError):</span>
+<span class="c">#            divide(10, 0)</span>
+
+<span class="c"># 5. Commiter</span>
+git add app.py tests/test_app.py
+git commit -m "feat: add divide function with zero check"
+
+<span class="c"># 6. Pousser la branche sur GitHub</span>
+git push -u origin feature/add-divide-function
+
+<span class="c"># 7. Sur GitHub : ouvrir une Pull Request
+#    → la CI se déclenche automatiquement
+#    → attendre le feu vert
+#    → merger</span>
+
+<span class="c"># 8. Nettoyer après le merge</span>
+git checkout main
+git pull
+git branch -d feature/add-divide-function
+git fetch --prune</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Pourquoi fait-on <code>git pull</code> sur <code>main</code> avant de créer une nouvelle branche ? Que risque-t-il de se passer si on ne le fait pas ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Si on crée la branche sans avoir fait <code>git pull</code>, elle va partir d'un commit ancien — pas du dernier état de <code>main</code>. Quand on voudra merger, il y aura potentiellement des conflits avec tous les commits intervenus entre-temps sur <code>main</code>.<br><br>Règle : <strong>toujours <code>git pull</code> sur <code>main</code> avant de créer une branche.</strong></p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(4)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(3)">← Précédent</button>
+      <button class="fnav p" onclick="go(5)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 5 — Situations qui font peur
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c5">
+    <div class="card-head" onclick="tog(5)">
+      <div class="cnum">5</div>
+      <div class="cmeta">
+        <h3>Situations qui font peur — démystifiées</h3>
+        <p>Branches divergentes, detached HEAD, reset — sans stress</p>
+      </div>
+      <span class="cbadge b-rescue">RESCUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b5">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> savoir diagnostiquer et résoudre les situations Git qui inquiètent les débutants — dont certaines que tu as déjà vécues dans ce parcours.</p></div>
+      </div>
+
+      <div class="st">Situation 1 — Branches divergentes (tu l'as vécu !)</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation</div>
+        <p>Git refuse de pusher : <em>"Updates were rejected because the remote contains work that you do not have locally"</em></p>
+      </div>
+      <div class="bschema">
+<span class="bc-label">Ce qui s'est passé :</span>
+<span class="bc-origin">origin/main</span> : <span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">C</span>  <span class="bc-label">(modifié sur GitHub)</span>
+<span class="bc-main">local/main</span>  : <span class="bc-commit">A</span> <span class="bc-arrow">──</span> <span class="bc-commit">B</span> <span class="bc-arrow">──</span> <span class="bc-commit">D</span>  <span class="bc-label">(modifié en local)</span>
+<span class="bc-label">Git ne sait pas lequel est "le bon" → il refuse</span>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — solution</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Récupère les commits distants et les rejoue sous les tiens</span>
+git pull --rebase origin main
+<span class="c"># → si conflit : résoudre, git add, git rebase --continue</span>
+
+git push</pre>
+      </div>
+
+      <div class="st">Situation 2 — Detached HEAD</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation</div>
+        <p>Git affiche : <em>"HEAD detached at a1b2c3d"</em> — ça fait peur mais c'est bénin.</p>
+      </div>
+      <p>Ça arrive quand tu fais <code>git checkout</code> directement sur un commit au lieu d'une branche. HEAD ne pointe plus sur une branche — il pointe directement sur un commit. Tout commit que tu ferais serait "orphelin" (sans branche pour le référencer).</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — solution</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Revenir sur une branche existante</span>
+git checkout main
+
+<span class="c"># Ou créer une branche depuis cet état (pour garder le travail fait)</span>
+git checkout -b ma-branche-de-secours</pre>
+      </div>
+
+      <div class="st">Situation 3 — Annuler le dernier commit</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation</div>
+        <p>Tu as commité quelque chose qu'il ne fallait pas. Le commit n'est pas encore pushé.</p>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Annule le commit mais GARDE les modifications dans les fichiers</span>
+git reset --soft HEAD~1
+
+<span class="c"># Annule le commit ET remet les fichiers comme avant</span>
+git reset --hard HEAD~1
+
+<span class="c"># HEAD~1 = "le commit juste avant HEAD"</span>
+<span class="c"># HEAD~2 = "2 commits avant HEAD", etc.</span></pre>
+      </div>
+      <div class="box warn"><span class="bi">⚠️</span><p><code>--hard</code> supprime définitivement les modifications — utilise-le seulement si tu es sûr de ne pas vouloir les garder. <code>--soft</code> est toujours plus sûr.</p></div>
+
+      <div class="st">Situation 4 — Se tromper de branche</div>
+      <div class="scenario">
+        <div class="sc-label">🎬 Situation</div>
+        <p>Tu as fait des commits sur <code>main</code> alors que tu aurais dû les faire sur une branche.</p>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Crée la branche qui aurait dû recevoir les commits</span>
+git checkout -b feature/oups
+
+<span class="c"># 2. Reviens sur main et annule les commits (soft = garde les fichiers)</span>
+git checkout main
+git reset --soft HEAD~2   <span class="c"># si tu avais fait 2 commits par erreur</span>
+
+<span class="c"># 3. main est propre, tes modifs sont dans feature/oups</span>
+git status  <span class="c"># tes fichiers sont encore là, stagés</span></pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu viens de faire <code>git reset --soft HEAD~1</code>. Qu'est-ce qui se passe exactement ? Tes fichiers sont-ils perdus ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Non, aucun fichier n'est perdu. <code>--soft</code> annule uniquement le commit dans l'historique Git, mais remet les modifications dans la zone de staging (comme si tu venais de faire <code>git add</code> sans <code>git commit</code>). Tu peux recommiter avec un meilleur message ou ajouter d'autres fichiers.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(5)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(4)">← Précédent</button>
+      <button class="fnav p" onclick="go(6)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 6 — Mémo & quiz de clôture
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c6">
+    <div class="card-head" onclick="tog(6)">
+      <div class="cnum">6</div>
+      <div class="cmeta">
+        <h3>Mémo & quiz de clôture</h3>
+        <p>Toutes les commandes + 3 questions de synthèse</p>
+      </div>
+      <span class="cbadge b-synth">SYNTHÈSE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b6">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> avoir une référence complète sur les branches et tester ta compréhension avec 3 questions de synthèse.</p></div>
+      </div>
+
+      <div class="st">Mémo — toutes les commandes branches</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — référence complète</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c">── VISUALISER ───────────────────────────────────</span>
+git branch                  <span class="c"># branches locales</span>
+git branch -a               <span class="c"># locales + distantes</span>
+git branch -v               <span class="c"># avec dernier commit</span>
+git log --oneline --graph --all  <span class="c"># graphe ASCII</span>
+
+<span class="c">── CRÉER / NAVIGUER ──────────────────────────────</span>
+git checkout -b nom         <span class="c"># créer + basculer</span>
+git checkout nom            <span class="c"># basculer sur existante</span>
+git switch -c nom           <span class="c"># créer + basculer (moderne)</span>
+git switch nom              <span class="c"># basculer (moderne)</span>
+
+<span class="c">── POUSSER / SYNCHRONISER ────────────────────────</span>
+git push -u origin nom      <span class="c"># première fois</span>
+git push                    <span class="c"># fois suivantes</span>
+git pull                    <span class="c"># récupérer + merger</span>
+git pull --rebase           <span class="c"># récupérer + rebaser</span>
+git fetch --prune           <span class="c"># nettoyer les refs distantes</span>
+
+<span class="c">── MERGER / REBASER ──────────────────────────────</span>
+git merge nom               <span class="c"># merger dans branche active</span>
+git rebase main             <span class="c"># rebaser sur main</span>
+git rebase --continue       <span class="c"># après résolution conflit</span>
+git rebase --abort          <span class="c"># annuler le rebase</span>
+git merge --abort           <span class="c"># annuler le merge</span>
+
+<span class="c">── SUPPRIMER ─────────────────────────────────────</span>
+git branch -d nom           <span class="c"># supprimer locale (mergée)</span>
+git branch -D nom           <span class="c"># forcer la suppression</span>
+git push origin --delete nom <span class="c"># supprimer sur GitHub</span>
+
+<span class="c">── ANNULER ───────────────────────────────────────</span>
+git reset --soft HEAD~1     <span class="c"># annuler commit, garder fichiers</span>
+git reset --hard HEAD~1     <span class="c"># annuler commit + modifications</span>
+git restore --staged fichier <span class="c"># déstaguer un fichier</span></pre>
+      </div>
+
+      <div class="st">Quiz de clôture</div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 1 / 3</div>
+        <div class="qtext">Un collègue te dit : <em>"J'ai pushé sur main directement au lieu de passer par une PR, comment on fait pour que ça n'arrive plus ?"</em> Quelle fonctionnalité GitHub utilises-tu ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Les <strong>Branch Protection Rules</strong> dans GitHub : <em>Settings → Branches → Add rule → main</em>. En cochant "Require a pull request before merging", personne ne peut plus pusher directement sur <code>main</code> — même les admins. C'est ce qu'on a fait à l'étape 7 du Module 1.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 2 / 3</div>
+        <div class="qtext">Explique avec tes propres mots pourquoi <code>origin</code> n'est pas une branche. Qu'est-ce que c'est vraiment ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>origin</code> est un <strong>alias</strong> (surnom) qui pointe vers l'URL du repo distant — dans notre cas GitHub. Ce n'est pas une branche, c'est le nom du serveur. On peut le vérifier avec <code>git remote -v</code>. Le nom <code>origin</code> est juste une convention — on pourrait l'appeler autrement, mais tout le monde utilise <code>origin</code>.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 3 / 3</div>
+        <div class="qtext">Tu dois choisir entre <code>merge</code> et <code>rebase</code> pour intégrer ta branche <code>feature/dashboard</code> dans <code>main</code> via une Pull Request sur GitHub. Lequel utilises-tu et pourquoi ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Pour une Pull Request sur GitHub, on utilise <strong>merge</strong>. C'est ce que fait le bouton "Merge pull request" — il crée un merge commit qui documente quand et comment les branches ont été réunies.<br><br>Le rebase est utile localement pour mettre à jour sa branche avant d'ouvrir la PR (<code>git rebase main</code> depuis sa branche), mais on ne rebase jamais une branche déjà pushée et partagée.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(6)">🎉 Module 3 terminé !</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav" onclick="go(5)">← Précédent</button></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const TOTAL = 6;
+const doneSet = new Set();
+const openSet = new Set();
+
+function buildNav() {
+  const nav = document.getElementById('dnav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dn' + (doneSet.has(i) ? ' done' : '') + (openSet.has(i) ? ' open' : '');
+    d.textContent = i;
+    d.onclick = () => go(i);
+    nav.appendChild(d);
+  }
+}
+
+function updProg() {
+  const pct = (doneSet.size / TOTAL) * 100;
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pp').textContent = doneSet.size + ' / ' + TOTAL;
+}
+
+function tog(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  const isOpen = body.classList.contains('vis');
+  if (isOpen) {
+    body.classList.remove('vis'); head.classList.remove('op');
+    openSet.delete(n); if (!doneSet.has(n)) card.classList.remove('open');
+  } else {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  buildNav();
+}
+
+function go(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  if (!body.classList.contains('vis')) {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  buildNav();
+}
+
+function mkDone(n) {
+  const btn = document.querySelector('#b' + n + ' .dbtn');
+  const card = document.getElementById('c' + n);
+  if (doneSet.has(n)) {
+    doneSet.delete(n);
+    btn.textContent = n === 6 ? '🎉 Module 3 terminé !' : '✓ Leçon terminée';
+    btn.classList.remove('undo'); card.classList.remove('done');
+    if (openSet.has(n)) card.classList.add('open');
+  } else {
+    doneSet.add(n);
+    btn.textContent = '↩ Marquer comme non terminée';
+    btn.classList.add('undo'); card.classList.remove('open'); card.classList.add('done');
+  }
+  updProg(); buildNav();
+}
+
+function cp(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copié'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function rev(btn) {
+  btn.nextElementSibling.classList.add('show');
+  btn.style.display = 'none';
+}
+
+buildNav(); updProg(); tog(1);
+</script>
+</body>
+</html>
