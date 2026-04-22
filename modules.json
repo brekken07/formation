@@ -21,8 +21,15 @@
           "tags": ["BRANCHES", "RESCUE", "STASH"],
           "status": "new"
         },
+	{
+	  "file": "module3-branches.html",
+          "title": "Branches Git",
+          "description": "Comprendre ce qu'est vraiment une branche et comment elle fonctionne.",
+          "tags": ["BRANCHES", "GIT"],
+          "status": "new"
+	},
         {
-          "file": "module3-docker.html",
+          "file": "module4-docker.html",
           "title": "Docker",
           "description": "Conteneuriser ton application Python et intégrer Docker dans le pipeline CI/CD.",
           "tags": ["DOCKER", "CONTAINERS"],
