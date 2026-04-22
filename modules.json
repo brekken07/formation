@@ -52,7 +52,7 @@
       ]
     },
     {
-      "id": "linux",
+      "id": "Linux",
       "title": "Linux / LPIC-1",
       "icon": "🐧",
       "description": "Maîtriser Linux de la ligne de commande à l'administration système.",
