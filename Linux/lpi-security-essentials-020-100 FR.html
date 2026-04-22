@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LPI Security Essentials 020-100 — Exam Prep</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0a0d12;
+    --bg2: #0f1318;
+    --bg3: #141920;
+    --border: #1e2730;
+    --border2: #2a3545;
+    --text: #c8d8e8;
+    --text-dim: #6a8090;
+    --text-bright: #e8f4ff;
+    --accent: #00c8ff;
+    --accent2: #0090cc;
+    --green: #00e890;
+    --red: #ff4060;
+    --orange: #ffaa00;
+    --purple: #bb80ff;
+    --yellow: #ffdd44;
+
+    /* domain colors */
+    --d021: #00c8ff;
+    --d022: #bb80ff;
+    --d023: #00e890;
+    --d024: #ffaa00;
+    --d025: #ff6688;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 30px;
+  }
+  .logo-line {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+  h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  h1 span { color: var(--accent); }
+  .exam-meta {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .meta-item strong { color: var(--accent); }
+
+  /* ── DOMAIN LEGEND ── */
+  .domain-legend {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .domain-tag {
+    font-size: 10px; letter-spacing: 1px; padding: 4px 10px;
+    border-radius: 2px; font-weight: 600;
+    border: 1px solid currentColor;
+    opacity: 0.75;
+  }
+  .domain-tag.d021 { color: var(--d021); }
+  .domain-tag.d022 { color: var(--d022); }
+  .domain-tag.d023 { color: var(--d023); }
+  .domain-tag.d024 { color: var(--d024); }
+  .domain-tag.d025 { color: var(--d025); }
+
+  /* ── QUIZ SELECT ── */
+  #quiz-select {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px; margin-bottom: 40px;
+  }
+  .quiz-card {
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .quiz-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+  .quiz-card:hover::before { opacity: 1; }
+  .quiz-card h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem; font-weight: 600; color: var(--text-bright);
+    margin-bottom: 6px;
+  }
+  .quiz-card p { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+  .quiz-card .card-badge {
+    display: inline-block; font-size: 10px; padding: 2px 8px;
+    border: 1px solid var(--border2); color: var(--text-dim);
+    margin-top: 10px; border-radius: 2px;
+  }
+  .quiz-card .score-badge {
+    position: absolute; top: 12px; right: 12px;
+    font-size: 10px; padding: 2px 8px;
+    border-radius: 2px; font-weight: 600;
+  }
+  .score-pass { background: rgba(0,232,144,0.15); color: var(--green); border: 1px solid var(--green); }
+  .score-fail { background: rgba(255,64,96,0.15); color: var(--red); border: 1px solid var(--red); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .progress-bar-track {
+    flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 2px; transition: width .3s;
+  }
+  .progress-text { font-size: 11px; color: var(--text-dim); min-width: 70px; text-align: right; }
+
+  /* ── TIMER ── */
+  .timer-wrap {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--text-dim);
+  }
+  .timer-clock {
+    font-size: 1.1rem; font-weight: 700; color: var(--accent);
+    min-width: 56px; text-align: center;
+    padding: 4px 8px; border: 1px solid var(--border2); border-radius: 3px;
+    background: var(--bg2);
+    transition: color .3s;
+  }
+  .timer-clock.warning { color: var(--orange); border-color: var(--orange); }
+  .timer-clock.danger  { color: var(--red);    border-color: var(--red);   animation: blink .8s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+  }
+
+  /* ── QUESTION CARD ── */
+  .q-domain {
+    font-size: 10px; letter-spacing: 2px; font-weight: 600;
+    padding: 3px 10px; border-radius: 2px; border: 1px solid currentColor;
+    display: inline-block; margin-bottom: 14px;
+  }
+  .q-num {
+    font-size: 11px; color: var(--text-dim); margin-bottom: 8px;
+  }
+  .q-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.15rem; font-weight: 500;
+    color: var(--text-bright); line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .q-multi-hint {
+    font-size: 10px; color: var(--orange); letter-spacing: 1px;
+    margin-bottom: 14px; padding: 4px 10px;
+    border: 1px solid rgba(255,170,0,0.3);
+    background: rgba(255,170,0,0.05);
+    border-radius: 2px; display: inline-block;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    padding: 12px 16px; border: 1px solid var(--border);
+    background: var(--bg2); border-radius: 3px;
+    cursor: pointer; transition: all .15s;
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 0.95rem; line-height: 1.5;
+  }
+  .option:hover { border-color: var(--accent2); background: var(--bg3); }
+  .option.selected { border-color: var(--accent); background: rgba(0,200,255,0.07); }
+  .option.correct  { border-color: var(--green); background: rgba(0,232,144,0.07); color: var(--green); }
+  .option.wrong    { border-color: var(--red);   background: rgba(255,64,96,0.07);  color: var(--red);   }
+  .option.missed   { border-color: var(--green); background: rgba(0,232,144,0.05); text-decoration: none; }
+  .option .opt-key {
+    font-size: 10px; font-weight: 700; min-width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid currentColor; border-radius: 2px; margin-top: 1px; opacity: .7;
+    flex-shrink: 0;
+  }
+
+  /* ── EXPLANATION ── */
+  .explanation {
+    margin-top: 18px; padding: 14px 16px;
+    border-left: 3px solid var(--accent2);
+    background: rgba(0,144,204,0.06);
+    font-size: 0.9rem; line-height: 1.7;
+    color: var(--text-dim);
+    border-radius: 0 3px 3px 0;
+    display: none;
+  }
+  .explanation.show { display: block; }
+  .explanation strong { color: var(--text); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 10px 24px; border-radius: 3px;
+    border: 1px solid var(--accent2); color: var(--accent);
+    background: rgba(0,200,255,0.05);
+    cursor: pointer; transition: all .2s;
+  }
+  .btn:hover { background: rgba(0,200,255,0.12); border-color: var(--accent); }
+  .btn-green { border-color: var(--green); color: var(--green); background: rgba(0,232,144,0.05); }
+  .btn-green:hover { background: rgba(0,232,144,0.12); }
+  .btn-red { border-color: var(--red); color: var(--red); background: rgba(255,64,96,0.05); }
+  .btn-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+
+  /* ── RESULTS ── */
+  #results { display: none; }
+  .score-circle {
+    width: 140px; height: 140px; border-radius: 50%;
+    border: 3px solid var(--border2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+  .score-circle::before {
+    content: '';
+    position: absolute; inset: -3px; border-radius: 50%;
+    background: conic-gradient(var(--accent) var(--score-pct), var(--border) 0);
+    z-index: -1;
+    transition: all 1s;
+  }
+  .score-circle .score-val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 2.2rem; font-weight: 700; color: var(--text-bright);
+  }
+  .score-circle .score-label { font-size: 10px; color: var(--text-dim); letter-spacing: 2px; }
+
+  .result-verdict {
+    text-align: center; margin-bottom: 30px;
+  }
+  .verdict-badge {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.5rem; font-weight: 700; letter-spacing: 3px;
+    padding: 8px 28px; border-radius: 3px; display: inline-block;
+  }
+  .verdict-pass { border: 2px solid var(--green); color: var(--green); background: rgba(0,232,144,0.08); }
+  .verdict-fail { border: 2px solid var(--red);   color: var(--red);   background: rgba(255,64,96,0.08);  }
+
+  .result-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px; margin-bottom: 28px;
+  }
+  .stat-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 3px; padding: 14px; text-align: center;
+  }
+  .stat-box .stat-val {
+    font-family: 'Rajdhani', sans-serif; font-size: 1.8rem; font-weight: 700;
+    color: var(--text-bright);
+  }
+  .stat-box .stat-lbl { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-top: 4px; }
+
+  .domain-breakdown { margin-bottom: 28px; }
+  .domain-breakdown h3 {
+    font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 600;
+    color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .db-row {
+    display: grid; grid-template-columns: 200px 1fr 50px;
+    align-items: center; gap: 12px; margin-bottom: 8px;
+  }
+  .db-label { font-size: 11px; color: var(--text-dim); }
+  .db-bar-track { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; }
+  .db-bar-fill { height: 100%; border-radius: 3px; transition: width 1s; }
+  .db-pct { font-size: 11px; text-align: right; font-weight: 600; }
+
+  .review-list { margin-top: 20px; }
+  .review-item {
+    border: 1px solid var(--border); border-radius: 3px;
+    margin-bottom: 10px; overflow: hidden;
+  }
+  .review-header {
+    padding: 12px 16px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); transition: background .15s;
+  }
+  .review-header:hover { background: var(--bg3); }
+  .review-icon { font-size: 14px; flex-shrink: 0; }
+  .review-q-text { font-size: 12px; flex: 1; line-height: 1.4; }
+  .review-body { padding: 14px 16px; background: var(--bg); display: none; font-size: 12px; }
+  .review-body.open { display: block; }
+
+  /* ── GLOBAL HIDDEN ── */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="logo-line">Linux Professional Institute</div>
+  <h1>Security <span>Essentials</span></h1>
+  <div class="exam-meta">
+    <div class="meta-item">Exam Code: <strong>020-100</strong></div>
+    <div class="meta-item">Questions: <strong>40</strong></div>
+    <div class="meta-item">Durée: <strong>60 min</strong></div>
+    <div class="meta-item">Score cible: <strong>500 / 800</strong></div>
+  </div>
+</header>
+
+<!-- QUIZ SELECTION -->
+<div id="home">
+  <div class="domain-legend">
+    <span class="domain-tag d021">021 Security Concepts</span>
+    <span class="domain-tag d022">022 Encryption</span>
+    <span class="domain-tag d023">023 Device &amp; Storage</span>
+    <span class="domain-tag d024">024 Network &amp; Services</span>
+    <span class="domain-tag d025">025 Identity &amp; Privacy</span>
+  </div>
+  <div id="quiz-select"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="hidden">
+  <div class="top-bar">
+    <div class="progress-wrap" style="flex:1; min-width:200px;">
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="progress-text" id="prog-text">0 / 40</div>
+    </div>
+    <div class="timer-wrap">
+      <span style="font-size:10px;letter-spacing:1px;color:var(--text-dim)">TEMPS</span>
+      <div class="timer-clock" id="timer-display">60:00</div>
+    </div>
+  </div>
+
+  <div id="q-container"></div>
+
+  <div class="btn-actions" id="q-actions">
+    <button class="btn" id="btn-check" onclick="checkAnswer()">Valider</button>
+    <button class="btn" id="btn-next" onclick="nextQuestion()" style="display:none">Suivant →</button>
+    <button class="btn btn-red" onclick="endQuiz()" style="margin-left:auto;font-size:11px">Terminer</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results"></div>
+
+</div><!-- /container -->
+
+<script>
+// ════════════════════════════════════════════════════════
+//  QUESTIONS — 4 quizzes × 40 questions = 160 total
+//  Format: { q, opts:[...], ans:[], multi:bool, exp, domain, sub }
+//  ans = array of correct indices (0-based)
+// ════════════════════════════════════════════════════════
+
+const QUIZZES = [
+
+// ── QUIZ 1 ──────────────────────────────────────────────
+{
+title: "Quiz 1 — Concepts & Encryption",
+desc: "Sécurité des concepts fondamentaux, cryptographie, PKI, TLS, chiffrement des e-mails et du stockage.",
+questions: [
+{q:"Quel terme décrit le fait qu'une information n'a pas été modifiée de manière non autorisée ?",opts:["Confidentialité","Disponibilité","Intégrité","Non-répudiation"],ans:[2],exp:"L'intégrité garantit que les données restent exactes et non altérées. La confidentialité protège contre les accès non autorisés, la disponibilité assure l'accès légitime, et la non-répudiation empêche de nier une action.",domain:"021",sub:"021.1"},
+{q:"Lequel des acteurs suivants désigne une personne cherchant à améliorer la sécurité d'un système avec l'autorisation du propriétaire ?",opts:["Black hat","Script kiddie","White hat","Cracker"],ans:[2],exp:"Un 'white hat' (chapeau blanc) est un hacker éthique qui teste les systèmes avec autorisation pour améliorer leur sécurité.",domain:"021",sub:"021.1"},
+{q:"Qu'est-ce qu'un CVE (Common Vulnerabilities and Exposures) ?",opts:["Un outil d'audit réseau","Un identifiant standard pour les vulnérabilités connues","Un protocole de chiffrement","Un type de firewall"],ans:[1],exp:"CVE est un système de référencement public qui attribue un identifiant unique à chaque vulnérabilité logicielle connue, facilitant le partage d'informations entre la communauté sécurité.",domain:"021",sub:"021.2"},
+{q:"Dans un contexte de gestion des risques, que signifie 'atténuation du risque' ?",opts:["Ignorer le risque faute de budget","Transférer entièrement le risque à un tiers","Réduire la probabilité ou l'impact d'un risque","Accepter le risque sans action"],ans:[2],exp:"L'atténuation (mitigation) consiste à mettre en place des mesures qui réduisent soit la probabilité d'occurrence du risque, soit son impact potentiel.",domain:"021",sub:"021.2"},
+{q:"Quelle obligation éthique s'applique lorsqu'un chercheur découvre une vulnérabilité dans un logiciel tiers ?",opts:["La publier immédiatement sur les réseaux sociaux","La vendre au plus offrant","Pratiquer la divulgation responsable en notifiant le fournisseur","L'exploiter pour démontrer sa dangerosité"],ans:[2],exp:"La divulgation responsable (responsible disclosure) consiste à informer le fournisseur en privé, lui laisser le temps de corriger, puis publier l'information. C'est la pratique éthique standard.",domain:"021",sub:"021.3"},
+{q:"Quel algorithme de hachage est aujourd'hui considéré comme cryptographiquement cassé et ne doit plus être utilisé ?",opts:["SHA-256","SHA-3","MD5","bcrypt"],ans:[2],exp:"MD5 est vulnérable aux attaques par collision depuis 2004. Il ne doit plus être utilisé pour des fonctions de sécurité. SHA-256 et SHA-3 sont actuellement sûrs.",domain:"022",sub:"022.1"},
+{q:"Qu'est-ce qu'une autorité de certification (CA) dans une PKI ?",opts:["Un serveur DNS sécurisé","Une entité de confiance qui émet et signe des certificats numériques","Un protocole de chiffrement asymétrique","Un pare-feu applicatif"],ans:[1],exp:"Une Certificate Authority (CA) est une entité de confiance dans une PKI qui vérifie l'identité des demandeurs et émet des certificats numériques signés avec sa clé privée.",domain:"022",sub:"022.1"},
+{q:"Dans le chiffrement asymétrique, quelle clé est utilisée pour chiffrer un message destiné à un tiers ?",opts:["La clé privée du destinataire","La clé publique du destinataire","La clé privée de l'expéditeur","Une clé symétrique partagée"],ans:[1],exp:"Pour envoyer un message chiffré à quelqu'un, on utilise SA clé publique. Seule sa clé privée (qu'il garde secrète) permet de déchiffrer le message.",domain:"022",sub:"022.1"},
+{q:"Que vérifie un navigateur web lors de l'établissement d'une connexion HTTPS ?",opts:["La vitesse du serveur","La validité et la confiance du certificat TLS du serveur","La présence d'un pare-feu applicatif","La version du système d'exploitation du serveur"],ans:[1],multi:false,exp:"Le navigateur vérifie que le certificat est signé par une CA de confiance, qu'il n'est pas expiré et que le nom du domaine correspond. C'est la base de la confiance HTTPS.",domain:"022",sub:"022.2"},
+{q:"Laquelle de ces versions de TLS est considérée comme obsolète et non sécurisée ?",opts:["TLS 1.3","TLS 1.2","TLS 1.0","TLS 1.1"],ans:[2,3],multi:true,exp:"TLS 1.0 et TLS 1.1 sont officiellement dépréciés (RFC 8996, 2021) et ne doivent plus être utilisés. TLS 1.2 est encore acceptable, TLS 1.3 est le standard actuel.",domain:"022",sub:"022.2"},
+{q:"Quel protocole permet d'envoyer des e-mails chiffrés de bout en bout sans infrastructure centralisée de clés ?",opts:["S/MIME avec PKI d'entreprise","OpenPGP / GnuPG","TLS SMTP uniquement","DKIM"],ans:[1],exp:"OpenPGP (implémenté par GnuPG) utilise un modèle de 'web of trust' décentralisé. S/MIME repose sur une PKI centralisée. TLS chiffre uniquement le transport, pas le contenu.",domain:"022",sub:"022.3"},
+{q:"Quel outil Linux en ligne de commande est couramment utilisé pour chiffrer des fichiers avec OpenPGP ?",opts:["openssl enc","gpg","ssh-keygen","cryptsetup"],ans:[1],exp:"gpg (GNU Privacy Guard) est l'implémentation libre d'OpenPGP. Il permet de chiffrer, déchiffrer, signer et vérifier des fichiers et e-mails.",domain:"022",sub:"022.3"},
+{q:"Quel mécanisme Linux permet de chiffrer intégralement une partition de disque ?",opts:["eCryptfs","LUKS (Linux Unified Key Setup)","AppArmor","dm-crypt seul sans LUKS"],ans:[1],exp:"LUKS est le standard de facto pour le chiffrement de partitions sous Linux. Il s'appuie sur dm-crypt mais ajoute une gestion des clés, des métadonnées et le support multi-utilisateurs.",domain:"022",sub:"022.4"},
+{q:"Que signifie l'acronyme TPM dans le contexte de la sécurité matérielle ?",opts:["Trusted Platform Module","Terminal Port Manager","Transport Protocol Module","Timed Process Monitor"],ans:[0],exp:"Le TPM (Trusted Platform Module) est une puce dédiée à la sécurité qui stocke des clés cryptographiques, permet l'attestation d'intégrité du système et protège les secrets matériels.",domain:"023",sub:"023.1"},
+{q:"Quel risque de sécurité est spécifiquement associé à la connexion de périphériques USB inconnus ?",opts:["Surtension électrique uniquement","Injection de clavier HID (BadUSB) et introduction de malware","Panne du contrôleur USB","Incompatibilité de pilotes uniquement"],ans:[1],exp:"L'attaque BadUSB exploite le fait qu'un périphérique USB peut se reprogrammer pour se faire passer pour un clavier et injecter des commandes malveillantes. Les malwares peuvent aussi se propager via USB.",domain:"023",sub:"023.1"},
+{q:"Parmi les types de malware suivants, lequel se propage automatiquement à d'autres systèmes sans action de l'utilisateur ?",opts:["Cheval de Troie (Trojan)","Ver (Worm)","Spyware","Adware"],ans:[1],exp:"Un ver (worm) se propage de façon autonome en exploitant des vulnérabilités réseau. Un trojan nécessite une exécution par l'utilisateur. Un spyware surveille sans se propager.",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce qu'un ransomware ?",opts:["Un logiciel qui affiche des publicités non désirées","Un malware qui chiffre les données de la victime et exige une rançon","Un programme qui vole des mots de passe","Un rootkit dissimulé dans le BIOS"],ans:[1],exp:"Le ransomware chiffre les fichiers de la victime et demande une rançon (souvent en cryptomonnaie) pour fournir la clé de déchiffrement. C'est l'une des menaces les plus coûteuses aujourd'hui.",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce que la règle de sauvegarde 3-2-1 ?",opts:["3 sauvegardes hebdomadaires, 2 mensuelles, 1 annuelle","3 copies des données, sur 2 supports différents, dont 1 hors site","Sauvegarder toutes les 3h, 2 fois par jour, 1 fois la nuit","3 disques en RAID 2, avec 1 sauvegarde"],ans:[1],exp:"La règle 3-2-1 est une bonne pratique universelle : 3 copies des données, sur 2 types de supports différents (ex: disque et cloud), dont au moins 1 copie hors site pour résister aux catastrophes physiques.",domain:"023",sub:"023.4"},
+{q:"Quelle commande Linux permet d'afficher les connexions réseau actives et les ports en écoute ?",opts:["ifconfig -a","ss -tuln","route -n","ip link show"],ans:[1],exp:"'ss -tuln' affiche les sockets TCP (-t) et UDP (-u) en mode listening (-l) sans résolution DNS (-n). 'netstat -tuln' est l'équivalent historique, mais ss est l'outil moderne recommandé.",domain:"024",sub:"024.1"},
+{q:"Qu'est-ce qu'un VPN (Virtual Private Network) ?",opts:["Un réseau local sans fil sécurisé","Un tunnel chiffré permettant de connecter des réseaux ou utilisateurs distants de façon sécurisée","Un protocole de routage BGP sécurisé","Un pare-feu de nouvelle génération"],ans:[1],exp:"Un VPN crée un tunnel chiffré entre l'utilisateur et un serveur distant, protégeant les communications sur des réseaux non fiables et permettant d'accéder à des ressources d'entreprise à distance.",domain:"024",sub:"024.1"},
+{q:"Quel type d'attaque consiste à inonder un service de requêtes pour le rendre indisponible ?",opts:["Man-in-the-Middle (MitM)","SQL Injection","Denial of Service (DoS) / DDoS","Phishing"],ans:[2],exp:"Une attaque DoS/DDoS vise la disponibilité en saturant un service ou réseau. DDoS (Distributed) utilise de multiples sources coordonnées (botnet) pour amplifier l'attaque.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce qu'un pare-feu de type 'stateful inspection' ?",opts:["Un firewall qui inspecte uniquement les en-têtes IP","Un firewall qui maintient une table d'état des connexions pour autoriser le trafic de retour légitime","Un proxy applicatif au niveau 7","Un IDS basé sur les signatures"],ans:[1],exp:"Un firewall à inspection stateful suit l'état des connexions TCP/UDP. Il permet automatiquement le trafic retour d'une connexion établie depuis l'intérieur, contrairement à un filtre statique.",domain:"024",sub:"024.2"},
+{q:"Quel protocole TOR utilise-t-il pour assurer l'anonymat des communications ?",opts:["Chiffrement de bout en bout avec une seule clé","Onion routing : chiffrement en couches multiples via des relais","VPN traditionnel avec masquage IP","Proxy HTTP transparent"],ans:[1],exp:"TOR utilise l'onion routing : les données sont chiffrées en plusieurs couches, chaque relais ne connaissant que le relai précédent et suivant. Aucun nœud ne connaît à la fois la source et la destination.",domain:"024",sub:"024.3"},
+{q:"Qu'est-ce que l'authentification à deux facteurs (2FA) ?",opts:["Utiliser deux mots de passe différents","Combiner deux facteurs d'authentification de catégories différentes","Chiffrer deux fois les données","Utiliser deux algorithmes de hachage"],ans:[1],exp:"Le 2FA combine deux facteurs de catégories distinctes : quelque chose que vous savez (mot de passe), possédez (token, téléphone) ou êtes (biométrie). Deux mots de passe ne constituent pas un 2FA.",domain:"025",sub:"025.1"},
+{q:"Quelle est la principale vulnérabilité d'un mot de passe réutilisé sur plusieurs services ?",opts:["Le hachage est plus facile à casser","Si un service est compromis, tous les autres comptes sont exposés (credential stuffing)","Le mot de passe expire plus vite","La synchronisation réseau est ralentie"],ans:[1],exp:"Le credential stuffing exploite les mots de passe volés sur un site pour les tester sur d'autres. La réutilisation multiplie l'impact d'une compromission unique.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce que le phishing ?",opts:["Une attaque réseau par force brute","Une technique d'ingénierie sociale visant à tromper l'utilisateur pour obtenir ses identifiants","Un type de malware se propageant par e-mail","Une injection de code dans une page web"],ans:[1],exp:"Le phishing est une attaque d'ingénierie sociale : l'attaquant usurpe une identité de confiance (banque, service en ligne) pour inciter la victime à divulguer ses identifiants ou cliquer sur un lien malveillant.",domain:"025",sub:"025.2"},
+{q:"Qu'est-ce qu'une fuite de données (data leak) ?",opts:["Un bug de mémoire dans un programme","La divulgation non autorisée d'informations sensibles vers l'extérieur","Un type d'attaque DDoS","Une corruption de système de fichiers"],ans:[1],exp:"Une fuite de données est la divulgation non autorisée d'informations confidentielles. Elle peut résulter d'une attaque externe, d'une négligence interne ou d'une mauvaise configuration.",domain:"025",sub:"025.2"},
+{q:"Quel droit fondamental est reconnu par le RGPD (GDPR) en matière de protection des données ?",opts:["Le droit de surveiller les employés sans limite","Le droit à l'oubli (effacement des données personnelles)","L'obligation de tout stocker pendant 10 ans","L'exemption des PME de toute obligation"],ans:[1],exp:"Le RGPD consacre plusieurs droits : accès, rectification, effacement (droit à l'oubli), portabilité, opposition. Ces droits s'appliquent aux données personnelles des citoyens européens.",domain:"025",sub:"025.3"},
+{q:"Lequel de ces éléments constitue une donnée personnelle au sens du RGPD ?",opts:["Le nom d'un logiciel open source","L'adresse IP d'un utilisateur identifiable","La documentation technique d'un serveur","Le numéro de version d'un OS"],ans:[1],exp:"Une adresse IP peut identifier une personne physique et constitue donc une donnée personnelle au sens du RGPD. Toute information permettant d'identifier directement ou indirectement une personne est concernée.",domain:"025",sub:"025.3"},
+{q:"Quel est le rôle d'un certificat racine (root CA certificate) dans une PKI ?",opts:["Chiffrer les données en transit","Servir d'ancre de confiance à partir de laquelle toute la chaîne de certification est validée","Gérer les révocations en temps réel","Générer les paires de clés des utilisateurs"],ans:[1],exp:"Le certificat racine est au sommet de la hiérarchie PKI. Il est auto-signé et préinstallé dans les navigateurs/OS. Toute la chaîne de confiance (CA intermédiaires → certificats serveurs) remonte à lui.",domain:"022",sub:"022.1"},
+{q:"Que permet la liste de révocation de certificats (CRL) dans une PKI ?",opts:["D'accélérer le chiffrement TLS","De lister les certificats qui ont été révoqués avant leur date d'expiration","De générer de nouveaux certificats","De chiffrer les échanges entre CA"],ans:[1],exp:"Une CRL publie la liste des certificats révoqués (compromis, mauvais usage…) avant leur expiration. Le protocole OCSP est une alternative plus moderne permettant une vérification en temps réel.",domain:"022",sub:"022.1"},
+{q:"Quel algorithme de chiffrement symétrique est le standard actuel recommandé pour le chiffrement de fichiers ?",opts:["DES (Data Encryption Standard)","3DES","AES (Advanced Encryption Standard)","RC4"],ans:[2],exp:"AES est le standard de chiffrement symétrique depuis 2001 (NIST). DES et 3DES sont obsolètes. RC4 est cassé. AES-256 est la version recommandée pour une sécurité maximale.",domain:"022",sub:"022.1"},
+{q:"Quelle attaque exploite la prise de contrôle d'une communication entre deux parties à leur insu ?",opts:["DoS","SQL Injection","Man-in-the-Middle (MitM)","Ransomware"],ans:[2],exp:"L'attaque MitM place l'attaquant entre deux parties communicantes, lui permettant d'intercepter, lire ou modifier les échanges. HTTPS/TLS, la vérification de certificats et les VPN protègent contre cette menace.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce qu'un rootkit ?",opts:["Un script de configuration du compte root","Un malware conçu pour dissimuler sa présence et celle d'autres logiciels malveillants sur un système","Un outil d'administration légitime sous Linux","Un type de ransomware chiffrant uniquement /root"],ans:[1],exp:"Un rootkit s'installe profondément dans le système (parfois au niveau kernel) pour masquer des processus, fichiers ou connexions malveillants. Sa détection est particulièrement difficile.",domain:"023",sub:"023.3"},
+{q:"Parmi les bonnes pratiques suivantes, lesquelles réduisent la surface d'attaque d'un système Linux ?",opts:["Désactiver les services inutiles","Utiliser le compte root pour toutes les opérations quotidiennes","Appliquer régulièrement les mises à jour de sécurité","Ouvrir tous les ports pour faciliter la connectivité"],ans:[0,2],multi:true,exp:"Réduire la surface d'attaque implique de désactiver les services non nécessaires (moins de vecteurs d'attaque) et d'appliquer les correctifs de sécurité (moins de vulnérabilités exploitables). L'utilisation de root et l'ouverture de ports sont des pratiques à éviter.",domain:"023",sub:"023.2"},
+{q:"Qu'est-ce que le chiffrement de bout en bout (E2EE) ?",opts:["Un chiffrement appliqué uniquement sur le serveur de destination","Un chiffrement où seuls l'émetteur et le destinataire peuvent lire le message","Le protocole TLS entre deux serveurs","Le chiffrement du disque dur du serveur"],ans:[1],exp:"E2EE garantit que les messages sont chiffrés côté client et ne peuvent être déchiffrés que par le destinataire final. Ni les serveurs intermédiaires ni les fournisseurs de service n'ont accès au contenu.",domain:"024",sub:"024.3"},
+{q:"Que signifie 'principe du moindre privilège' en sécurité ?",opts:["Tout utilisateur doit avoir les droits administrateur par défaut","Chaque utilisateur ou processus ne doit avoir que les droits strictement nécessaires à sa fonction","Les droits sont gérés uniquement par le pare-feu","Les privilèges doivent être distribués équitablement entre tous les utilisateurs"],ans:[1],exp:"Le principe du moindre privilège (Principle of Least Privilege) limite les droits au strict nécessaire, réduisant l'impact d'une compromission. C'est un principe fondamental de sécurité des systèmes.",domain:"023",sub:"023.2"},
+{q:"Quel outil permet de gérer et stocker des mots de passe de façon sécurisée ?",opts:["Un fichier texte chiffré avec rot13","Un gestionnaire de mots de passe (KeePass, Bitwarden, etc.)","Le fichier /etc/passwd","Le navigateur web sans master password"],ans:[1],exp:"Un gestionnaire de mots de passe chiffre tous vos identifiants avec une clé maître forte. Il permet d'utiliser des mots de passe uniques et complexes pour chaque service sans les mémoriser.",domain:"025",sub:"025.1"},
+{q:"Lequel de ces protocoles assure un transfert de fichiers chiffré, en remplacement de FTP ?",opts:["FTP over SSL (FTPS) et SFTP sont tous deux acceptables","Telnet","TFTP","rsh"],ans:[0],exp:"FTPS (FTP over TLS) et SFTP (SSH File Transfer Protocol) chiffrent le transfert de fichiers. FTP, Telnet, TFTP et rsh transmettent les données (et souvent les mots de passe) en clair.",domain:"024",sub:"024.1"},
+{q:"Quelle technique de sécurité réseau permet de segmenter le réseau en zones isolées pour limiter la propagation d'attaques ?",opts:["Network Address Translation (NAT)","VLAN et segmentation réseau","Bridge réseau","Agrégation de liens (bonding)"],ans:[1],exp:"La segmentation réseau via VLANs crée des zones isolées (DMZ, LAN, serveurs…). Si une zone est compromise, l'attaquant ne peut pas facilement accéder aux autres, limitant le mouvement latéral.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce que le HTTPS Strict Transport Security (HSTS) ?",opts:["Un protocole de cache web","Un mécanisme forçant les navigateurs à n'utiliser que HTTPS pour un domaine","Un type de certificat auto-signé","Un outil d'analyse de trafic réseau"],ans:[1],exp:"HSTS (RFC 6797) est un en-tête HTTP indiquant au navigateur de n'accéder au site qu'en HTTPS, même si l'utilisateur tape http://. Il protège contre les attaques de downgrade et le SSL stripping.",domain:"022",sub:"022.2"},
+]
+},
+
+// ── QUIZ 2 ──────────────────────────────────────────────
+{
+title: "Quiz 2 — Réseau, Identité & Privacy",
+desc: "Protocoles réseau, services, chiffrement réseau, anonymisation, identité, authentification, protection de la vie privée.",
+questions: [
+{q:"Quel port TCP est utilisé par défaut par le protocole SSH ?",opts:["21","22","23","443"],ans:[1],exp:"SSH utilise le port 22/TCP par défaut. Le port 21 est FTP, le 23 est Telnet (non chiffré), et le 443 est HTTPS.",domain:"024",sub:"024.1"},
+{q:"Qu'est-ce qu'un enregistrement DNSSEC permet de garantir ?",opts:["La confidentialité des réponses DNS","L'intégrité et l'authenticité des réponses DNS","La vitesse de résolution DNS","L'anonymat des requêtes DNS"],ans:[1],exp:"DNSSEC (DNS Security Extensions) signe cryptographiquement les réponses DNS pour garantir leur intégrité et authenticité, protégeant contre l'empoisonnement de cache DNS (cache poisoning).",domain:"024",sub:"024.2"},
+{q:"Lequel de ces protocoles chiffre les requêtes DNS pour protéger la vie privée ?",opts:["DNS classique (port 53)","DNSSEC","DNS over TLS (DoT) ou DNS over HTTPS (DoH)","MDNS"],ans:[2],exp:"DoT (port 853) et DoH (port 443) chiffrent les requêtes DNS, empêchant l'écoute et la modification. DNS classique et DNSSEC ne chiffrent pas le contenu des échanges.",domain:"024",sub:"024.3"},
+{q:"Qu'est-ce qu'une attaque par déni de service distribuée (DDoS) ?",opts:["Une attaque menée par un seul hôte contre un serveur","Une attaque coordonnée depuis de multiples sources (botnet) visant à saturer un service","Un scan de ports distribué","Une attaque MitM sur plusieurs connexions simultanées"],ans:[1],exp:"Un DDoS utilise des milliers à millions de machines compromises (botnet) pour générer un trafic massif vers la cible, la rendant inaccessible. L'aspect distribué rend le blocage difficile.",domain:"024",sub:"024.2"},
+{q:"Quel protocole fournit un tunnel chiffré pour sécuriser n'importe quel protocole TCP/IP ?",opts:["IPsec","SSH tunneling","HTTP CONNECT","Tous les précédents peuvent être utilisés"],ans:[3],multi:false,exp:"IPsec, SSH tunneling et HTTP CONNECT peuvent tous créer des tunnels sécurisés. SSH est particulièrement polyvalent pour le port forwarding. IPsec opère au niveau réseau (couche 3).",domain:"024",sub:"024.3"},
+{q:"Qu'est-ce que l'usurpation d'identité (identity theft) en contexte numérique ?",opts:["La création d'un faux profil sur les réseaux sociaux uniquement","L'utilisation frauduleuse des informations personnelles d'une personne à son insu","Un type d'attaque réseau par spoofing d'adresse MAC","Une erreur de configuration d'annuaire LDAP"],ans:[1],exp:"L'usurpation d'identité numérique consiste à utiliser les données personnelles (nom, numéro de sécurité sociale, données bancaires…) d'une victime pour commettre des fraudes ou accéder à des services.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce que l'authentification sans mot de passe basée sur FIDO2/WebAuthn ?",opts:["Une connexion utilisant uniquement un code SMS","Un standard d'authentification forte utilisant des clés cryptographiques matérielles ou biométriques","Un protocole de mot de passe à usage unique (OTP)","Une connexion via réseau social (OAuth)"],ans:[1],exp:"FIDO2/WebAuthn utilise la cryptographie asymétrique : une clé privée stockée sur l'appareil ou clé matérielle (YubiKey) s'associe à une clé publique sur le serveur. Résistant au phishing car les clés sont liées au domaine.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce qu'une attaque par force brute sur un mot de passe ?",opts:["L'exploitation d'une vulnérabilité logicielle connue","L'essai systématique de toutes les combinaisons possibles jusqu'à trouver le bon mot de passe","L'interception du hash de mot de passe en réseau","Le décodage d'un mot de passe via une table arc-en-ciel"],ans:[1],exp:"Une attaque brute force teste exhaustivement les combinaisons. Pour la ralentir : mots de passe longs, verrouillage de compte, hash adaptatif (bcrypt, Argon2). Les tables arc-en-ciel sont une attaque distincte.",domain:"025",sub:"025.1"},
+{q:"Quel protocole est utilisé pour l'authentification centralisée dans les environnements Linux d'entreprise ?",opts:["NFS v4","LDAP avec Kerberos (ou Active Directory)","SNMP v3","DHCP"],ans:[1],exp:"LDAP fournit l'annuaire d'utilisateurs, Kerberos fournit l'authentification par tickets. L'Active Directory de Microsoft combine les deux. C'est la base de l'authentification centralisée en entreprise.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce qu'un cookie de session web et quel risque principal présente-t-il ?",opts:["Un fichier de configuration du serveur web","Un identifiant stocké côté client permettant de maintenir une session ; risque de vol (session hijacking)","Un cache de pages web ; risque de contenu obsolète","Un certificat client ; risque d'expiration"],ans:[1],exp:"Les cookies de session identifient l'utilisateur auprès du serveur. S'ils sont volés (via XSS, sniffing), l'attaquant peut usurper la session. Les attributs Secure et HttpOnly réduisent ce risque.",domain:"025",sub:"025.2"},
+{q:"Que signifie 'minimisation des données' dans le contexte du RGPD ?",opts:["Compresser les données pour réduire leur taille","Ne collecter que les données strictement nécessaires à la finalité déclarée","Anonymiser toutes les données après 30 jours","Chiffrer les données au minimum avec AES-128"],ans:[1],exp:"La minimisation des données (RGPD art. 5) impose de ne collecter que les données adéquates, pertinentes et limitées à ce qui est nécessaire. Collecter des données 'au cas où' est contraire au RGPD.",domain:"025",sub:"025.3"},
+{q:"Quel attribut d'un cookie HTTP empêche son accès via JavaScript (protection XSS) ?",opts:["Secure","SameSite","HttpOnly","Path=/"],ans:[2],exp:"L'attribut HttpOnly empêche l'accès au cookie via document.cookie en JavaScript, limitant les attaques XSS visant le vol de session. L'attribut Secure empêche la transmission sur HTTP non chiffré.",domain:"025",sub:"025.2"},
+{q:"Quelle technique d'anonymisation remplace les données personnelles par des valeurs irréversibles ?",opts:["Pseudonymisation","Chiffrement","Anonymisation irréversible (hashing sans sel, agrégation)","Tokenisation réversible"],ans:[2],exp:"L'anonymisation irréversible (hash sans sel ou agrégation statistique) empêche toute réidentification. La pseudonymisation et la tokenisation sont réversibles et ne constituent pas une anonymisation complète.",domain:"025",sub:"025.3"},
+{q:"Lequel de ces éléments est considéré comme un facteur d'authentification de type 'possession' ?",opts:["Mot de passe","Empreinte digitale","Token matériel (YubiKey, Google Titan)","Code PIN"],ans:[2],exp:"Les facteurs d'authentification : savoir (mot de passe, PIN), posséder (token physique, téléphone), être (biométrie). Un YubiKey est un facteur de possession. L'empreinte digitale est un facteur d'inhérence (biométrie).",domain:"025",sub:"025.1"},
+{q:"Quelle est la différence principale entre un IDS et un IPS ?",opts:["L'IDS est matériel, l'IPS est logiciel","L'IDS détecte et alerte, l'IPS détecte et bloque activement les menaces","L'IDS fonctionne en réseau, l'IPS uniquement sur l'hôte","L'IDS analyse les logs, l'IPS analyse le trafic en temps réel"],ans:[1],exp:"IDS (Intrusion Detection System) détecte et alerte les administrateurs. IPS (Intrusion Prevention System) va plus loin en bloquant automatiquement le trafic malveillant. Les deux peuvent être réseau (NIDS/NIPS) ou hôte (HIDS/HIPS).",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce que le scan de ports avec nmap permet de réaliser ?",opts:["Identifier les ports ouverts et services en écoute sur un hôte cible","Chiffrer les communications réseau","Configurer les règles de pare-feu","Analyser le contenu des paquets HTTP"],ans:[0],exp:"nmap est un scanner réseau permettant de détecter les ports ouverts, services actifs, versions logicielles et parfois le système d'exploitation d'un hôte. Essentiel en audit de sécurité et pentest.",domain:"024",sub:"024.1"},
+{q:"Quel mécanisme de sécurité empêche un serveur web malveillant de charger des ressources depuis d'autres origines ?",opts:["CORS (Cross-Origin Resource Sharing)","CSP (Content Security Policy)","HSTS","X-Frame-Options"],ans:[1],exp:"La Content Security Policy (CSP) est un en-tête HTTP permettant au serveur de définir les sources de contenu autorisées (scripts, images, styles), réduisant les risques XSS et injection de contenu.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce qu'une DMZ (Demilitarized Zone) dans une architecture réseau ?",opts:["Un réseau WiFi invité non sécurisé","Une zone réseau isolée hébergeant les services exposés à Internet, séparée du réseau interne","Un segment réseau réservé aux administrateurs","Un VPN inter-sites"],ans:[1],exp:"La DMZ est une zone tampon entre Internet et le réseau interne. Les serveurs web, mail, DNS publics y sont placés. Si compromis, l'attaquant est isolé du réseau interne par un firewall.",domain:"024",sub:"024.2"},
+{q:"Que fait la commande 'iptables -A INPUT -p tcp --dport 22 -j ACCEPT' ?",opts:["Bloque le port SSH","Autorise les connexions entrantes sur le port 22 (SSH)","Redirige le port 22 vers un autre port","Supprime toutes les règles de la chaîne INPUT"],ans:[1],exp:"Cette règle iptables ajoute (-A) à la chaîne INPUT une règle autorisant (-j ACCEPT) les paquets TCP (-p tcp) destinés au port 22 (--dport 22). C'est la règle de base pour autoriser SSH.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce que le protocole HTTPS garantit-il lors d'une connexion à un site web ?",opts:["L'anonymat complet de l'utilisateur","L'authentification du serveur, la confidentialité et l'intégrité des données échangées","La vitesse de la connexion","Que le contenu du site est sûr et légitime"],ans:[1],exp:"HTTPS (HTTP over TLS) garantit : authentification du serveur (certificat), confidentialité (chiffrement) et intégrité (protection contre la modification). Il ne garantit pas l'anonymat ni la légitimité du contenu.",domain:"022",sub:"022.2"},
+{q:"Quel type d'attaque consiste à insérer du code SQL malveillant dans un formulaire web ?",opts:["XSS (Cross-Site Scripting)","SQL Injection","CSRF (Cross-Site Request Forgery)","Path Traversal"],ans:[1],exp:"L'injection SQL exploite une mauvaise validation des entrées pour injecter des requêtes SQL arbitraires, pouvant donner accès à la base de données. Prévention : requêtes préparées, ORM, validation des entrées.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce que le principe de 'sécurité par l'obscurité' et pourquoi est-il insuffisant ?",opts:["C'est une méthode de chiffrement basée sur des algorithmes secrets ; elle est insuffisante car les algorithmes secrets ne sont pas auditables","Il suffit de cacher les informations de configuration ; insuffisant car des techniques d'énumération peuvent les révéler","C'est un standard NIST reconnu comme seule protection nécessaire","C'est une bonne pratique recommandée par l'ISO 27001"],ans:[0],exp:"La sécurité par l'obscurité cache les mécanismes de sécurité plutôt que de les renforcer. Elle est insuffisante car un attaquant déterminé peut découvrir les secrets, et elle ne résiste pas à une analyse approfondie. Elle peut compléter mais jamais remplacer une vraie sécurité.",domain:"021",sub:"021.1"},
+{q:"Qu'est-ce que la stéganographie ?",opts:["Un algorithme de chiffrement asymétrique","L'art de dissimuler un message dans un autre fichier (image, audio) de façon imperceptible","Un protocole de transfert de fichiers sécurisé","Une technique de compression de données"],ans:[1],exp:"La stéganographie dissimule l'existence même d'un message (contrairement à la cryptographie qui le rend illisible). Par exemple, cacher des données dans les pixels d'une image.",domain:"022",sub:"022.1"},
+{q:"Quelles bonnes pratiques s'appliquent aux mots de passe selon les recommandations actuelles du NIST ?",opts:["Forcer le changement de mot de passe tous les 30 jours","Utiliser des mots de passe longs (passphrase) et éviter les changements forcés réguliers","Limiter les mots de passe à 8 caractères pour faciliter la mémorisation","Interdire les caractères spéciaux pour éviter les injections"],ans:[1],multi:false,exp:"Le NIST SP 800-63B (2020) recommande des mots de passe longs (16+ chars), n'exige plus de changement périodique forcé (contre-productif), recommande la vérification contre les dictionnaires de mots de passe compromis.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce qu'une attaque de type 'social engineering' ?",opts:["Une attaque exploitant des failles logicielles","Une manipulation psychologique visant à tromper des individus pour obtenir des informations ou accès","Une attaque réseau automatisée par botnet","Une injection de code dans les réseaux sociaux"],ans:[1],exp:"L'ingénierie sociale manipule des personnes (pas des systèmes) pour obtenir des informations sensibles ou des accès. Exemples : phishing, vishing (téléphone), pretexting (fausse identité), baiting (USB infectée).",domain:"021",sub:"021.1"},
+{q:"Qu'est-ce que TOTP (Time-based One-Time Password) ?",opts:["Un mot de passe permanent généré par un serveur d'authentification","Un code à usage unique généré à partir d'une clé secrète et de l'heure courante","Un token matériel USB pour l'authentification","Un protocole de chiffrement des SMS"],ans:[1],exp:"TOTP (RFC 6238) génère un code à 6 chiffres toutes les 30 secondes à partir d'un secret partagé et du timestamp. Utilisé par les applications 2FA (Google Authenticator, Authy). L'heure synchronisée est critique.",domain:"025",sub:"025.1"},
+{q:"Quel risque présente le Wi-Fi public non chiffré ?",opts:["Une consommation batterie excessive","L'interception du trafic par n'importe qui sur le même réseau (sniffing)","Une vitesse de connexion réduite","Des frais d'itinérance supplémentaires"],ans:[1],exp:"Sur un réseau WiFi ouvert, tout le trafic non chiffré est lisible par les autres participants. Un attaquant peut capturer identifiants, cookies de session, etc. L'utilisation d'un VPN ou HTTPS est indispensable.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce que le Certificate Transparency (CT) ?",opts:["Un protocole de révocation de certificats","Un journal public et auditable de tous les certificats TLS émis par les CA","Un algorithme de vérification de chaîne de certification","Un type de certificat pour le code signing"],ans:[1],exp:"Certificate Transparency (RFC 6962) est un système de journaux publics où toutes les CA doivent enregistrer les certificats émis. Cela permet de détecter des certificats frauduleux ou mal émis.",domain:"022",sub:"022.2"},
+{q:"Que signifie 'pen test' (test de pénétration) ?",opts:["Tester les performances d'un réseau sous charge","Un audit de sécurité autorisé simulant des attaques réelles pour identifier des vulnérabilités","Scanner les logs système à la recherche d'erreurs","Installer des patchs de sécurité sur les serveurs"],ans:[1],exp:"Un pentest est une évaluation de sécurité mandatée où des experts (ethical hackers) tentent de compromettre des systèmes avec les mêmes techniques qu'un attaquant, mais dans un cadre légal et contractuel.",domain:"021",sub:"021.2"},
+{q:"Qu'est-ce que la non-répudiation en sécurité informatique ?",opts:["La capacité de chiffrer des messages de façon indéchiffrable","La garantie qu'un acteur ne peut nier avoir effectué une action (signature électronique)","Le principe d'interdire toute action non autorisée","La redondance des systèmes pour éviter les pannes"],ans:[1],exp:"La non-répudiation garantit qu'un expéditeur ne peut nier avoir envoyé un message ou effectué une transaction. Elle s'implémente via les signatures numériques (clé privée unique à l'expéditeur).",domain:"021",sub:"021.1"},
+{q:"Quel outil Linux permet d'analyser les logs d'authentification pour détecter des tentatives d'intrusion ?",opts:["df -h","grep / journalctl / fail2ban","ps aux","lsof"],ans:[1],exp:"On examine /var/log/auth.log ou journalctl pour les tentatives SSH. fail2ban automatise le blocage des IP après N échecs. C'est un outil essentiel de surveillance de sécurité.",domain:"021",sub:"021.2"},
+{q:"Qu'est-ce qu'une politique de sécurité des informations (ISMS) au sens de l'ISO 27001 ?",opts:["Un antivirus d'entreprise","Un ensemble de politiques, procédures et contrôles gérant systématiquement la sécurité de l'information","Un pare-feu de nouvelle génération certifié ISO","Un scanner de vulnérabilités certifié"],ans:[1],exp:"Un ISMS (Information Security Management System) selon ISO 27001 est un cadre organisationnel complet : politiques, gestion des risques, contrôles techniques et organisationnels, audit continu.",domain:"021",sub:"021.2"},
+{q:"Quel protocole est recommandé pour sécuriser les e-mails en transit entre serveurs de messagerie ?",opts:["SMTP en clair (port 25)","SMTP over TLS / STARTTLS (port 587)","POP3 non chiffré","HTTP"],ans:[1],exp:"STARTTLS sur le port 587 (submission) ou 465 (SMTPS) chiffre les e-mails en transit. Sans TLS, les e-mails transitent en clair et peuvent être interceptés. SPF, DKIM et DMARC complètent la sécurité SMTP.",domain:"022",sub:"022.3"},
+{q:"Qu'est-ce que DKIM (DomainKeys Identified Mail) ?",opts:["Un filtre anti-spam basé sur liste noire","Un mécanisme de signature cryptographique des e-mails sortants permettant de vérifier l'authenticité de l'expéditeur","Un protocole de chiffrement des e-mails de bout en bout","Un standard de chiffrement du stockage des e-mails"],ans:[1],exp:"DKIM ajoute une signature numérique aux e-mails sortants. Le destinataire vérifie via un enregistrement DNS TXT. Combiné à SPF et DMARC, il lutte contre le spoofing d'e-mails.",domain:"022",sub:"022.3"},
+{q:"Quel est l'objectif principal d'un backup immutable (immuable) ?",opts:["Accélérer les sauvegardes","Empêcher la modification ou la suppression des sauvegardes, notamment par un ransomware","Réduire l'espace disque utilisé","Permettre l'accès partagé aux sauvegardes"],ans:[1],exp:"Un backup immuable (WORM - Write Once Read Many) ne peut être modifié ni supprimé pendant une période définie. C'est une protection cruciale contre les ransomwares qui ciblent désormais les sauvegardes.",domain:"023",sub:"023.4"},
+{q:"Qu'est-ce qu'un honeypot en sécurité ?",opts:["Un container Docker isolé pour les tests","Un système leurre conçu pour attirer et détecter les attaquants","Un outil de hachage de fichiers","Un pare-feu applicatif web"],ans:[1],exp:"Un honeypot est un système délibérément vulnérable (mais isolé) destiné à attirer les attaquants. Il permet de les détecter, étudier leurs techniques et collecter des indicateurs de compromission.",domain:"021",sub:"021.2"},
+{q:"Laquelle de ces pratiques constitue une menace de type 'insider threat' ?",opts:["Un attaquant externe exploitant une vulnérabilité CVE","Un employé exfiltrant des données confidentielles de l'entreprise","Un botnet attaquant depuis Internet","Un scan de ports depuis une IP étrangère"],ans:[1],exp:"Une menace interne (insider threat) provient de personnes ayant un accès légitime : employés, ex-employés, sous-traitants. Elle peut être malveillante (vol de données) ou accidentelle (erreur de configuration).",domain:"021",sub:"021.1"},
+]
+},
+
+// ── QUIZ 3 ──────────────────────────────────────────────
+{
+title: "Quiz 3 — Device, Storage & Applications",
+desc: "Sécurité des appareils, malware, disponibilité des données, applications, IoT, Bluetooth et chiffrement du stockage.",
+questions: [
+{q:"Quel mécanisme de sécurité Linux contrôle l'accès aux ressources au niveau du noyau, au-delà du modèle DAC classique ?",opts:["sudo","SELinux / AppArmor (MAC - Mandatory Access Control)","chmod / chown","PAM (Pluggable Authentication Modules)"],ans:[1],exp:"SELinux (Security-Enhanced Linux) et AppArmor implémentent le MAC qui ajoute des règles de sécurité indépendantes du propriétaire du fichier. Même root peut être limité par des politiques SELinux.",domain:"023",sub:"023.2"},
+{q:"Qu'est-ce qu'une mise à jour de sécurité (patch) et pourquoi est-elle critique ?",opts:["Une mise à jour cosmétique de l'interface","Un correctif qui corrige des vulnérabilités exploitables dans un logiciel","Une mise à jour qui ajoute uniquement de nouvelles fonctionnalités","Un outil de sauvegarde automatique"],ans:[1],exp:"Un patch de sécurité corrige des vulnérabilités identifiées (souvent listées dans des CVE). Ne pas appliquer les patches laisse le système exposé à des exploits connus. C'est le vecteur d'attaque le plus fréquent après le phishing.",domain:"023",sub:"023.2"},
+{q:"Quel type de malware se déguise en logiciel légitime pour tromper l'utilisateur ?",opts:["Ver (Worm)","Ransomware","Cheval de Troie (Trojan)","Rootkit"],ans:[2],exp:"Un Trojan se présente comme un logiciel utile ou légitime. Une fois exécuté par l'utilisateur, il installe une backdoor, un keylogger ou d'autres malwares. Contrairement aux vers, il ne se propage pas seul.",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce qu'un spyware ?",opts:["Un malware qui chiffre les fichiers","Un logiciel qui collecte secrètement des informations sur l'utilisateur et les envoie à un tiers","Un virus se propageant par réseau","Un outil de surveillance légitime des employés"],ans:[1],exp:"Un spyware surveille secrètement les activités de l'utilisateur (frappes clavier, captures d'écran, historique web) et exfiltre ces données. Il peut être intégré dans des logiciels gratuits (adware-spyware).",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce qu'un adware ?",opts:["Un logiciel de gestion de publicité légitim","Un logiciel qui affiche des publicités non sollicitées, souvent accompagné de fonctions espion","Un type de ransomware ciblant les agences publicitaires","Un bloqueur de publicités malveillant"],ans:[1],exp:"L'adware affiche des publicités intrusives pour générer des revenus. Souvent livré avec des logiciels gratuits, il peut aussi collecter des données utilisateur. La frontière avec le spyware est mince.",domain:"023",sub:"023.3"},
+{q:"Quel outil Linux permet de vérifier l'intégrité des fichiers système contre des modifications malveillantes ?",opts:["ls -la","AIDE (Advanced Intrusion Detection Environment) ou Tripwire","df -h","lsof"],ans:[1],exp:"AIDE et Tripwire créent une base de référence (checksums, permissions) des fichiers système. Des vérifications périodiques détectent toute modification, notamment les rootkits qui modifient les binaires.",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce que le chiffrement eCryptfs sous Linux ?",opts:["Un chiffrement de partition entière au niveau bloc","Un chiffrement de niveau fichier permettant de chiffrer des répertoires individuels (home directory)","Un protocole de chiffrement réseau","Un outil de chiffrement des e-mails"],ans:[1],exp:"eCryptfs est un système de fichiers chiffrés au niveau fichier (stacked filesystem). Il chiffre chaque fichier individuellement et est souvent utilisé pour chiffrer les home directories sous Ubuntu.",domain:"022",sub:"022.4"},
+{q:"Quel est l'avantage principal d'un chiffrement de disque complet (FDE) ?",opts:["Il protège les données même si le disque est physiquement volé","Il chiffre uniquement les fichiers modifiés récemment","Il accélère les accès disque","Il remplace la nécessité d'un mot de passe système"],ans:[0],exp:"Le Full Disk Encryption (FDE) via LUKS/BitLocker protège toutes les données sur le disque si l'appareil est volé. Sans le mot de passe ou la clé, les données sont illisibles même si le disque est monté sur un autre système.",domain:"022",sub:"022.4"},
+{q:"Qu'est-ce que Secure Boot dans le contexte UEFI ?",opts:["Un mode de démarrage en lecture seule","Un mécanisme vérifiant la signature cryptographique du bootloader et du noyau au démarrage","Un chiffrement du BIOS","Un outil de récupération du système"],ans:[1],exp:"Secure Boot vérifie que le bootloader et le noyau sont signés par des clés de confiance avant de les exécuter. Cela protège contre les bootkits et rootkits qui infectent le processus de démarrage.",domain:"023",sub:"023.1"},
+{q:"Quels risques de sécurité sont associés aux appareils IoT ?",opts:["Uniquement un risque de consommation électrique excessive","Mots de passe par défaut non changés, firmware non mis à jour, manque de chiffrement","Risque limité car ils ne traitent pas de données sensibles","Uniquement un risque pour le réseau WiFi domestique"],ans:[1],multi:false,exp:"Les IoT présentent de nombreux risques : mots de passe usine non changés, absence de mises à jour, protocoles non sécurisés, manque de chiffrement. Ils constituent souvent le maillon faible d'un réseau.",domain:"023",sub:"023.1"},
+{q:"Qu'est-ce qu'une attaque de type 'bluebugging' via Bluetooth ?",opts:["Un déni de service sur interface Bluetooth","L'accès non autorisé à un appareil Bluetooth pour passer des appels ou envoyer des messages","Le vol d'identité via NFC","Un type de ransomware mobile"],ans:[1],exp:"Le bluebugging exploite des vulnérabilités Bluetooth pour prendre le contrôle d'un appareil (passer des appels, lire contacts, SMS). Désactiver Bluetooth quand inutilisé et maintenir le firmware à jour réduisent ce risque.",domain:"023",sub:"023.1"},
+{q:"Quelle est la différence entre RAID 1 et une sauvegarde traditionnelle en termes de protection des données ?",opts:["Le RAID 1 est supérieur à une sauvegarde car il est automatique","Le RAID 1 protège contre la panne de disque mais pas contre la suppression accidentelle ou le ransomware ; une sauvegarde hors ligne protège aussi contre ces cas","Une sauvegarde est identique au RAID 1","Le RAID 1 chiffre les données contrairement à la sauvegarde"],ans:[1],exp:"RAID 1 (mirroring) protège contre la défaillance matérielle d'un disque. Mais si vous supprimez un fichier ou si un ransomware chiffre vos données, RAID 1 réplique immédiatement la suppression/chiffrement sur les deux disques.",domain:"023",sub:"023.4"},
+{q:"Qu'est-ce que la virtualisation apporte en termes de sécurité ?",opts:["Elle remplace entièrement les mécanismes de sécurité du système hôte","Elle permet l'isolation : une VM compromise n'affecte pas directement les autres VMs ou l'hôte","Elle désactive les firewalls pour la performance","Elle rend l'encryption inutile"],ans:[1],exp:"La virtualisation fournit une isolation : chaque VM s'exécute dans son propre espace mémoire et disque. Un malware dans une VM ne peut généralement pas s'échapper vers l'hôte (sauf exploitation d'hyperviseur).",domain:"023",sub:"023.2"},
+{q:"Quel mécanisme Linux limite les privilèges d'un processus aux capacités (capabilities) strictement nécessaires ?",opts:["sudo -i","Linux Capabilities (cap_net_admin, cap_sys_admin, etc.)","chmod +s (setuid)","chroot"],ans:[1],exp:"Les Linux Capabilities divisent les privilèges root en unités granulaires. Un processus peut avoir CAP_NET_BIND_SERVICE (port <1024) sans être entièrement root. Cela applique le principe du moindre privilège au niveau des processus.",domain:"023",sub:"023.2"},
+{q:"Qu'est-ce qu'un conteneur Docker par rapport à une VM en termes de sécurité ?",opts:["Un conteneur est plus sécurisé car il a son propre noyau","Un conteneur partage le noyau hôte, offrant moins d'isolation qu'une VM ; une faille noyau peut compromettre l'hôte","Un conteneur est identique à une VM sur le plan sécurité","Un conteneur ne peut pas être compromis"],ans:[1],exp:"Les conteneurs partagent le noyau de l'hôte (moins d'isolation). Une VMs a son propre hyperviseur et noyau (plus d'isolation). Les conteneurs compensent avec namespaces, cgroups, seccomp et SELinux/AppArmor.",domain:"023",sub:"023.2"},
+{q:"Quel type d'analyse de malware consiste à exécuter le code dans un environnement contrôlé pour observer son comportement ?",opts:["Analyse statique","Reverse engineering","Analyse dynamique / sandbox","Analyse forensique post-mortem"],ans:[2],exp:"L'analyse dynamique (sandboxing) exécute le malware dans un environnement isolé et surveille : fichiers créés, connexions réseau, clés registre modifiées. Cuckoo Sandbox est un exemple d'outil open source.",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce que le principe de 'defense in depth' (défense en profondeur) ?",opts:["Utiliser un seul firewall très puissant","Mettre en place plusieurs couches de sécurité indépendantes pour qu'un attaquant contournant une couche trouve encore d'autres obstacles","Concentrer toute la sécurité sur le périmètre réseau","Sécuriser uniquement les données les plus critiques"],ans:[1],exp:"La défense en profondeur empile plusieurs contrôles de sécurité : pare-feu périmétrique, segmentation réseau, EDR sur les hôtes, chiffrement des données, authentification forte, surveillance. Chaque couche compense les limites des autres.",domain:"021",sub:"021.2"},
+{q:"Qu'est-ce qu'une vulnérabilité zero-day ?",opts:["Une vulnérabilité exploitée exactement à minuit","Une faille inconnue du fournisseur ou sans patch disponible, exploitable immédiatement","Une vulnérabilité de niveau critique découverte il y a exactement 0 jour","Un bug qui se manifeste uniquement au démarrage du système"],ans:[1],exp:"Un zero-day est une vulnérabilité inconnue du fournisseur du logiciel (ou connue mais sans correctif). L'attaquant a 'zéro jour' de répit au défenseur. Ces exploits sont très précieux sur le marché noir.",domain:"021",sub:"021.2"},
+{q:"Quels outils permettent de chiffrer un répertoire ou un système de fichiers sur Linux ?",opts:["LUKS/dm-crypt","eCryptfs","VeraCrypt","Tous les précédents"],ans:[3],multi:false,exp:"LUKS/dm-crypt chiffre au niveau bloc (partitions entières), eCryptfs au niveau fichier (répertoires), VeraCrypt crée des volumes chiffrés portables. Chacun a ses cas d'usage selon le besoin.",domain:"022",sub:"022.4"},
+{q:"Qu'est-ce qu'un enregistrement SPF (Sender Policy Framework) dans le DNS ?",opts:["Un enregistrement indiquant les serveurs de mail autorisés à envoyer des e-mails pour un domaine","Un certificat TLS pour le serveur mail","Un mécanisme de chiffrement des e-mails","Un outil de filtrage anti-spam côté client"],ans:[0],exp:"SPF est un enregistrement DNS TXT listant les serveurs IP autorisés à envoyer des e-mails au nom du domaine. Le serveur destinataire vérifie l'IP de l'expéditeur contre cette liste. Il lutte contre le spoofing.",domain:"022",sub:"022.3"},
+{q:"Dans quel cas utilise-t-on une clé de récupération LUKS ?",opts:["Pour accélérer le déchiffrement du disque","Pour déchiffrer le volume si le mot de passe principal est oublié ou si le slot de clé principal est corrompu","Pour chiffrer le disque avec un algorithme de récupération spécial","LUKS ne supporte pas les clés de récupération"],ans:[1],exp:"LUKS supporte jusqu'à 8 slots de clés. Une clé de récupération (passphrase ou fichier de clé) stockée en lieu sûr permet d'accéder au volume si le mot de passe principal est perdu ou si le header LUKS est partiellement corrompu.",domain:"022",sub:"022.4"},
+{q:"Quel type d'attaque vise les mots de passe en utilisant des listes de mots courants ?",opts:["Attaque par force brute pure","Attaque par dictionnaire","Attaque par table arc-en-ciel","Attaque de type Birthday"],ans:[1],exp:"L'attaque par dictionnaire utilise des listes de mots courants, variantes et combinaisons fréquentes. Plus efficace que la force brute pure. Les outils comme hashcat ou John the Ripper intègrent les deux approches.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce que le sandboxing d'applications sur un OS mobile ?",opts:["Le chiffrement des données de l'application","L'isolation de chaque application dans son propre espace, l'empêchant d'accéder aux données des autres apps","La limitation de la consommation CPU de l'application","La vérification de la signature de l'application avant installation"],ans:[1],exp:"Android et iOS isolent chaque application dans son propre sandbox : espace mémoire séparé, accès limité au système de fichiers et aux APIs. Une app malveillante ne peut pas lire les données d'une autre app sans permission explicite.",domain:"023",sub:"023.2"},
+{q:"Qu'est-ce que le principe de 'fail-safe defaults' en sécurité ?",opts:["Un système qui redémarre automatiquement en cas de panne","Par défaut, tout accès est refusé ; les autorisations doivent être explicitement accordées","Un système de sauvegarde automatique en cas de défaillance","Les paramètres par défaut doivent être les plus sécurisés possibles"],ans:[1],exp:"Fail-safe defaults : le comportement par défaut d'un système doit être de refuser l'accès. Les droits doivent être accordés explicitement, pas par défaut. C'est l'inverse du 'fail-open' qui laisserait tout passer en cas de problème.",domain:"021",sub:"021.1"},
+{q:"Quelle commande Linux affiche les processus en cours et leur utilisation des ressources ?",opts:["ps aux / top / htop","ls -la /proc","df -h","netstat -s"],ans:[0],exp:"ps aux liste tous les processus. top et htop affichent en temps réel. Ces outils permettent de détecter des processus malveillants (malware) consommant anormalement le CPU ou la mémoire.",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce qu'un filtre egress (sortant) dans un pare-feu ?",opts:["Un filtre bloquant le trafic entrant","Un filtre contrôlant le trafic sortant du réseau, limitant l'exfiltration de données","Un outil d'inspection des paquets entrants","Un proxy inverse pour les connexions sortantes"],ans:[1],exp:"Le filtrage egress contrôle le trafic sortant : il peut bloquer les connexions vers des domaines malveillants, limiter l'exfiltration de données par des malwares, ou restreindre les applications autorisées à accéder à Internet.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce que la journalisation (logging) sécurisée et pourquoi est-elle importante ?",opts:["Stocker les logs en RAM pour la vitesse","Enregistrer les événements système et les envoyer vers un serveur distant (SIEM) pour audit et détection d'incidents","Supprimer les logs après 24h pour économiser de l'espace","Chiffrer les logs avec une clé perdue"],ans:[1],exp:"Une bonne journalisation enregistre les événements importants (connexions, erreurs, actions admin) et les centralise sur un serveur distant (SIEM). Un attaquant qui comprend un système effacera les logs locaux ; les logs distants préservent la traçabilité.",domain:"021",sub:"021.2"},
+{q:"Qu'est-ce qu'un 'air gap' (isolation physique) en sécurité ?",opts:["Un espace vide dans un rack serveur","Un réseau totalement isolé physiquement d'Internet et d'autres réseaux non fiables","Un tunnel VPN entre deux sites","Un pare-feu sans état"],ans:[1],exp:"Un air gap est une isolation physique totale : aucun câble, WiFi ou connexion externe. Utilisé pour les systèmes critiques (centrales nucléaires, réseaux classifiés). Des attaques sophistiquées contournent l'air gap via ultrasons, LED ou signaux électromagnétiques.",domain:"023",sub:"023.1"},
+{q:"Que fait la commande 'gpg --encrypt --recipient alice@example.com fichier.txt' ?",opts:["Chiffre fichier.txt avec la clé privée de l'utilisateur courant","Chiffre fichier.txt avec la clé publique d'Alice, seule sa clé privée permettant le déchiffrement","Signe fichier.txt avec la clé publique d'Alice","Génère une paire de clés pour alice@example.com"],ans:[1],exp:"Cette commande GPG chiffre le fichier avec la clé publique d'Alice. Seule Alice (détentrice de la clé privée correspondante) pourra déchiffrer avec 'gpg --decrypt'. C'est le paradigme du chiffrement asymétrique.",domain:"022",sub:"022.3"},
+{q:"Qu'est-ce que la gestion des vulnérabilités (vulnerability management) ?",opts:["L'installation ponctuelle de mises à jour","Un processus continu d'identification, évaluation, priorisation et correction des vulnérabilités d'un système","Un outil de détection d'intrusion","La gestion des accès utilisateurs"],ans:[1],exp:"La gestion des vulnérabilités est un cycle continu : découverte (scan), évaluation (CVSS score), priorisation (risque business), remédiation (patch), vérification. Des outils comme OpenVAS, Nessus ou Qualys automatisent ce processus.",domain:"021",sub:"021.2"},
+{q:"Quel protocole remplace Telnet pour l'administration sécurisée de serveurs distants ?",opts:["FTP","SSH (Secure Shell)","SNMP","HTTP Basic Auth"],ans:[1],exp:"SSH chiffre intégralement la session d'administration (commandes, données, mots de passe). Telnet transmet tout en clair. SSH offre aussi le port forwarding, le SFTP et l'authentification par clé.",domain:"024",sub:"024.1"},
+{q:"Quelle technique permet de limiter les risques d'infection par malware lors de la navigation web ?",opts:["Utiliser uniquement HTTP pour éviter les certificats frauduleux","Désactiver les mises à jour automatiques du navigateur","Utiliser un bloqueur de publicités/scripts et maintenir le navigateur à jour","Autoriser tous les popups pour ne pas manquer d'information"],ans:[2],exp:"Un bloqueur de scripts/pub (uBlock Origin, NoScript) empêche l'exécution de code malveillant via publicités malveillantes (malvertising). Un navigateur à jour corrige les CVE exploitées via des drive-by downloads.",domain:"023",sub:"023.2"},
+{q:"Qu'est-ce qu'une attaque par rebond (pivoting) dans le contexte d'une intrusion ?",opts:["Redémarrer un serveur pour effacer les traces","Utiliser un système compromis comme point de départ pour attaquer d'autres systèmes du réseau interne","Faire rebondir des requêtes DNS","Utiliser un proxy pour masquer son IP"],ans:[1],exp:"Le pivoting consiste à utiliser un hôte compromis comme relais pour atteindre des systèmes moins exposés du réseau interne. C'est pour cela que la segmentation réseau et la surveillance du trafic interne sont importantes.",domain:"024",sub:"024.2"},
+{q:"Lesquels de ces éléments font partie d'une politique de mot de passe robuste ?",opts:["Longueur minimale de 12+ caractères","Vérification contre les bases de mots de passe compromis (ex: HaveIBeenPwned)","Obligation de changer le mot de passe tous les 30 jours","Complexité : mélange majuscules, minuscules, chiffres, symboles"],ans:[0,1,3],multi:true,exp:"NIST SP 800-63B recommande : longueur élevée (12+ chars), vérification contre les listes de compromission, complexité. Le changement forcé fréquent est déconseillé car il pousse les utilisateurs à des mots de passe prévisibles.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce qu'un certificat d'Extended Validation (EV) par rapport à un certificat DV ?",opts:["Un certificat EV est identique à un DV mais plus cher","Un certificat EV implique une vérification rigoureuse de l'identité juridique de l'organisation, contrairement au DV qui vérifie seulement la propriété du domaine","Un certificat EV est auto-signé","Un certificat DV offre plus de sécurité technique qu'un EV"],ans:[1],exp:"DV (Domain Validated) : la CA vérifie uniquement que le demandeur contrôle le domaine. EV (Extended Validation) : vérification approfondie de l'identité légale de l'organisation. EV était identifiable par la barre verte (abandonnée dans les navigateurs modernes).",domain:"022",sub:"022.2"},
+{q:"Quelle commande Linux permet de créer un volume chiffré LUKS ?",opts:["mkfs.ext4 /dev/sdb1","cryptsetup luksFormat /dev/sdb1","fdisk /dev/sdb","gpg --symmetric /dev/sdb1"],ans:[1],exp:"'cryptsetup luksFormat' initialise le volume LUKS en définissant la passphrase et les paramètres de chiffrement. Ensuite, 'cryptsetup luksOpen' ouvre le volume, 'mkfs' crée le système de fichiers, et 'mount' monte le volume.",domain:"022",sub:"022.4"},
+]
+},
+
+// ── QUIZ 4 ──────────────────────────────────────────────
+{
+title: "Quiz 4 — Examen Blanc Complet",
+desc: "Simulation complète couvrant tous les domaines en proportion pondérée, proche du format Pearson VUE.",
+questions: [
+{q:"Lequel de ces objectifs de sécurité garantit que les services restent accessibles aux utilisateurs légitimes ?",opts:["Confidentialité","Intégrité","Disponibilité","Non-répudiation"],ans:[2],exp:"La disponibilité (Availability) garantit que les systèmes et données sont accessibles quand nécessaire. C'est un des trois piliers CIA. Les attaques DoS/DDoS ciblent spécifiquement la disponibilité.",domain:"021",sub:"021.1"},
+{q:"Quelle est la différence entre une vulnérabilité et une menace ?",opts:["Aucune, ce sont des synonymes","Une vulnérabilité est une faiblesse exploitable ; une menace est un acteur ou événement pouvant exploiter cette faiblesse","Une menace est technique, une vulnérabilité est humaine","Une vulnérabilité concerne les réseaux, une menace concerne les applications"],ans:[1],exp:"Vulnérabilité = faiblesse (bug, mauvaise config). Menace = acteur/événement pouvant exploiter une vulnérabilité. Risque = probabilité × impact d'exploitation. Ces trois concepts sont fondamentaux en gestion du risque.",domain:"021",sub:"021.2"},
+{q:"Dans quel cas est-il légalement et éthiquement acceptable d'effectuer un test de pénétration ?",opts:["Quand on pense que le système est vulnérable","Quand on obtient une autorisation écrite explicite du propriétaire du système","Quand on est employé de l'entreprise cible","Quand on utilise uniquement des outils open source"],ans:[1],exp:"Le test de pénétration sans autorisation explicite est illégal dans la plupart des pays. Une autorisation écrite (scope, limites, durée) est indispensable. L'éthique impose également de ne pas divulguer les informations obtenues.",domain:"021",sub:"021.3"},
+{q:"Qu'est-ce que la cryptographie symétrique et quelle est sa limitation principale ?",opts:["Elle utilise deux clés différentes ; limitation : complexité mathématique","Elle utilise la même clé pour chiffrer et déchiffrer ; limitation : distribution sécurisée de la clé","Elle est uniquement utilisable pour le hachage ; limitation : irréversibilité","Elle est basée sur des certificats ; limitation : coût des CA"],ans:[1],exp:"En cryptographie symétrique (AES, ChaCha20), la même clé chiffre et déchiffre. Le problème fondamental est : comment partager la clé de façon sécurisée ? La cryptographie asymétrique résout ce problème (échange de clé Diffie-Hellman).",domain:"022",sub:"022.1"},
+{q:"Qu'est-ce que la signature numérique d'un document garantit-elle ?",opts:["La confidentialité du document","L'authenticité de l'auteur et l'intégrité du document","Le chiffrement du document pour le destinataire","L'anonymat de l'expéditeur"],ans:[1],exp:"Une signature numérique utilise la clé privée de l'auteur. Elle garantit : authenticité (seul l'auteur a la clé privée) et intégrité (toute modification invalide la signature). Elle ne chiffre pas le document.",domain:"022",sub:"022.1"},
+{q:"Quel indicateur dans un navigateur web confirme qu'une connexion HTTPS est établie avec le bon site ?",opts:["La présence du mot 'http://' dans l'URL","L'icône cadenas et le nom de domaine correspondant au certificat","La couleur verte de la page web","La rapidité de chargement de la page"],ans:[1],exp:"L'icône cadenas indique que TLS est actif. Le certificat présenté doit correspondre au domaine visité. Si le nom ne correspond pas, le navigateur affiche une erreur de certificat. Cela prévient les attaques MitM.",domain:"022",sub:"022.2"},
+{q:"Lequel de ces protocoles assure la confidentialité et l'intégrité du trafic web par défaut ?",opts:["HTTP","HTTPS (TLS 1.2 ou 1.3)","FTP","SNMP v1"],ans:[1],exp:"HTTPS utilise TLS pour chiffrer les communications HTTP. HTTP, FTP et SNMP v1 transmettent les données en clair. SNMP v3 est la version sécurisée de SNMP.",domain:"022",sub:"022.2"},
+{q:"Qu'est-ce que S/MIME et dans quel contexte est-il utilisé ?",opts:["Un protocole de tunneling VPN","Un standard de sécurisation des e-mails via chiffrement et/ou signature avec des certificats X.509","Un protocole de transfert de fichiers sécurisé","Un mécanisme d'authentification web"],ans:[1],exp:"S/MIME (Secure/Multipurpose Internet Mail Extensions) utilise des certificats X.509 pour signer et/ou chiffrer les e-mails. Contrairement à PGP, il s'intègre nativement dans Outlook, Apple Mail et d'autres clients.",domain:"022",sub:"022.3"},
+{q:"Quel type de chiffrement est utilisé pour sécuriser les communications TLS lors de l'établissement d'une session ?",opts:["Uniquement du chiffrement symétrique","Chiffrement asymétrique pour l'échange de clés, puis symétrique pour les données","Uniquement du chiffrement asymétrique","Hachage MD5 pour la confidentialité"],ans:[1],exp:"TLS utilise un handshake asymétrique (RSA ou Diffie-Hellman) pour établir une clé de session secrète, puis bascule sur le chiffrement symétrique (AES) pour les données, plus performant pour de gros volumes.",domain:"022",sub:"022.1"},
+{q:"Qu'est-ce qu'un virus informatique ?",opts:["Tout programme malveillant","Un malware qui s'attache à un fichier légitime et se réplique lors de l'exécution de l'hôte","Un malware qui se propage sans fichier hôte","Un logiciel de surveillance légitime"],ans:[1],exp:"Un virus s'attache à un fichier existant (exécutable, document) et se propage quand l'hôte est exécuté/ouvert. Contrairement aux vers (autonomes) ou aux trojans (se déguisent), les virus ont besoin d'un fichier hôte pour se propager.",domain:"023",sub:"023.3"},
+{q:"Qu'est-ce que le BYOD (Bring Your Own Device) comme politique implique comme risques de sécurité ?",opts:["Aucun risque supplémentaire si l'employé est de confiance","Accès aux données d'entreprise depuis des appareils non maîtrisés, potentiellement non patchés ou compromis","Uniquement un risque de vol physique du matériel","Des risques uniquement pour les données personnelles de l'employé"],ans:[1],exp:"Le BYOD introduit des appareils hors du contrôle IT de l'entreprise : OS non à jour, applications non validées, accès à des réseaux WiFi publics, mélange données pro/perso. Les solutions MDM (Mobile Device Management) aident à gérer ce risque.",domain:"023",sub:"023.1"},
+{q:"Quel commande Linux permet de tester la connectivité réseau et la résolution DNS d'un hôte ?",opts:["ls -la","ping hostname && dig hostname","df -h","chmod 755 hostname"],ans:[1],exp:"ping vérifie la connectivité ICMP vers un hôte. dig (ou nslookup) effectue des requêtes DNS. Ces deux outils sont fondamentaux pour diagnostiquer les problèmes réseau et vérifier la configuration DNS.",domain:"024",sub:"024.1"},
+{q:"Qu'est-ce qu'une attaque de type 'phishing spear' (spear phishing) ?",opts:["Un phishing envoyé à des milliers de personnes aléatoirement","Un phishing personnalisé ciblant une personne ou organisation spécifique avec des informations collectées au préalable","Un phishing via SMS","Un phishing ciblant uniquement les PDG (whaling)"],ans:[1],exp:"Le spear phishing est hautement ciblé : l'attaquant utilise des informations personnelles (nom, poste, collègues) pour créer un e-mail crédible. Taux de succès bien supérieur au phishing générique. Le whaling est le spear phishing ciblant des dirigeants.",domain:"025",sub:"025.2"},
+{q:"Qu'est-ce qu'un pare-feu applicatif (WAF - Web Application Firewall) ?",opts:["Un firewall réseau standard avec règles IP","Un firewall spécialisé qui inspecte le trafic HTTP/HTTPS et protège contre les attaques web (SQLi, XSS)","Un proxy de cache web","Un IDS réseau générique"],ans:[1],exp:"Un WAF analyse le contenu des requêtes HTTP pour bloquer les attaques applicatives : SQL injection, XSS, CSRF, path traversal. Il opère au niveau applicatif (couche 7) contrairement aux firewalls réseau (couches 3-4).",domain:"024",sub:"024.2"},
+{q:"Quel protocole permet à un client de vérifier en temps réel si un certificat TLS est révoqué ?",opts:["CRL (Certificate Revocation List)","OCSP (Online Certificate Status Protocol)","HSTS","Certificate Transparency"],ans:[1],exp:"OCSP permet une vérification en temps réel de la révocation d'un certificat en interrogeant le serveur OCSP de la CA. La CRL est moins efficace (téléchargement de listes volumineuses potentiellement non à jour).",domain:"022",sub:"022.1"},
+{q:"Qu'est-ce que le chiffrement homomorphe ?",opts:["Un chiffrement identique pour tous les utilisateurs","Un type de chiffrement permettant d'effectuer des calculs sur des données chiffrées sans les déchiffrer","Le chiffrement de la relation entre les données","Un chiffrement bi-directionnel entre deux parties"],ans:[1],exp:"Le chiffrement homomorphe permet de déléguer des calculs (ex: à un cloud) sur des données chiffrées, et d'obtenir un résultat chiffré équivalent au calcul sur les données en clair. C'est une technologie émergente aux applications prometteuses.",domain:"022",sub:"022.1"},
+{q:"Qu'est-ce que la technique de 'typosquatting' (ou cybersquatting) ?",opts:["Une attaque par injection de code dans les URLs","L'enregistrement de noms de domaine similaires (avec fautes de frappe) à des sites légitimes pour tromper les utilisateurs","Une attaque DDoS utilisant des domaines compromis","Un empoisonnement de cache DNS"],ans:[1],exp:"Le typosquatting exploite les erreurs de frappe : 'gooogle.com', 'paypa1.com'. L'utilisateur arrive sur un site malveillant visuellement identique à l'original et entre ses identifiants. Vérifier attentivement les URLs est essentiel.",domain:"025",sub:"025.2"},
+{q:"Que signifie 'chiffrement de bout en bout' dans une application de messagerie ?",opts:["Le serveur de messagerie peut lire les messages mais pas les fournisseurs réseau","Seuls l'émetteur et le destinataire peuvent lire les messages ; le serveur ne stocke que des données chiffrées","Le trafic est chiffré uniquement entre l'app et le serveur","Le chiffrement est activé de bout en bout de la journée"],ans:[1],exp:"E2EE en messagerie (Signal, WhatsApp) : les clés de déchiffrement restent sur les appareils des utilisateurs. Le serveur relaye des données chiffrées qu'il ne peut pas lire. Une compromission du serveur n'expose pas le contenu des messages.",domain:"024",sub:"024.3"},
+{q:"Quel outil Linux est utilisé pour configurer le pare-feu Netfilter ?",opts:["iptables / nftables","ufw (qui est un frontend pour iptables)","firewalld","Tous les précédents peuvent configurer Netfilter"],ans:[3],multi:false,exp:"iptables, nftables, ufw et firewalld sont tous des interfaces pour configurer Netfilter (le framework de filtrage du noyau Linux). nftables remplace progressivement iptables. ufw et firewalld sont des frontends simplifiés.",domain:"024",sub:"024.2"},
+{q:"Qu'est-ce que la 'surface d'attaque' (attack surface) d'un système ?",opts:["La surface physique des serveurs dans le datacenter","L'ensemble des points d'entrée potentiels qu'un attaquant peut tenter d'exploiter","La taille de la base de code d'une application","Le nombre d'administrateurs ayant accès au système"],ans:[1],exp:"La surface d'attaque englobe tous les vecteurs potentiels : ports ouverts, services actifs, APIs exposées, interfaces utilisateur, bibliothèques tierces, utilisateurs avec accès. Réduire la surface d'attaque diminue le risque.",domain:"021",sub:"021.2"},
+{q:"Quelle propriété cryptographique garantit qu'il est impossible de retrouver l'entrée à partir de la sortie d'une fonction de hachage ?",opts:["Unicité","Résistance à la préimage (one-way property)","Déterminisme","Collision-resistance"],ans:[1],exp:"La résistance à la préimage garantit qu'à partir du hash h, il est computationnellement impossible de trouver m tel que hash(m) = h. C'est la propriété 'sens unique' essentielle pour le stockage sécurisé des mots de passe.",domain:"022",sub:"022.1"},
+{q:"Qu'est-ce que DMARC (Domain-based Message Authentication, Reporting and Conformance) ?",opts:["Un protocole de chiffrement des e-mails","Une politique qui spécifie comment traiter les e-mails qui échouent les vérifications SPF ou DKIM","Un mécanisme de signature TLS pour les serveurs mail","Un système de filtrage anti-spam basé sur le contenu"],ans:[1],exp:"DMARC (DNS TXT) définit la politique : quarantaine ou rejet des e-mails qui ne passent pas SPF/DKIM. Il fournit aussi des rapports aux propriétaires de domaines sur les tentatives d'usurpation. Combiné avec SPF et DKIM, il forme le socle anti-spoofing.",domain:"022",sub:"022.3"},
+{q:"Qu'est-ce que le 'credential stuffing' ?",opts:["La création de faux identifiants pour l'accès à un système","L'utilisation automatisée d'identifiants volés (login/mot de passe) de brèches précédentes pour tenter de se connecter à d'autres services","Une attaque par force brute sur un seul service","L'injection de credentials dans le code source d'une application"],ans:[1],exp:"Le credential stuffing exploite la réutilisation des mots de passe. Des outils automatisés testent des millions de paires login/mdp volées sur des brèches connues. Solution : mots de passe uniques et 2FA.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce qu'un proxy de navigation anonyme et quelles sont ses limites ?",opts:["Un VPN complet garantissant l'anonymat total","Un intermédiaire masquant l'IP du client au serveur web, mais susceptible d'enregistrer le trafic lui-même","Un pare-feu applicatif","Un outil de chiffrement bout en bout"],ans:[1],exp:"Un proxy web masque l'IP réelle du client vis-à-vis du serveur. Ses limites : le proxy voit tout le trafic (confiance requise), pas de chiffrement bout en bout, les cookies et empreintes navigateur peuvent identifier l'utilisateur.",domain:"024",sub:"024.3"},
+{q:"Quelle est la principale différence entre chiffrement et hachage ?",opts:["Le chiffrement est plus rapide","Le chiffrement est réversible (avec la clé) ; le hachage est irréversible","Le hachage utilise une clé, le chiffrement non","Il n'y a aucune différence fonctionnelle"],ans:[1],exp:"Chiffrement : transformation réversible nécessitant une clé (pour déchiffrer). Hachage : transformation irréversible produisant une empreinte de taille fixe. Les mots de passe sont hachés (pas chiffrés) car on n'a jamais besoin de les récupérer.",domain:"022",sub:"022.1"},
+{q:"Quel protocole sécurise l'accès aux répertoires LDAP via chiffrement ?",opts:["LDAP (port 389) avec Basic Auth","LDAPS (port 636) ou LDAP avec STARTTLS","LDAP avec MD5 digest","LDAP v2"],ans:[1],exp:"LDAPS encapsule LDAP dans TLS (port 636). STARTTLS peut aussi upgrader une connexion LDAP standard. LDAP en clair (port 389) transmet les données et les mots de passe en clair.",domain:"024",sub:"024.1"},
+{q:"Quel mécanisme protège contre la réutilisation d'un token d'authentification intercepté ?",opts:["Les tokens à longue durée de vie","Les tokens à courte durée de vie et les nonces (tokens à usage unique)","Le chiffrement symétrique des tokens","La taille du token (plus il est long, mieux c'est)"],ans:[1],exp:"Les tokens à courte expiration (JWT exp court) et les nonces (valeurs aléatoires à usage unique) limitent la fenêtre d'exploitation si un token est intercepté. HTTPS prévient l'interception elle-même.",domain:"025",sub:"025.1"},
+{q:"Qu'est-ce que la géolocalisation des données et pourquoi est-elle importante pour la conformité ?",opts:["La compression géographique des données","La restriction du lieu de stockage et traitement des données selon des lois locales (ex: RGPD impose que les données des citoyens UE restent dans l'UE ou pays adéquats)","La localisation des datacenter pour optimiser la latence","Un outil de tracking utilisateur"],ans:[1],exp:"Le RGPD impose des règles sur les transferts de données hors UE. Les données ne peuvent être transférées que vers des pays offrant un niveau de protection adéquat ou avec des garanties contractuelles (clauses types UE).",domain:"025",sub:"025.3"},
+{q:"Quel outil Python/Linux est utilisé pour tester la sécurité d'une application web ?",opts:["Wireshark","OWASP ZAP (Zed Attack Proxy) ou Burp Suite","Nmap","Tripwire"],ans:[1],exp:"OWASP ZAP et Burp Suite sont des proxies d'interception pour tester la sécurité des applications web : injection SQL, XSS, CSRF, etc. Nmap est un scanner réseau. Wireshark analyse le trafic réseau. Tripwire vérifie l'intégrité des fichiers.",domain:"023",sub:"023.2"},
+{q:"Qu'est-ce que le principe d'imputabilité (accountability) en sécurité informatique ?",opts:["La capacité de chiffrer les actions des utilisateurs","La possibilité de retracer et d'imputer chaque action à un utilisateur identifié via les logs et l'authentification","La limitation des accès par domaine","Le blocage automatique des comptes inactifs"],ans:[1],exp:"L'imputabilité garantit que chaque action peut être attribuée à une entité identifiée. Elle nécessite : authentification forte (pour identifier l'acteur), journalisation (pour enregistrer les actions), et intégrité des logs (pour garantir la traçabilité).",domain:"021",sub:"021.1"},
+{q:"Quels éléments composent la 'triade CIA' de la sécurité de l'information ?",opts:["Chiffrement, Intégrité, Authentification","Confidentialité, Intégrité, Disponibilité","Contrôle, Identification, Autorisation","Cryptographie, Infrastructure, Accès"],ans:[1],multi:false,exp:"La triade CIA (Confidentiality, Integrity, Availability) est le modèle fondamental de la sécurité de l'information. Confidentialité : accès limité aux personnes autorisées. Intégrité : données non altérées. Disponibilité : accès garanti aux utilisateurs légitimes.",domain:"021",sub:"021.1"},
+{q:"Quel outil est utilisé pour analyser les captures de trafic réseau (.pcap) ?",opts:["htop","Wireshark / tcpdump","nmap","fail2ban"],ans:[1],exp:"Wireshark offre une interface graphique pour analyser des captures .pcap. tcpdump est l'outil ligne de commande équivalent. Ces outils sont indispensables pour analyser des incidents réseau et comprendre les protocoles.",domain:"024",sub:"024.1"},
+{q:"Qu'est-ce que le 'hardening' (durcissement) d'un système Linux ?",opts:["L'installation d'un antivirus","L'ensemble des mesures réduisant la surface d'attaque : désactivation de services, restrictions de permissions, configuration sécurisée","La mise en place d'un RAID pour la disponibilité","L'installation de mises à jour uniquement"],ans:[1],exp:"Le hardening inclut : désactivation des services inutiles, suppression des comptes par défaut, configuration sécurisée des services, restrictions de permissions, activation de SELinux/AppArmor, application des patches. Des guides CIS Benchmarks définissent les bonnes pratiques.",domain:"023",sub:"023.2"},
+{q:"Quel protocole réseau permet de synchroniser l'heure de façon sécurisée sur les systèmes Linux ?",opts:["NTP (port 123) sans authentification","NTPsec ou Chrony avec authentification cryptographique","SNTP","ICMP timestamp"],ans:[1],exp:"La synchronisation d'heure est critique pour les logs, Kerberos et les certificats TLS. NTP classique (port 123) est vulnérable à l'amplification DDoS et à la manipulation. NTPsec et Chrony avec clés cryptographiques sécurisent la synchronisation.",domain:"024",sub:"024.1"},
+{q:"Qu'est-ce que l'ingénierie sociale de type 'vishing' ?",opts:["Un phishing via message vidéo","Une attaque d'ingénierie sociale par téléphone, se faisant passer pour un support IT ou une banque","Un phishing via VoIP uniquement","Un virus transmis par signal vocal"],ans:[1],exp:"Le vishing (voice phishing) utilise le téléphone pour manipuler des victimes. L'attaquant se fait passer pour le support IT, la banque, ou les impôts pour obtenir des informations sensibles ou faire effectuer des actions (virement, installation de logiciel).",domain:"021",sub:"021.1"},
+{q:"Quel outil en ligne de commande Linux teste la résilience d'un serveur SSH contre les attaques ?",opts:["ssh-keyscan","ssh-audit","sshd -T","ssh -v"],ans:[1],exp:"ssh-audit analyse la configuration d'un serveur SSH : algorithmes supportés, version, vulnérabilités connues. Il identifie les algorithmes faibles (MD5, DES) et recommande les configurations sécurisées.",domain:"024",sub:"024.1"},
+{q:"Qu'est-ce que la 'pseudonymisation' des données au sens du RGPD ?",opts:["La suppression irréversible des données personnelles","Le remplacement des données directement identifiantes par un identifiant artificiel, la réidentification restant possible avec une clé séparée","Le chiffrement des données sur le disque","L'anonymisation complète des données"],ans:[1],exp:"La pseudonymisation remplace les données identifiantes (nom, email) par un pseudonyme. La réidentification reste possible si on a accès à la table de correspondance. C'est moins protecteur que l'anonymisation complète mais reconnu par le RGPD comme mesure de sécurité.",domain:"025",sub:"025.3"},
+{q:"Quelle est la principale utilité d'un gestionnaire de secrets (HashiCorp Vault, AWS Secrets Manager) ?",opts:["Stocker les mots de passe des employés","Gérer et distribuer de façon sécurisée les secrets (clés API, mots de passe, certificats) aux applications, avec audit et rotation automatique","Chiffrer les bases de données de production","Gérer les accès VPN des développeurs"],ans:[1],exp:"Les gestionnaires de secrets centralisent les secrets applicatifs (clés API, DB passwords) avec : contrôle d'accès fin, journalisation, rotation automatique, et distribution sécurisée. Ils évitent le 'secret sprawl' (secrets dans le code source).",domain:"023",sub:"023.2"},
+]
+}
+
+]; // end QUIZZES
+
+// ════════════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════════════
+let state = {
+  quiz: null, qIdx: 0, answers: [],
+  timer: null, timeLeft: 60 * 60,
+  answered: false
+};
+
+const DOMAIN_COLORS = { '021':'var(--d021)', '022':'var(--d022)', '023':'var(--d023)', '024':'var(--d024)', '025':'var(--d025)' };
+const DOMAIN_NAMES = {
+  '021':'021 Security Concepts', '022':'022 Encryption',
+  '023':'023 Device & Storage', '024':'024 Network & Services', '025':'025 Identity & Privacy'
+};
+
+// Load saved scores
+function getSavedScore(idx) {
+  try { return JSON.parse(localStorage.getItem('sec_quiz_' + idx)); } catch(e) { return null; }
+}
+function saveScore(idx, score, total) {
+  localStorage.setItem('sec_quiz_' + idx, JSON.stringify({score, total, date: Date.now()}));
+}
+
+// ── BUILD HOME ──
+function buildHome() {
+  const sel = document.getElementById('quiz-select');
+  sel.innerHTML = '';
+  QUIZZES.forEach((q, i) => {
+    const saved = getSavedScore(i);
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    let badge = '';
+    if (saved) {
+      const pct = Math.round(saved.score / 800 * 100);
+      badge = `<div class="score-badge ${saved.score >= 500 ? 'score-pass' : 'score-fail'}">${saved.score}/800</div>`;
+    }
+    card.innerHTML = `
+      ${badge}
+      <h3>${q.title}</h3>
+      <p>${q.desc}</p>
+      <span class="card-badge">40 questions · 60 min · 500/800</span>
+    `;
+    card.onclick = () => startQuiz(i);
+    sel.appendChild(card);
+  });
+}
+
+// ── START QUIZ ──
+function startQuiz(idx) {
+  state.quiz = idx;
+  state.qIdx = 0;
+  state.answers = new Array(40).fill(null).map(() => []);
+  state.timeLeft = 60 * 60;
+  state.answered = false;
+
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').classList.remove('hidden');
+
+  startTimer();
+  renderQuestion();
+}
+
+// ── TIMER ──
+function startTimer() {
+  clearInterval(state.timer);
+  state.timer = setInterval(() => {
+    state.timeLeft--;
+    updateTimerDisplay();
+    if (state.timeLeft <= 0) { clearInterval(state.timer); endQuiz(); }
+  }, 1000);
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer-display');
+  const m = Math.floor(state.timeLeft / 60);
+  const s = state.timeLeft % 60;
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-clock';
+  if (state.timeLeft < 300) el.classList.add('danger');
+  else if (state.timeLeft < 600) el.classList.add('warning');
+}
+
+// ── RENDER QUESTION ──
+function renderQuestion() {
+  const q = QUIZZES[state.quiz].questions[state.qIdx];
+  state.answered = false;
+
+  // progress
+  const pct = (state.qIdx / 40) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = `${state.qIdx + 1} / 40`;
+
+  document.getElementById('btn-check').style.display = 'inline-block';
+  document.getElementById('btn-next').style.display = 'none';
+
+  const domColor = DOMAIN_COLORS[q.domain] || 'var(--accent)';
+  const domName = DOMAIN_NAMES[q.domain] || q.domain;
+
+  const keys = ['A','B','C','D','E'];
+  const opts = q.opts.map((o, i) => `
+    <div class="option" id="opt-${i}" onclick="toggleOpt(${i})" data-idx="${i}">
+      <span class="opt-key">${keys[i]}</span>
+      <span>${o}</span>
+    </div>`).join('');
+
+  document.getElementById('q-container').innerHTML = `
+    <div style="border:1px solid var(--border);background:var(--bg2);border-radius:4px;padding:24px;margin-bottom:16px;">
+      <div class="q-domain" style="color:${domColor};border-color:${domColor};">${domName} · ${q.sub}</div>
+      <div class="q-num">Question ${state.qIdx + 1} sur 40</div>
+      <div class="q-text">${q.q}</div>
+      ${q.multi ? '<div class="q-multi-hint">⚠ Plusieurs réponses correctes possibles</div>' : ''}
+      <div class="options" id="options-wrap">${opts}</div>
+      <div class="explanation" id="explanation"></div>
+    </div>
+  `;
+}
+
+function toggleOpt(idx) {
+  if (state.answered) return;
+  const q = QUIZZES[state.quiz].questions[state.qIdx];
+  const sel = state.answers[state.qIdx];
+
+  if (q.multi) {
+    const pos = sel.indexOf(idx);
+    if (pos >= 0) sel.splice(pos, 1);
+    else sel.push(idx);
+  } else {
+    state.answers[state.qIdx] = [idx];
+  }
+
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  state.answers[state.qIdx].forEach(i => {
+    document.getElementById('opt-' + i)?.classList.add('selected');
+  });
+}
+
+function checkAnswer() {
+  const q = QUIZZES[state.quiz].questions[state.qIdx];
+  const sel = state.answers[state.qIdx];
+  state.answered = true;
+
+  const correct = q.ans;
+  const isCorrect = correct.length === sel.length && correct.every(a => sel.includes(a));
+
+  q.opts.forEach((_, i) => {
+    const el = document.getElementById('opt-' + i);
+    if (!el) return;
+    el.onclick = null;
+    if (correct.includes(i) && sel.includes(i)) el.className = 'option correct';
+    else if (sel.includes(i) && !correct.includes(i)) el.className = 'option wrong';
+    else if (correct.includes(i)) el.className = 'option missed';
+    else el.className = 'option';
+  });
+
+  const expEl = document.getElementById('explanation');
+  expEl.innerHTML = `<strong>Explication :</strong> ${q.exp}`;
+  expEl.classList.add('show');
+
+  document.getElementById('btn-check').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  state.qIdx++;
+  if (state.qIdx >= 40) { endQuiz(); return; }
+  renderQuestion();
+}
+
+// ── END / RESULTS ──
+function endQuiz() {
+  clearInterval(state.timer);
+  document.getElementById('quiz').classList.add('hidden');
+
+  const qs = QUIZZES[state.quiz].questions;
+  let correct = 0;
+  qs.forEach((q, i) => {
+    const sel = state.answers[i] || [];
+    if (q.ans.length === sel.length && q.ans.every(a => sel.includes(a))) correct++;
+  });
+
+  const rawPct = correct / 40;
+  const score = Math.round(200 + rawPct * 600); // LPI 200-800 scale
+  const pass = score >= 500;
+
+  saveScore(state.quiz, score, 800);
+
+  // domain stats
+  const domStats = {};
+  qs.forEach((q, i) => {
+    if (!domStats[q.domain]) domStats[q.domain] = {tot:0, ok:0};
+    domStats[q.domain].tot++;
+    const sel = state.answers[i] || [];
+    if (q.ans.length === sel.length && q.ans.every(a => sel.includes(a))) domStats[q.domain].ok++;
+  });
+
+  const scorePct = rawPct * 100;
+  const circleAngle = `${scorePct}%`;
+
+  let domRows = Object.entries(domStats).map(([dom, {tot, ok}]) => {
+    const p = Math.round(ok/tot*100);
+    const col = DOMAIN_COLORS[dom];
+    return `<div class="db-row">
+      <div class="db-label" style="color:${col}">${DOMAIN_NAMES[dom]}</div>
+      <div class="db-bar-track"><div class="db-bar-fill" style="width:${p}%;background:${col}"></div></div>
+      <div class="db-pct" style="color:${col}">${p}%</div>
+    </div>`;
+  }).join('');
+
+  // review
+  let reviewHTML = qs.map((q, i) => {
+    const sel = state.answers[i] || [];
+    const ok = q.ans.length === sel.length && q.ans.every(a => sel.includes(a));
+    const keys = ['A','B','C','D','E'];
+    const selText = sel.map(s => keys[s] + '. ' + q.opts[s]).join(', ') || '—';
+    const corrText = q.ans.map(a => keys[a] + '. ' + q.opts[a]).join(', ');
+    return `<div class="review-item">
+      <div class="review-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span class="review-icon">${ok ? '✓' : '✗'}</span>
+        <span class="review-q-text" style="color:${ok?'var(--green)':'var(--red)'}">${i+1}. ${q.q}</span>
+      </div>
+      <div class="review-body">
+        <div style="margin-bottom:6px"><strong style="color:var(--text-dim)">Votre réponse :</strong> <span style="color:${ok?'var(--green)':'var(--red)'}">${selText}</span></div>
+        <div style="margin-bottom:6px"><strong style="color:var(--text-dim)">Bonne réponse :</strong> <span style="color:var(--green)">${corrText}</span></div>
+        <div style="color:var(--text-dim)">${q.exp}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+  resultsEl.innerHTML = `
+    <div style="text-align:center;margin-bottom:30px;">
+      <div class="score-circle" style="--score-pct:${scorePct}%">
+        <div class="score-val">${score}</div>
+        <div class="score-label">/ 800</div>
+      </div>
+      <div class="result-verdict">
+        <div class="verdict-badge ${pass ? 'verdict-pass' : 'verdict-fail'}">${pass ? '✓ PASS' : '✗ FAIL'}</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text-dim)">Score minimum requis : 500 / 800</div>
+      </div>
+    </div>
+
+    <div class="result-stats">
+      <div class="stat-box"><div class="stat-val">${correct}</div><div class="stat-lbl">Correctes</div></div>
+      <div class="stat-box"><div class="stat-val">${40-correct}</div><div class="stat-lbl">Incorrectes</div></div>
+      <div class="stat-box"><div class="stat-val">${Math.round(scorePct)}%</div><div class="stat-lbl">Score %</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${pass?'var(--green)':'var(--red)'}">${score}</div><div class="stat-lbl">Score LPI</div></div>
+    </div>
+
+    <div class="domain-breakdown">
+      <h3>Résultats par domaine</h3>
+      ${domRows}
+    </div>
+
+    <div class="btn-actions" style="margin-bottom:24px;">
+      <button class="btn btn-green" onclick="retryQuiz()">↺ Recommencer ce quiz</button>
+      <button class="btn" onclick="goHome()">← Choisir un autre quiz</button>
+    </div>
+
+    <div class="review-list">
+      <h3 style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Révision détaillée</h3>
+      ${reviewHTML}
+    </div>
+  `;
+
+  window.scrollTo(0, 0);
+  buildHome(); // refresh scores on home
+}
+
+function retryQuiz() {
+  document.getElementById('results').style.display = 'none';
+  startQuiz(state.quiz);
+}
+
+function goHome() {
+  clearInterval(state.timer);
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+  buildHome();
+}
+
+// ── INIT ──
+buildHome();
+</script>
+</body>
+</html>

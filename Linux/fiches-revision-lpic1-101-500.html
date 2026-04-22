@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiches LPIC-1 – Points à réviser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:      #0d1117;
+    --bg2:     #161b22;
+    --bg3:     #1c2128;
+    --border:  #30363d;
+    --text:    #e6edf3;
+    --text2:   #8b949e;
+    --text3:   #6e7681;
+    --red:     #ff7b72;
+    --red-bg:  rgba(255,123,114,0.08);
+    --red-bd:  rgba(255,123,114,0.25);
+    --green:   #3fb950;
+    --green-bg:rgba(63,185,80,0.08);
+    --green-bd:rgba(63,185,80,0.25);
+    --blue:    #79c0ff;
+    --blue-bg: rgba(121,192,255,0.08);
+    --blue-bd: rgba(121,192,255,0.25);
+    --amber:   #e3b341;
+    --amber-bg:rgba(227,179,65,0.08);
+    --amber-bd:rgba(227,179,65,0.25);
+    --purple:  #bc8cff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .nav-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+  .nav-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .search-input {
+    flex: 1;
+    max-width: 220px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    outline: none;
+  }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus { border-color: var(--blue); }
+
+  /* LAYOUT */
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.25rem 1rem 3rem;
+  }
+
+  /* CATEGORY HEADER */
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 2rem 0 0.75rem;
+  }
+  .cat-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .cat-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+  }
+  .cat-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* FICHE CARD */
+  .fiche {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .fiche-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 14px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fiche-header:active { background: var(--bg3); }
+
+  .fiche-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .fiche-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.45;
+  }
+  .fiche-arrow {
+    color: var(--text3);
+    font-size: 11px;
+    flex-shrink: 0;
+    padding-top: 3px;
+    transition: transform 0.2s;
+  }
+  .fiche-arrow.open { transform: rotate(180deg); }
+
+  /* BODY */
+  .fiche-body {
+    display: none;
+    padding: 0 14px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .fiche-body.open { display: block; }
+
+  /* Blocs internes */
+  .block {
+    border-radius: 8px;
+    padding: 11px 13px;
+    margin-top: 10px;
+    font-size: 13.5px;
+    line-height: 1.65;
+  }
+  .block-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 6px;
+  }
+
+  .block-retenir { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); }
+  .block-retenir .block-label { color: var(--text3); }
+
+  .block-piege { background: var(--amber-bg); border: 1px solid var(--amber-bd); color: #f0cc7a; }
+  .block-piege .block-label { color: var(--amber); }
+
+  .block-memo { background: var(--blue-bg); border: 1px solid var(--blue-bd); color: #aad4ff; }
+  .block-memo .block-label { color: var(--blue); }
+
+  /* Tableau */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text3);
+    text-align: left;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+  td {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    color: var(--text2);
+    vertical-align: top;
+  }
+  td:first-child {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Code */
+  pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #c9d1d9;
+  }
+  .c-green { color: var(--green); }
+  .c-red   { color: var(--red); }
+  .c-amber { color: var(--amber); }
+  .c-blue  { color: var(--blue); }
+  .c-gray  { color: var(--text3); }
+  .c-purple{ color: var(--purple); }
+
+  code {
+    font-family: var(--mono);
+    background: rgba(255,255,255,0.07);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--blue);
+  }
+
+  /* Pastille catégorie */
+  .cat-udev   .cat-icon { background: rgba(121,192,255,0.12); }
+  .cat-fs     .cat-icon { background: rgba(63,185,80,0.12); }
+  .cat-kernel .cat-icon { background: rgba(188,140,255,0.12); }
+  .cat-shell  .cat-icon { background: rgba(227,179,65,0.12); }
+  .cat-sig    .cat-icon { background: rgba(255,123,114,0.12); }
+  .cat-boot   .cat-icon { background: rgba(121,192,255,0.12); }
+  .cat-pkg    .cat-icon { background: rgba(63,185,80,0.12); }
+  .cat-virt   .cat-icon { background: rgba(188,140,255,0.12); }
+
+  /* Search highlight */
+  .fiche.hidden { display: none; }
+  mark { background: rgba(227,179,65,0.3); color: var(--text); border-radius: 2px; }
+
+  /* Scroll to top */
+  .back-top {
+    display: block;
+    text-align: center;
+    padding: 0.5rem;
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-decoration: none;
+    margin-top: 1rem;
+  }
+  .back-top:hover { color: var(--blue); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-title">LPIC-1 · Révision</span>
+  <input class="search-input" type="search" placeholder="Rechercher..." id="search" oninput="doSearch(this.value)">
+  <span class="nav-count" id="nav-count">19 fiches</span>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════
+     UDEV
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-udev">
+  <div class="cat-icon">🔌</div>
+  <span class="cat-name">udev &amp; périphériques</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f1">
+  <div class="fiche-header" onclick="toggle('f1')">
+    <span class="fiche-num">01</span>
+    <span class="fiche-title">Surveiller les événements udev en temps réel</span>
+    <span class="fiche-arrow" id="a-f1">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f1">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      <code>udevadm monitor</code> est la sous-commande dédiée pour écouter les événements matériels en temps réel. Elle affiche les événements kernel ET udev au fur et à mesure.
+    </div>
+    <pre><span class="c-green">udevadm monitor</span>              <span class="c-gray"># kernel + udev</span>
+<span class="c-green">udevadm monitor --kernel</span>      <span class="c-gray"># kernel uniquement</span>
+<span class="c-green">udevadm monitor --udev</span>        <span class="c-gray"># udev uniquement</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>journalctl -f</code> affiche les logs systemd en général — ce n'est <strong>pas</strong> spécifique aux événements udev.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Mémo sous-commandes udevadm</div>
+      monitor · info · trigger · settle · test · control
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f2">
+  <div class="fiche-header" onclick="toggle('f2')">
+    <span class="fiche-num">02</span>
+    <span class="fiche-title">Afficher les attributs udev en hiérarchie</span>
+    <span class="fiche-arrow" id="a-f2">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f2">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      <code>udevadm info --attribute-walk</code> affiche tous les attributs du device ET de ses devices parents, en hiérarchie. Indispensable pour écrire des règles udev.
+    </div>
+    <pre><span class="c-green">udevadm info --attribute-walk /dev/sda</span>
+<span class="c-green">udevadm info -a /dev/sda</span>      <span class="c-gray"># forme courte</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>--tree</code> n'est pas une option valide de <code>udevadm info</code>.
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SYSTÈMES DE FICHIERS
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-fs">
+  <div class="cat-icon">💾</div>
+  <span class="cat-name">Systèmes de fichiers</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f3">
+  <div class="fiche-header" onclick="toggle('f3')">
+    <span class="fiche-num">03</span>
+    <span class="fiche-title">mkfs sans argument → quel type par défaut ?</span>
+    <span class="fiche-arrow" id="a-f3">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f3">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Sans option <code>-t</code>, <code>mkfs</code> crée un système <strong>ext2</strong> par défaut — pas ext3, pas ext4.
+    </div>
+    <pre><span class="c-red">mkfs /dev/sdb1</span>               <span class="c-gray"># → ext2 par défaut</span>
+<span class="c-green">mkfs -t ext4 /dev/sdb1</span>       <span class="c-gray"># → ext4 explicite</span>
+<span class="c-green">mkfs.ext4 /dev/sdb1</span>          <span class="c-gray"># → idem</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège classique LPIC</div>
+      ext2 ≠ ext3 ≠ ext4. Le défaut historique est <strong>ext2</strong>. Ne pas confondre avec le format le plus courant aujourd'hui (ext4).
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f4">
+  <div class="fiche-header" onclick="toggle('f4')">
+    <span class="fiche-num">04</span>
+    <span class="fiche-title">Espace réservé par défaut sur ext4 : 5%</span>
+    <span class="fiche-arrow" id="a-f4">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f4">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Par défaut, ext4 réserve <strong>5%</strong> de l'espace total pour root, afin d'éviter les blocages système quand le disque est plein.
+    </div>
+    <pre><span class="c-green">tune2fs -m 2 /dev/sda1</span>       <span class="c-gray"># réduire à 2%</span>
+<span class="c-green">tune2fs -l /dev/sda1</span>         <span class="c-gray"># voir les paramètres</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Les réponses fréquentes sont 5%, 10%, 3%. La bonne est <strong>5%</strong>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f5">
+  <div class="fiche-header" onclick="toggle('f5')">
+    <span class="fiche-num">05</span>
+    <span class="fiche-title">tune2fs — options à ne pas confondre</span>
+    <span class="fiche-arrow" id="a-f5">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f5">
+    <table>
+      <tr><th>Option</th><th>Rôle</th></tr>
+      <tr><td>-i 200</td><td>Intervalle de vérification en <strong>jours</strong></td></tr>
+      <tr><td>-c 30</td><td>Vérification tous les <strong>N montages</strong></td></tr>
+      <tr><td>-m 5</td><td>Pourcentage d'espace <strong>réservé</strong> pour root</td></tr>
+      <tr><td>-l</td><td><strong>Lister</strong> les paramètres du fs</td></tr>
+      <tr><td>-C</td><td>Forcer le <strong>compteur</strong> de montages</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Pour l'intervalle de vérification : c'est <code>-i</code> (interval), pas <code>-d</code> (qui n'existe pas) ni <code>-c</code> (count).
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     KERNEL / MODULES
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-kernel">
+  <div class="cat-icon">⚙️</div>
+  <span class="cat-name">Kernel &amp; modules</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f6">
+  <div class="fiche-header" onclick="toggle('f6')">
+    <span class="fiche-num">06</span>
+    <span class="fiche-title">modprobe -r vs rmmod</span>
+    <span class="fiche-arrow" id="a-f6">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f6">
+    <table>
+      <tr><th>Commande</th><th>Comportement</th></tr>
+      <tr><td>rmmod module</td><td>Supprime le module spécifié <strong>uniquement</strong></td></tr>
+      <tr><td>modprobe -r module</td><td>Supprime le module <strong>ET ses dépendances</strong> inutilisées</td></tr>
+    </table>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      modprobe = intelligent (gère les dépendances) — comme apt vs dpkg.
+      rmmod = brut (module seul).
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f7">
+  <div class="fiche-header" onclick="toggle('f7')">
+    <span class="fiche-num">07</span>
+    <span class="fiche-title">dmesg -C vs dmesg -c — vider le ring buffer</span>
+    <span class="fiche-arrow" id="a-f7">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f7">
+    <table>
+      <tr><th>Option</th><th>Comportement</th></tr>
+      <tr><td>dmesg -C</td><td>Vide le ring buffer <strong>sans afficher</strong> (Clear only)</td></tr>
+      <tr><td>dmesg -c</td><td>Affiche <strong>puis</strong> vide le ring buffer</td></tr>
+      <tr><td>dmesg --clear</td><td><span style="color:var(--red)">N'existe pas !</span></td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      La casse change tout : <code>-C</code> majuscule ≠ <code>-c</code> minuscule. Et <code>--clear</code> n'existe pas.
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SHELL
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-shell">
+  <div class="cat-icon">🐚</div>
+  <span class="cat-name">Shell &amp; traitement de texte</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f8">
+  <div class="fiche-header" onclick="toggle('f8')">
+    <span class="fiche-num">08</span>
+    <span class="fiche-title">Redirections bash : 1>&2 vs 2>&1</span>
+    <span class="fiche-arrow" id="a-f8">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f8">
+    <table>
+      <tr><th>Notation</th><th>Sens</th></tr>
+      <tr><td>2>&1</td><td>stderr → stdout (le plus courant)</td></tr>
+      <tr><td>1>&2</td><td>stdout → stderr</td></tr>
+    </table>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Lecture : <strong>"fd source vers fd destination"</strong>. Le <code>&amp;</code> devant le chiffre indique un descripteur de fichier, pas un nom de fichier.
+      <br><br>fd 0 = stdin · fd 1 = stdout · fd 2 = stderr
+    </div>
+    <pre><span class="c-gray"># Envoyer stdout ET stderr dans un fichier :</span>
+<span class="c-green">commande > fichier.log 2>&1</span>
+<span class="c-gray"># Ignorer les erreurs :</span>
+<span class="c-green">commande 2>/dev/null</span></pre>
+  </div>
+</div>
+
+<div class="fiche" id="f9">
+  <div class="fiche-header" onclick="toggle('f9')">
+    <span class="fiche-num">09</span>
+    <span class="fiche-title">grep -E et regex étendues — filtrer par heure</span>
+    <span class="fiche-arrow" id="a-f9">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f9">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Pour matcher les logs entre 8h00 et 8h59, il faut cibler le champ heure avec <code>:08:</code> et utiliser <code>-E</code> pour les regex étendues.
+    </div>
+    <pre><span class="c-green">grep -E ':08:[0-9]+:[0-9]+' log.txt</span>
+<span class="c-gray"># ERE = Extended Regular Expressions</span>
+<span class="c-gray"># Permet : +  |  ()  sans échappement</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      grep (BRE) · grep -E ou egrep (ERE) · grep -P (PCRE Perl)
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f10">
+  <div class="fiche-header" onclick="toggle('f10')">
+    <span class="fiche-num">10</span>
+    <span class="fiche-title">source vs . vs exécution directe</span>
+    <span class="fiche-arrow" id="a-f10">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f10">
+    <table>
+      <tr><th>Syntaxe</th><th>Sous-shell créé ?</th></tr>
+      <tr><td>./script.sh</td><td>Oui</td></tr>
+      <tr><td>/bin/bash script.sh</td><td>Oui</td></tr>
+      <tr><td>source script.sh</td><td><span style="color:var(--green)">Non</span> — shell courant</td></tr>
+      <tr><td>. script.sh</td><td><span style="color:var(--green)">Non</span> — shell courant</td></tr>
+    </table>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      <code>source</code> et <code>.</code> sont équivalents. L'intérêt : les variables et exports <strong>persistent</strong> dans la session courante après exécution.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f11">
+  <div class="fiche-header" onclick="toggle('f11')">
+    <span class="fiche-num">11</span>
+    <span class="fiche-title">watch pour les fichiers /proc dynamiques</span>
+    <span class="fiche-arrow" id="a-f11">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f11">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      <code>tail -f</code> fonctionne uniquement pour les fichiers qui <em>grossissent</em>. Les fichiers <code>/proc</code> sont dynamiques (contenu rechargé en mémoire) → utiliser <code>watch</code>.
+    </div>
+    <pre><span class="c-green">watch -n 1 'cat /proc/interrupts'</span>
+<span class="c-green">watch -n 2 'cat /proc/meminfo'</span>
+<span class="c-green">watch -n 1 free -h</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      <code>watch -n N</code> = rafraîchir toutes les N secondes. Par défaut : 2s.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f12">
+  <div class="fiche-header" onclick="toggle('f12')">
+    <span class="fiche-num">12</span>
+    <span class="fiche-title">tr -d '\r' — conversion Windows → Unix</span>
+    <span class="fiche-arrow" id="a-f12">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f12">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Windows utilise <code>\r\n</code> (CR-LF). Unix utilise <code>\n</code> (LF). Pour supprimer le <code>\r</code> :
+    </div>
+    <pre><span class="c-green">tr -d '\r' &lt; fichier_win.txt &gt; fichier_unix.txt</span>
+<span class="c-gray"># Alternatives :</span>
+<span class="c-green">sed 's/\r//' fichier.txt</span>
+<span class="c-green">dos2unix fichier.txt</span>     <span class="c-gray"># si installé</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Pour l'exam, la réponse canonique est <code>tr -d '\r'</code>. dos2unix peut ne pas être disponible.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f13">
+  <div class="fiche-header" onclick="toggle('f13')">
+    <span class="fiche-num">13</span>
+    <span class="fiche-title">find -maxdepth — la profondeur commence à 0</span>
+    <span class="fiche-arrow" id="a-f13">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f13">
+    <table>
+      <tr><th>Option</th><th>Portée</th></tr>
+      <tr><td>-maxdepth 1</td><td>Répertoire courant <strong>uniquement</strong> (profondeur 0)</td></tr>
+      <tr><td>-maxdepth 2</td><td>Courant + sous-répertoires <strong>directs</strong> (0 et 1)</td></tr>
+      <tr><td>-maxdepth 3</td><td>Courant + 2 niveaux en dessous</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      La profondeur du répertoire courant (<code>.</code>) est <strong>0</strong>, pas 1. Donc pour inclure les sous-répertoires immédiats, il faut <code>-maxdepth 2</code>, pas 1.
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SIGNAUX
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-sig">
+  <div class="cat-icon">📡</div>
+  <span class="cat-name">Signaux Linux</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f14">
+  <div class="fiche-header" onclick="toggle('f14')">
+    <span class="fiche-num">14</span>
+    <span class="fiche-title">Tableau complet des signaux clavier</span>
+    <span class="fiche-arrow" id="a-f14">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f14">
+    <table>
+      <tr><th>Raccourci / commande</th><th>Signal</th><th>N°</th><th>Effet</th></tr>
+      <tr><td>Ctrl+C</td><td>SIGINT</td><td>2</td><td>Interruption (capturable)</td></tr>
+      <tr><td>Ctrl+Z</td><td>SIGSTOP</td><td>19/20</td><td>Suspension (reprise fg/bg)</td></tr>
+      <tr><td>Ctrl+\</td><td>SIGQUIT</td><td>3</td><td>Quit + core dump</td></tr>
+      <tr><td>kill</td><td>SIGTERM</td><td>15</td><td>Terminaison propre (capturable)</td></tr>
+      <tr><td>kill -9</td><td>SIGKILL</td><td>9</td><td>Terminaison forcée (non capturable)</td></tr>
+      <tr><td>kill -19</td><td>SIGSTOP</td><td>19</td><td>Suspension (non capturable)</td></tr>
+      <tr><td>(reprise)</td><td>SIGCONT</td><td>18</td><td>Reprendre un processus stoppé</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Pièges fréquents à l'exam</div>
+      Ctrl+C → <strong>SIGINT</strong> (pas SIGKILL, pas SIGTERM)<br>
+      Ctrl+Z → <strong>SIGSTOP</strong> (pas SIGINT, pas SIGTERM)
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     BOOT / INIT
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-boot">
+  <div class="cat-icon">🚀</div>
+  <span class="cat-name">Boot, init &amp; initramfs</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f15">
+  <div class="fiche-header" onclick="toggle('f15')">
+    <span class="fiche-num">15</span>
+    <span class="fiche-title">SysV init — /sbin/init et PID 1</span>
+    <span class="fiche-arrow" id="a-f15">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f15">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Le kernel lance <code>/sbin/init</code> comme premier processus (PID 1). Init reste actif <strong>toute la vie du système</strong> jusqu'au shutdown.
+    </div>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      SysV init et systemd sont deux systèmes <strong>alternatifs</strong>, pas séquentiels. Sur un système SysV pur, init ne "passe jamais le relais" à systemd.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      SysV → <code>/sbin/init</code><br>
+      systemd → <code>/lib/systemd/systemd</code> (avec lien depuis <code>/sbin/init</code>)<br>
+      Les deux ont toujours PID 1.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f16">
+  <div class="fiche-header" onclick="toggle('f16')">
+    <span class="fiche-num">16</span>
+    <span class="fiche-title">initramfs — ce que c'est et ce que ce n'est pas</span>
+    <span class="fiche-arrow" id="a-f16">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f16">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      L'initramfs est une <strong>archive cpio compressée</strong> chargée en RAM par GRUB. Elle contient les drivers et outils pour monter le vrai <code>/</code>. Ce n'est <strong>pas</strong> le kernel, ni le MBR.
+    </div>
+    <table>
+      <tr><th>Composant</th><th>Emplacement</th></tr>
+      <tr><td>MBR / bootloader</td><td>Géré par GRUB</td></tr>
+      <tr><td>Kernel</td><td>/boot/vmlinuz-*</td></tr>
+      <tr><td>initramfs</td><td>/boot/initrd.img-*</td></tr>
+      <tr><td>Contenu après boot</td><td>/run/initramfs/</td></tr>
+    </table>
+    <pre><span class="c-gray"># Regénérer l'initramfs :</span>
+<span class="c-green">update-initramfs -u</span>              <span class="c-gray"># Debian/Ubuntu</span>
+<span class="c-green">dracut --force</span>                   <span class="c-gray"># RHEL/Fedora</span></pre>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PACKAGES
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-pkg">
+  <div class="cat-icon">📦</div>
+  <span class="cat-name">Gestion des packages &amp; dépôts</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f17">
+  <div class="fiche-header" onclick="toggle('f17')">
+    <span class="fiche-num">17</span>
+    <span class="fiche-title">apt-get upgrade vs dist-upgrade vs apt full-upgrade</span>
+    <span class="fiche-arrow" id="a-f17">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f17">
+    <table>
+      <tr><th>Commande</th><th>Comportement</th></tr>
+      <tr><td>apt-get upgrade</td><td>Met à jour sans supprimer ni installer de nouveaux packages</td></tr>
+      <tr><td>apt-get dist-upgrade</td><td>Gère les dépendances complexes, peut supprimer des packages obsolètes</td></tr>
+      <tr><td>apt full-upgrade</td><td>Équivalent de dist-upgrade dans l'interface <code>apt</code></td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>full-upgrade</code> existe dans <code>apt</code>, mais <strong>pas dans <code>apt-get</code></strong>. Si la question porte sur <code>apt-get</code>, la réponse est <code>dist-upgrade</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f18">
+  <div class="fiche-header" onclick="toggle('f18')">
+    <span class="fiche-num">18</span>
+    <span class="fiche-title">Dépôts RHEL vs Debian/Ubuntu</span>
+    <span class="fiche-arrow" id="a-f18">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f18">
+    <table>
+      <tr><th>Dépôt</th><th>Distribution</th></tr>
+      <tr><td>EPEL</td><td>RHEL / CentOS / Rocky</td></tr>
+      <tr><td>CodeReady Builder</td><td>RHEL</td></tr>
+      <tr><td>Snap store</td><td>Multi-distro</td></tr>
+      <tr><td>Universe / Multiverse</td><td>Ubuntu uniquement</td></tr>
+      <tr><td>contrib / non-free</td><td>Debian uniquement</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>contrib</code> est un dépôt <strong>Debian</strong>, pas RHEL. Ne jamais mélanger les deux univers dans une réponse RHEL.
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     VIRTUALISATION
+══════════════════════════════════════════════ -->
+<div class="cat-header cat-virt">
+  <div class="cat-icon">🖥️</div>
+  <span class="cat-name">Virtualisation &amp; containers</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f19">
+  <div class="fiche-header" onclick="toggle('f19')">
+    <span class="fiche-num">19</span>
+    <span class="fiche-title">Containers vs machines virtuelles — différences clés</span>
+    <span class="fiche-arrow" id="a-f19">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f19">
+    <table>
+      <tr><th></th><th>Container</th><th>VM (hyperviseur)</th></tr>
+      <tr><td>Kernel</td><td>Partagé avec l'hôte</td><td>Kernel dédié</td></tr>
+      <tr><td>OS différents</td><td><span style="color:var(--red)">Non</span></td><td><span style="color:var(--green)">Oui</span></td></tr>
+      <tr><td>Isolation</td><td>namespaces + cgroups</td><td>Hyperviseur</td></tr>
+      <tr><td>Performance</td><td>Proche du natif</td><td>Overhead hyperviseur</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège classique</div>
+      Les containers sur un même hôte <strong>ne peuvent pas utiliser des OS différents</strong> car ils partagent le kernel de l'hôte. Seules les VMs le permettent.
+    </div>
+  </div>
+</div>
+
+<a class="back-top" href="#">↑ Retour en haut</a>
+
+</main>
+
+<script>
+function toggle(id) {
+  const body = document.getElementById('b-' + id);
+  const arrow = document.getElementById('a-' + id);
+  const isOpen = body.classList.toggle('open');
+  arrow.classList.toggle('open', isOpen);
+}
+
+function doSearch(val) {
+  const q = val.toLowerCase().trim();
+  const fiches = document.querySelectorAll('.fiche');
+  let count = 0;
+  fiches.forEach(f => {
+    const text = f.textContent.toLowerCase();
+    if (!q || text.includes(q)) {
+      f.classList.remove('hidden');
+      count++;
+    } else {
+      f.classList.add('hidden');
+    }
+  });
+  document.getElementById('nav-count').textContent = q ? count + ' résultat' + (count > 1 ? 's' : '') : '19 fiches';
+}
+</script>
+</body>
+</html>

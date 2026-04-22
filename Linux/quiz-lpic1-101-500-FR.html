@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz LPIC-1 — Entraînement</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg:      #0d1117;
+  --bg2:     #161b22;
+  --bg3:     #1c2128;
+  --bg4:     #21262d;
+  --border:  #30363d;
+  --text:    #e6edf3;
+  --text2:   #8b949e;
+  --text3:   #6e7681;
+  --green:   #3fb950;
+  --green-bg:rgba(63,185,80,0.1);
+  --green-bd:rgba(63,185,80,0.3);
+  --red:     #ff7b72;
+  --red-bg:  rgba(255,123,114,0.1);
+  --red-bd:  rgba(255,123,114,0.3);
+  --blue:    #79c0ff;
+  --blue-bg: rgba(121,192,255,0.08);
+  --blue-bd: rgba(121,192,255,0.25);
+  --amber:   #e3b341;
+  --amber-bg:rgba(227,179,65,0.08);
+  --amber-bd:rgba(227,179,65,0.25);
+  --purple:  #bc8cff;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── ÉCRAN D'ACCUEIL ── */
+#screen-home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+.home-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--blue);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  padding: 5px 14px;
+  border: 1px solid var(--blue-bd);
+  border-radius: 20px;
+  background: var(--blue-bg);
+  display: inline-block;
+}
+.home-title {
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+.home-title span { color: var(--blue); }
+.home-sub {
+  font-size: 15px;
+  color: var(--text2);
+  max-width: 480px;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+.home-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.home-stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  min-width: 110px;
+}
+.home-stat-val {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--blue);
+}
+.home-stat-lbl {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.btn-start {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 36px;
+  background: var(--blue);
+  color: #0d1117;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-start:hover { opacity: 0.88; }
+.btn-start:active { transform: scale(0.97); }
+
+.level-tags {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.level-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.tag-novice  { color: var(--green);  border-color: var(--green-bd);  background: var(--green-bg); }
+.tag-inter   { color: var(--amber);  border-color: var(--amber-bd);  background: var(--amber-bg); }
+.tag-expert  { color: var(--red);    border-color: var(--red-bd);    background: var(--red-bg); }
+
+/* ── ÉCRAN QUIZ ── */
+#screen-quiz { display: none; }
+
+.quiz-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(13,17,23,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nav-info {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.nav-score {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--blue);
+  white-space: nowrap;
+}
+.progress-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.quiz-main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+/* Question card */
+.q-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.q-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+.q-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+}
+.q-level {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.q-domain {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  margin-left: auto;
+}
+.q-points {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--amber);
+  padding: 2px 8px;
+  border: 1px solid var(--amber-bd);
+  border-radius: 10px;
+  background: var(--amber-bg);
+}
+
+.q-text {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--text);
+  margin-bottom: 1.25rem;
+}
+
+code {
+  font-family: var(--mono);
+  background: rgba(255,255,255,0.07);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--blue);
+}
+
+/* Options */
+.options { display: flex; flex-direction: column; gap: 8px; }
+
+.opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+.opt:hover:not(:disabled) {
+  border-color: var(--blue);
+  background: var(--bg4);
+}
+.opt:disabled { cursor: default; }
+
+.opt-letter {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  width: 20px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.opt-text {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.opt.correct {
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+.opt.correct .opt-letter,
+.opt.correct .opt-text { color: var(--green); }
+
+.opt.wrong {
+  border-color: var(--red);
+  background: var(--red-bg);
+}
+.opt.wrong .opt-letter,
+.opt.wrong .opt-text { color: var(--red); }
+
+.opt.reveal-correct {
+  border-color: var(--green);
+  background: var(--green-bg);
+  opacity: 0.6;
+}
+.opt.reveal-correct .opt-letter,
+.opt.reveal-correct .opt-text { color: var(--green); }
+
+/* Feedback */
+.feedback {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.feedback.show { display: block; }
+.feedback.ok  { background: var(--green-bg); border: 1px solid var(--green-bd); color: #8eeaa0; }
+.feedback.ko  { background: var(--red-bg);   border: 1px solid var(--red-bd);   color: #ffb0ab; }
+
+.feedback-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 5px;
+}
+.feedback.ok .feedback-title { color: var(--green); }
+.feedback.ko .feedback-title { color: var(--red); }
+
+/* Bouton suivant */
+.btn-next {
+  display: none;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  background: transparent;
+  color: var(--blue);
+  border: 1px solid var(--blue-bd);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  letter-spacing: 0.05em;
+}
+.btn-next.show { display: block; }
+.btn-next:hover { background: var(--blue-bg); }
+
+/* ── ÉCRAN RÉSULTATS ── */
+#screen-results { display: none; padding: 2rem 1rem 4rem; }
+
+.results-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.results-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 20px;
+  border: 1px solid;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+.badge-pass { color: var(--green); border-color: var(--green-bd); background: var(--green-bg); }
+.badge-fail { color: var(--red);   border-color: var(--red-bd);   background: var(--red-bg); }
+
+.results-score {
+  font-family: var(--mono);
+  font-size: clamp(48px, 12vw, 80px);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.score-pass { color: var(--green); }
+.score-fail { color: var(--red); }
+
+.results-sub {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 0.5rem;
+}
+.results-threshold {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* Barre score */
+.score-bar-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.score-bar-track {
+  height: 8px;
+  background: var(--bg3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  position: relative;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease;
+  width: 0%;
+}
+.fill-pass { background: var(--green); }
+.fill-fail { background: var(--red); }
+.score-bar-marker {
+  position: absolute;
+  top: -2px;
+  height: 12px;
+  width: 2px;
+  background: var(--amber);
+  left: 62.5%; /* 500/800 */
+}
+.score-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+}
+.score-bar-labels .threshold { color: var(--amber); }
+
+/* Stats grille */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-val {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+}
+.stat-lbl {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Par niveau */
+.levels-breakdown {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.levels-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+.level-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.level-row:last-child { margin-bottom: 0; }
+.level-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  width: 60px;
+  flex-shrink: 0;
+}
+.level-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.level-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.level-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Erreurs */
+.errors-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.errors-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+.error-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.error-item:last-child { border-bottom: none; }
+.error-q { color: var(--text2); margin-bottom: 4px; line-height: 1.5; }
+.error-ans {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.error-wrong { color: var(--red); }
+.error-right { color: var(--green); }
+
+.btn-retry {
+  width: 100%;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--blue);
+  color: #0d1117;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: opacity 0.15s;
+}
+.btn-retry:hover { opacity: 0.88; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ ACCUEIL ══════════════════ -->
+<div id="screen-home">
+  <div class="home-badge">LPIC-1 · Préparation examen</div>
+  <h1 class="home-title">Quiz d'entraînement<br><span>Linux Professional</span></h1>
+  <p class="home-sub">70 questions couvrant tes points faibles identifiés, de novice à expert. Score minimum requis : 500/800.</p>
+  <div class="level-tags">
+    <span class="level-tag tag-novice">Novice — 1 pt</span>
+    <span class="level-tag tag-inter">Intermédiaire — 2 pts</span>
+    <span class="level-tag tag-expert">Expert — 3 pts</span>
+  </div>
+  <div class="home-stats">
+    <div class="home-stat"><div class="home-stat-val">70</div><div class="home-stat-lbl">Questions</div></div>
+    <div class="home-stat"><div class="home-stat-val">800</div><div class="home-stat-lbl">Points max</div></div>
+    <div class="home-stat"><div class="home-stat-val">500</div><div class="home-stat-lbl">Seuil LPIC</div></div>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">Démarrer le quiz →</button>
+</div>
+
+<!-- ══════════════════ QUIZ ══════════════════ -->
+<div id="screen-quiz">
+  <div class="quiz-nav">
+    <span class="nav-info" id="nav-info">Q1 / 70</span>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+    <span class="nav-score" id="nav-score">0 pts</span>
+  </div>
+  <div class="quiz-main" id="quiz-main"></div>
+</div>
+
+<!-- ══════════════════ RÉSULTATS ══════════════════ -->
+<div id="screen-results">
+  <div class="results-wrap">
+    <div class="results-header">
+      <div class="results-badge" id="res-badge">RÉUSSI</div>
+      <div class="results-score" id="res-score">0</div>
+      <div class="results-sub" id="res-sub">sur 800 points</div>
+      <div class="results-threshold">Seuil de réussite LPIC : 500 / 800</div>
+    </div>
+
+    <div class="score-bar-wrap">
+      <div class="score-bar-track">
+        <div class="score-bar-fill" id="res-bar"></div>
+        <div class="score-bar-marker" title="Seuil 500"></div>
+      </div>
+      <div class="score-bar-labels">
+        <span>0</span>
+        <span class="threshold">500 (seuil)</span>
+        <span>800</span>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val" id="res-correct" style="color:var(--green)">0</div>
+        <div class="stat-lbl">Correctes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="res-wrong" style="color:var(--red)">0</div>
+        <div class="stat-lbl">Erreurs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="res-pct" style="color:var(--blue)">0%</div>
+        <div class="stat-lbl">Réussite</div>
+      </div>
+    </div>
+
+    <div class="levels-breakdown">
+      <div class="levels-title">Score par niveau</div>
+      <div class="level-row">
+        <span class="level-name" style="color:var(--green)">Novice</span>
+        <div class="level-bar-track"><div class="level-bar-fill" id="bar-novice" style="background:var(--green)"></div></div>
+        <span class="level-count" id="cnt-novice">0/25</span>
+      </div>
+      <div class="level-row">
+        <span class="level-name" style="color:var(--amber)">Interméd.</span>
+        <div class="level-bar-track"><div class="level-bar-fill" id="bar-inter" style="background:var(--amber)"></div></div>
+        <span class="level-count" id="cnt-inter">0/25</span>
+      </div>
+      <div class="level-row">
+        <span class="level-name" style="color:var(--red)">Expert</span>
+        <div class="level-bar-track"><div class="level-bar-fill" id="bar-expert" style="background:var(--red)"></div></div>
+        <span class="level-count" id="cnt-expert">0/20</span>
+      </div>
+    </div>
+
+    <div class="errors-section" id="errors-section">
+      <div class="errors-title">Questions ratées — À réviser</div>
+      <div id="errors-list"></div>
+    </div>
+
+    <button class="btn-retry" onclick="retryQuiz()">↺ Recommencer le quiz</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+// ═══════════════════════════════
+// NOVICE (1 pt chacune) — 25 questions
+// ═══════════════════════════════
+{
+  level:"novice", domain:"udev", pts:1,
+  q:"Quelle commande permet de surveiller les événements udev en temps réel ?",
+  opts:["journalctl -f udev","udevadm monitor","udev --watch","systemctl status udev"],
+  ans:1,
+  expl:"<code>udevadm monitor</code> est la sous-commande dédiée pour écouter les événements udev en temps réel. journalctl affiche les logs système généraux."
+},
+{
+  level:"novice", domain:"Systèmes de fichiers", pts:1,
+  q:"Quel système de fichiers mkfs crée-t-il par défaut sans argument de type ?",
+  opts:["ext4","ext3","ext2","xfs"],
+  ans:2,
+  expl:"Sans option <code>-t</code>, mkfs crée un système <code>ext2</code> par défaut. Pour ext4 il faut mkfs.ext4 ou mkfs -t ext4."
+},
+{
+  level:"novice", domain:"Signaux", pts:1,
+  q:"Quel signal est envoyé à un processus quand on appuie sur Ctrl+C ?",
+  opts:["SIGKILL","SIGTERM","SIGINT","SIGSTOP"],
+  ans:2,
+  expl:"Ctrl+C envoie <code>SIGINT</code> (signal 2). C'est un signal interruptible que le processus peut capturer. SIGKILL (9) est non interceptable."
+},
+{
+  level:"novice", domain:"Signaux", pts:1,
+  q:"Quel signal est envoyé à un processus quand on appuie sur Ctrl+Z ?",
+  opts:["SIGINT","SIGTERM","SIGKILL","SIGSTOP"],
+  ans:3,
+  expl:"Ctrl+Z envoie <code>SIGSTOP</code> qui suspend le processus. On peut le reprendre avec <code>fg</code> ou <code>bg</code>."
+},
+{
+  level:"novice", domain:"Shell", pts:1,
+  q:"Quelle commande exécute un script dans le shell courant sans créer de sous-shell ?",
+  opts:["./script.sh","bash script.sh","source script.sh","exec script.sh"],
+  ans:2,
+  expl:"<code>source script.sh</code> (ou <code>. script.sh</code>) exécute le script dans le shell courant. Les autres créent un sous-shell."
+},
+{
+  level:"novice", domain:"Shell", pts:1,
+  q:"Que fait l'opérateur || dans la commande : cmd1 || cmd2 ?",
+  opts:["Exécute cmd2 seulement si cmd1 réussit","Exécute cmd2 seulement si cmd1 échoue","Exécute toujours cmd1 et cmd2","Redirige la sortie de cmd1 vers cmd2"],
+  ans:1,
+  expl:"<code>||</code> est l'opérateur OU logique. cmd2 n'est exécutée que si cmd1 échoue (code retour ≠ 0). C'est l'inverse de <code>&&</code>."
+},
+{
+  level:"novice", domain:"SysV init", pts:1,
+  q:"Quel est le PID du processus init sur un système Linux ?",
+  opts:["0","1","2","Variable à chaque boot"],
+  ans:1,
+  expl:"Le processus init (ou systemd sur les systèmes modernes) est toujours le premier processus lancé par le kernel et reçoit toujours le PID 1."
+},
+{
+  level:"novice", domain:"SysV init", pts:1,
+  q:"Quel fichier contient le premier programme lancé par le kernel en mode SysV init ?",
+  opts:["/etc/rc.d/rc.init","/boot/init","/sbin/init","/lib/init.so"],
+  ans:2,
+  expl:"<code>/sbin/init</code> est le premier processus (PID 1) lancé par le kernel en mode SysV. Les scripts rc.d sont lancés par init ensuite."
+},
+{
+  level:"novice", domain:"Packages", pts:1,
+  q:"Quelle option de dpkg supprime un package ET ses fichiers de configuration ?",
+  opts:["-r","--remove","-P","--clean"],
+  ans:2,
+  expl:"<code>dpkg -P</code> (ou <code>--purge</code>) supprime le package et tous ses fichiers de configuration. <code>-r</code> supprime le package mais conserve les configs."
+},
+{
+  level:"novice", domain:"Réseau", pts:1,
+  q:"À quelle couche du modèle OSI l'adresse IP appartient-elle ?",
+  opts:["Couche 2 — Liaison","Couche 3 — Réseau","Couche 4 — Transport","Couche 7 — Application"],
+  ans:1,
+  expl:"L'adresse IP opère à la couche 3 (Réseau) du modèle OSI. L'adresse MAC est en couche 2, les ports TCP/UDP en couche 4."
+},
+{
+  level:"novice", domain:"Réseau", pts:1,
+  q:"À quelle couche du modèle OSI l'adresse MAC appartient-elle ?",
+  opts:["Couche 1","Couche 2","Couche 3","Couche 4"],
+  ans:1,
+  expl:"L'adresse MAC (Media Access Control) opère à la couche 2 (Liaison de données). Elle identifie les interfaces réseau sur un réseau local."
+},
+{
+  level:"novice", domain:"Processus", pts:1,
+  q:"Quel est le niveau de priorité nice par défaut quand on lance un processus avec la commande nice sans argument ?",
+  opts:["-10","0","10","19"],
+  ans:1,
+  expl:"La valeur nice par défaut est <code>0</code>. Les valeurs vont de -20 (priorité maximale) à 19 (priorité minimale). Seul root peut utiliser des valeurs négatives."
+},
+{
+  level:"novice", domain:"Shell", pts:1,
+  q:"Que fait la commande : find / -name '*.tmp' -exec rm {} + ?",
+  opts:["Lance rm une fois par fichier trouvé","Lance rm une seule fois avec tous les fichiers","Supprime les fichiers sans appeler rm","Affiche les fichiers sans les supprimer"],
+  ans:1,
+  expl:"Le <code>+</code> à la fin regroupe tous les résultats et lance <code>rm</code> une seule fois avec tous les fichiers. C'est plus efficace que <code>\\;</code> qui lance rm pour chaque fichier."
+},
+{
+  level:"novice", domain:"Archives", pts:1,
+  q:"Quelle commande tar permet de lister le contenu d'une archive .tgz sans l'extraire ?",
+  opts:["tar -xzf archive.tgz","tar -czf archive.tgz","tar -tzf archive.tgz","tar -vzf archive.tgz"],
+  ans:2,
+  expl:"<code>tar -t</code> liste le contenu, <code>-z</code> gère la compression gzip, <code>-f</code> spécifie le fichier. Mémo : c=create, x=extract, t=list."
+},
+{
+  level:"novice", domain:"Fichiers", pts:1,
+  q:"Quelle commande affiche le chemin vers l'exécutable qui serait lancé en tapant une commande ?",
+  opts:["type","which","locate","find"],
+  ans:1,
+  expl:"<code>which</code> cherche dans le PATH et retourne le chemin de l'exécutable. Il ne voit pas les builtins ni les alias."
+},
+{
+  level:"novice", domain:"Shell", pts:1,
+  q:"Que signifie !! en bash ?",
+  opts:["Exécuter la commande en arrière-plan","Répéter la dernière commande","Annuler la commande en cours","Afficher l'historique complet"],
+  ans:1,
+  expl:"<code>!!</code> est remplacé par la commande précédente complète. Usage classique : oublier sudo → taper <code>sudo !!</code>."
+},
+{
+  level:"novice", domain:"Fichiers", pts:1,
+  q:"Quelle commande permet d'extraire le nom de fichier d'un chemin complet ?",
+  opts:["dirname","filename","basename","pathinfo"],
+  ans:2,
+  expl:"<code>basename /chemin/vers/fichier.txt</code> retourne <code>fichier.txt</code>. Son opposé <code>dirname</code> retourne <code>/chemin/vers</code>."
+},
+{
+  level:"novice", domain:"Cloud", pts:1,
+  q:"Quel modèle cloud fournit uniquement l'infrastructure (serveurs, réseau, stockage) sans OS ni applications ?",
+  opts:["SaaS","PaaS","IaaS","DaaS"],
+  ans:2,
+  expl:"<code>IaaS</code> (Infrastructure as a Service) fournit la couche matérielle virtuelle. L'administrateur gère l'OS, le middleware et les applications."
+},
+{
+  level:"novice", domain:"Cloud", pts:1,
+  q:"Gmail et Office 365 sont des exemples de quel modèle cloud ?",
+  opts:["IaaS","PaaS","SaaS","DaaS"],
+  ans:2,
+  expl:"<code>SaaS</code> (Software as a Service) — le logiciel est entièrement géré par le fournisseur. L'utilisateur n'a qu'à utiliser l'application."
+},
+{
+  level:"novice", domain:"Sécurité", pts:1,
+  q:"Quel est le rôle principal d'un trojan (cheval de Troie) ?",
+  opts:["Chiffrer les données","Afficher des publicités","Fournir un accès distant à l'attaquant","Se propager automatiquement sur le réseau"],
+  ans:2,
+  expl:"Un trojan se déguise en logiciel légitime pour ouvrir une backdoor et donner un accès distant à l'attaquant. C'est sa fonction la plus caractéristique."
+},
+{
+  level:"novice", domain:"Sécurité", pts:1,
+  q:"Quel est le rôle principal d'un rootkit ?",
+  opts:["Voler des mots de passe","Se cacher et maintenir un accès furtif","Chiffrer les fichiers pour rançon","Envoyer des spams"],
+  ans:1,
+  expl:"Un rootkit est conçu pour la <strong>dissimulation</strong> et la persistance furtive. Il suppose une compromission préalable et cherche à rester invisible."
+},
+{
+  level:"novice", domain:"Réseau", pts:1,
+  q:"Quelle adresse IP est réservée au loopback (rebouclage local) ?",
+  opts:["192.168.0.1","10.0.0.1","127.0.0.1","172.16.0.1"],
+  ans:2,
+  expl:"<code>127.0.0.1</code> est l'adresse de loopback, aussi appelée localhost. Elle permet à une machine de se contacter elle-même sans passer par le réseau."
+},
+{
+  level:"novice", domain:"Réseau", pts:1,
+  q:"Quelle est la plage d'adresses IP privées de classe C ?",
+  opts:["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","169.254.0.0/16"],
+  ans:2,
+  expl:"La plage privée de classe C est <code>192.168.0.0/16</code> (192.168.x.x). Classe A = 10.x.x.x, Classe B = 172.16-31.x.x."
+},
+{
+  level:"novice", domain:"Sécurité Wi-Fi", pts:1,
+  q:"Quel protocole Wi-Fi utilise TKIP comme chiffrement ?",
+  opts:["WEP","WPA","WPA2","WPA3"],
+  ans:1,
+  expl:"<code>WPA</code> (Wi-Fi Protected Access, 2003) a introduit TKIP. WPA2 utilise AES/CCMP. WEP utilise RC4 statique. WPA3 utilise SAE."
+},
+{
+  level:"novice", domain:"Sécurité", pts:1,
+  q:"Quel outil Linux est conçu pour détecter les rootkits ?",
+  opts:["nmap","rkhunter","tcpdump","netstat"],
+  ans:1,
+  expl:"<code>rkhunter</code> (Rootkit Hunter) et <code>chkrootkit</code> sont les outils standards pour scanner un système Linux à la recherche de rootkits."
+},
+
+// ═══════════════════════════════
+// INTERMÉDIAIRE (2 pts chacune) — 25 questions
+// ═══════════════════════════════
+{
+  level:"inter", domain:"udev", pts:2,
+  q:"Quelle option de udevadm info affiche les attributs d'un périphérique en hiérarchie ?",
+  opts:["--tree","--hierarchy","--attribute-walk","--recursive"],
+  ans:2,
+  expl:"<code>udevadm info --attribute-walk /dev/sdX</code> affiche tous les attributs du device et de ses parents en hiérarchie. Utile pour écrire des règles udev."
+},
+{
+  level:"inter", domain:"Kernel", pts:2,
+  q:"Quelle est la différence entre dmesg -C et dmesg -c ?",
+  opts:["-C affiche et vide, -c vide uniquement","-C vide uniquement, -c affiche et vide","Les deux font la même chose","-C est obsolète, utiliser -c"],
+  ans:1,
+  expl:"<code>dmesg -C</code> (majuscule) = Clear only, vide sans afficher. <code>dmesg -c</code> (minuscule) = affiche puis vide. <code>--clear</code> n'existe pas."
+},
+{
+  level:"inter", domain:"Modules kernel", pts:2,
+  q:"Quelle commande supprime un module kernel ET ses dépendances inutilisées ?",
+  opts:["rmmod module","modprobe -r module","insmod -r module","lsmod --remove module"],
+  ans:1,
+  expl:"<code>modprobe -r</code> supprime intelligemment le module et ses dépendances inutilisées. <code>rmmod</code> supprime uniquement le module spécifié."
+},
+{
+  level:"inter", domain:"Shell", pts:2,
+  q:"Que fait la notation 1>&2 dans bash ?",
+  opts:["Redirige stderr vers stdout","Redirige stdout vers stderr","Redirige stdin vers stderr","Duplique stdout"],
+  ans:1,
+  expl:"<code>1>&2</code> redirige stdout (fd 1) vers stderr (fd 2). L'inverse est <code>2>&1</code>. Lecture : 'fd source vers fd destination'."
+},
+{
+  level:"inter", domain:"Shell", pts:2,
+  q:"Quelle option de grep active les expressions régulières étendues (ERE) ?",
+  opts:["-e","-E","-r","-G"],
+  ans:1,
+  expl:"<code>grep -E</code> active les Extended Regular Expressions qui permettent <code>+</code>, <code>|</code>, <code>()</code> sans échappement. Équivalent à <code>egrep</code>."
+},
+{
+  level:"inter", domain:"find", pts:2,
+  q:"Quelle option de find limite la recherche au répertoire courant et ses sous-répertoires immédiats ?",
+  opts:["-maxdepth 1","-maxdepth 2","-mindepth 1","-depth 2"],
+  ans:1,
+  expl:"<code>-maxdepth 2</code> car la profondeur du répertoire courant est 0. maxdepth 1 = courant seulement. maxdepth 2 = courant + enfants directs."
+},
+{
+  level:"inter", domain:"find", pts:2,
+  q:"Quelle option de find cherche des fichiers modifiés il y a moins de 24 heures ?",
+  opts:["-mtime 1","-mtime -1","-mtime +1","-atime 1"],
+  ans:1,
+  expl:"<code>-mtime -1</code> signifie modifié il y a moins d'1 jour. Le - signifie 'moins de'. Le + signifie 'plus de'. Sans signe = exactement."
+},
+{
+  level:"inter", domain:"find", pts:2,
+  q:"Quelle est la différence entre -mtime et -ctime dans find ?",
+  opts:["-mtime = modification métadonnées, -ctime = modification contenu","-mtime = modification contenu, -ctime = modification métadonnées","-mtime = création, -ctime = modification","-mtime et -ctime sont identiques"],
+  ans:1,
+  expl:"<code>-mtime</code> = modification du <strong>contenu</strong>. <code>-ctime</code> = modification des <strong>métadonnées</strong> (permissions, propriétaire). Attention : ctime ≠ création !"
+},
+{
+  level:"inter", domain:"Packages", pts:2,
+  q:"Quelle commande apt-get effectue une mise à jour complète en gérant les dépendances complexes ?",
+  opts:["apt-get upgrade","apt-get full-upgrade","apt-get dist-upgrade","apt-get update"],
+  ans:2,
+  expl:"<code>apt-get dist-upgrade</code> gère intelligemment les dépendances, peut supprimer des packages obsolètes. <code>full-upgrade</code> existe dans <code>apt</code> mais pas <code>apt-get</code>."
+},
+{
+  level:"inter", domain:"Packages", pts:2,
+  q:"Quel dépôt fournit des packages supplémentaires pour RHEL/CentOS non inclus par défaut ?",
+  opts:["Universe","contrib","EPEL","Multiverse"],
+  ans:2,
+  expl:"<code>EPEL</code> (Extra Packages for Enterprise Linux) est le dépôt complémentaire pour RHEL/CentOS. Universe et contrib sont des dépôts Debian/Ubuntu."
+},
+{
+  level:"inter", domain:"Boot", pts:2,
+  q:"Où se trouvent les contenus de l'initramfs après un boot réussi ?",
+  opts:["/boot/initramfs","/tmp/initramfs","/run/initramfs","/var/initramfs"],
+  ans:2,
+  expl:"Après le boot, les contenus de l'initramfs restent accessibles dans <code>/run/initramfs</code>. L'archive compressée est dans <code>/boot/initrd.img-*</code>."
+},
+{
+  level:"inter", domain:"Boot", pts:2,
+  q:"Quelle commande régénère l'initramfs sur un système Debian/Ubuntu ?",
+  opts:["dracut --force","mkinitrd","update-initramfs -u","grub-update"],
+  ans:2,
+  expl:"<code>update-initramfs -u</code> régénère l'initramfs sur Debian/Ubuntu. Sur RHEL/Fedora c'est <code>dracut --force</code>."
+},
+{
+  level:"inter", domain:"Sécurité", pts:2,
+  q:"Quel est le principal risque lié à l'utilisation d'une solution de stockage cloud ?",
+  opts:["Chiffrement des données","Redondance insuffisante","Dépendance à la connexion Internet","Coût du stockage"],
+  ans:2,
+  expl:"La <strong>dépendance à Internet</strong> est le risque caractéristique du cloud : sans connexion, ni synchronisation ni accès aux données ne sont possibles."
+},
+{
+  level:"inter", domain:"Shell", pts:2,
+  q:"Que fait la commande : find / -type f -name '*.tmp' -delete ?",
+  opts:["Supprime fichiers et dossiers vides nommés *.tmp","Supprime uniquement les fichiers réguliers nommés *.tmp","Affiche les fichiers sans les supprimer","Crée une archive des fichiers .tmp"],
+  ans:1,
+  expl:"<code>-type f</code> limite aux fichiers réguliers. <code>-delete</code> est une action intégrée à find sans appel externe. Sans -type f, -delete pourrait supprimer des dossiers vides."
+},
+{
+  level:"inter", domain:"Sécurité", pts:2,
+  q:"Qu'est-ce que le 'salting' en cryptographie des mots de passe ?",
+  opts:["Chiffrement du mot de passe avec AES","Ajout d'une valeur aléatoire unique avant le hachage","Double hachage du mot de passe","Stockage du hash en base64"],
+  ans:1,
+  expl:"Le sel est une valeur aléatoire unique ajoutée au mot de passe avant hachage. Cela rend les rainbow tables inutilisables car chaque utilisateur a un hash unique."
+},
+{
+  level:"inter", domain:"Sécurité", pts:2,
+  q:"Quel algorithme de hachage de mots de passe est recommandé aujourd'hui ?",
+  opts:["MD5","SHA1","bcrypt ou Argon2","SHA256 seul"],
+  ans:2,
+  expl:"<code>bcrypt</code> et <code>Argon2</code> sont recommandés car ils intègrent sel + lenteur volontaire. MD5 et SHA1 sont obsolètes. SHA256 seul est trop rapide = vulnérable au bruteforce."
+},
+{
+  level:"inter", domain:"Shell", pts:2,
+  q:"Quelle commande bash affiche la nature d'une commande (builtin, alias, binaire externe) ?",
+  opts:["which","where","type","file"],
+  ans:2,
+  expl:"<code>type</code> interroge bash de l'intérieur et identifie si une commande est un builtin, un alias, une fonction ou un binaire externe. <code>which</code> ne voit que les binaires dans le PATH."
+},
+{
+  level:"inter", domain:"Virtualisation", pts:2,
+  q:"Quelle affirmation sur les containers Linux est correcte ?",
+  opts:["Les containers peuvent utiliser différents OS sur le même hôte","Les containers partagent le kernel de l'hôte","Les containers utilisent un hyperviseur","Les containers sont plus lents que les VMs"],
+  ans:1,
+  expl:"Les containers partagent le kernel de l'hôte via namespaces et cgroups. Ils ne peuvent donc pas tourner des OS différents sur le même hôte, contrairement aux VMs."
+},
+{
+  level:"inter", domain:"Réseau", pts:2,
+  q:"Quelle est la plage d'adresses de classe B ?",
+  opts:["1.0.0.0 – 126.255.255.255","128.0.0.0 – 191.255.255.255","192.0.0.0 – 223.255.255.255","224.0.0.0 – 239.255.255.255"],
+  ans:1,
+  expl:"Classe B : premier octet de 128 à 191, masque /16 (255.255.0.0). Classe A : 1-126. Classe C : 192-223. Classe D : 224-239 (multicast)."
+},
+{
+  level:"inter", domain:"Fichiers", pts:2,
+  q:"Quelle est la limitation principale des hard links ?",
+  opts:["Ils consomment deux fois plus d'espace","Ils ne peuvent pas traverser les frontières de systèmes de fichiers","Ils nécessitent les droits root","Ils ne fonctionnent pas sur ext4"],
+  ans:1,
+  expl:"Les hard links partagent le même inode et doivent donc être sur le même système de fichiers. Ils ne peuvent pas pointer vers des fichiers sur une autre partition."
+},
+{
+  level:"inter", domain:"Shell", pts:2,
+  q:"Quelle commande convertit les fins de ligne Windows (CR-LF) en Unix (LF) ?",
+  opts:["sed -n 's/\\n/\\r\\n/' fichier","tr -d '\\r' < fichier_win.txt > fichier_unix.txt","grep -v '\\r' fichier","awk '{print $0}' fichier"],
+  ans:1,
+  expl:"<code>tr -d '\\r'</code> supprime tous les caractères carriage return (\\r), convertissant \\r\\n en \\n. dos2unix fait la même chose si disponible."
+},
+{
+  level:"inter", domain:"SysV init", pts:2,
+  q:"Dans SysV init, que signifie le préfixe S dans les scripts du répertoire rc.d ?",
+  opts:["System service","Stop the service","Start the service","Scheduled service"],
+  ans:2,
+  expl:"Le préfixe <code>S</code> indique que le script doit <strong>démarrer</strong> le service au passage à ce runlevel. Le préfixe <code>K</code> indique Kill (arrêt)."
+},
+{
+  level:"inter", domain:"Sécurité", pts:2,
+  q:"Un keylogger enregistre les frappes clavier. Quelle mesure immédiate protège vos données sensibles ?",
+  opts:["Déconnecter la machine d'Internet","Utiliser un clavier virtuel à l'écran","Désactiver l'antivirus","Changer le mot de passe"],
+  ans:1,
+  expl:"Un keylogger classique intercepte les frappes physiques. Un clavier virtuel fonctionne via des clics souris — il contourne le mécanisme d'interception."
+},
+{
+  level:"inter", domain:"Packages", pts:2,
+  q:"Quel outil Debian permet de trouver quel package fournit un fichier non encore installé ?",
+  opts:["dpkg -S","apt-cache search","apt-file search","which"],
+  ans:2,
+  expl:"<code>apt-file search</code> cherche dans tous les packages disponibles (même non installés). <code>dpkg -S</code> cherche uniquement parmi les packages déjà installés."
+},
+{
+  level:"inter", domain:"Sécurité", pts:2,
+  q:"Quel chiffrement symétrique est le standard actuel recommandé ?",
+  opts:["DES","RSA","AES","Diffie-Hellman"],
+  ans:2,
+  expl:"<code>AES</code> (Advanced Encryption Standard) est le standard symétrique actuel. RSA et Diffie-Hellman sont asymétriques. DES est obsolète."
+},
+
+// ═══════════════════════════════
+// EXPERT (3 pts chacune) — 20 questions
+// ═══════════════════════════════
+{
+  level:"expert", domain:"Systèmes de fichiers", pts:3,
+  q:"Quel pourcentage d'espace est réservé par défaut pour root sur un nouveau système ext4 ?",
+  opts:["3%","5%","10%","0%"],
+  ans:1,
+  expl:"Par défaut, ext4 réserve <strong>5%</strong> pour root afin d'éviter les paniques système. Modifiable avec <code>tune2fs -m N /dev/sdX</code>."
+},
+{
+  level:"expert", domain:"Systèmes de fichiers", pts:3,
+  q:"Quelle commande tune2fs définit un intervalle de vérification fsck de 200 jours ?",
+  opts:["tune2fs -d 200 /dev/sda1","tune2fs -c 200 /dev/sda1","tune2fs -i 200 /dev/sda1","tune2fs -t 200 /dev/sda1"],
+  ans:2,
+  expl:"<code>-i</code> = interval en jours. <code>-c</code> = count (nombre de montages). <code>-d</code> n'existe pas dans tune2fs."
+},
+{
+  level:"expert", domain:"find", pts:3,
+  q:"Quelle commande find recherche les fichiers modifiés il y a exactement 7 jours ?",
+  opts:["find . -mtime -7","find . -mtime +7","find . -mtime 7","find . -mmin 7"],
+  ans:2,
+  expl:"Sans signe, <code>-mtime 7</code> = exactement 7 jours. <code>-mtime -7</code> = moins de 7 jours. <code>-mtime +7</code> = plus de 7 jours."
+},
+{
+  level:"expert", domain:"find", pts:3,
+  q:"Quelle est la différence entre -exec rm {} \\; et -exec rm {} + dans find ?",
+  opts:["\\; = un rm par fichier, + = un seul rm pour tous","\\; = supprime avec confirmation, + = suppression forcée","Les deux sont identiques","+ = récursif, \\; = non récursif"],
+  ans:0,
+  expl:"<code>\\;</code> lance rm une fois <strong>par fichier</strong> (lent). <code>+</code> regroupe tous les fichiers et lance rm <strong>une seule fois</strong> (rapide, comme xargs)."
+},
+{
+  level:"expert", domain:"Shell", pts:3,
+  q:"Quelle commande bash affiche la commande numéro 142 de l'historique sans l'exécuter ?",
+  opts:["!142","!142:p","history 142","!!142"],
+  ans:1,
+  expl:"<code>!142:p</code> affiche la commande n°142 sans l'exécuter (p = print/preview). <code>!142</code> l'exécuterait directement."
+},
+{
+  level:"expert", domain:"Sécurité", pts:3,
+  q:"Dans /etc/shadow, que représente la valeur entre le premier et le deuxième $ dans la ligne de mot de passe ?",
+  opts:["L'algorithme de hachage","Le sel (salt)","Le hash du mot de passe","Le nombre d'itérations"],
+  ans:0,
+  expl:"Format : <code>$ID$sel$hash</code>. Le premier champ ($6 = SHA-512, $1 = MD5, $2a = bcrypt) indique l'algorithme. Le second est le sel."
+},
+{
+  level:"expert", domain:"Boot", pts:3,
+  q:"Quelle commande installe GRUB2 sur le MBR du troisième disque dur ?",
+  opts:["grub-install /dev/sdc1","grub2-install /dev/sdc1","grub-install /dev/sdc","grub-mbr-install /dev/sdc"],
+  ans:2,
+  expl:"<code>grub-install /dev/sdc</code> installe sur le disque entier (MBR), pas une partition. sda=1er, sdb=2e, sdc=3e. grub2-install existe sur certaines RedHat mais n'est pas universel."
+},
+{
+  level:"expert", domain:"Permissions", pts:3,
+  q:"Quelle valeur octale positionne SUID + SGID + rwxr-xr-x sur un fichier ?",
+  opts:["4755","2755","1755","6755"],
+  ans:3,
+  expl:"4000=SUID, 2000=SGID, 1000=Sticky. <code>6755</code> = 4000+2000+755 = SUID+SGID+rwxr-xr-x. <code>4755</code> = SUID uniquement."
+},
+{
+  level:"expert", domain:"Réseau", pts:3,
+  q:"Quel est le masque par défaut d'une adresse de classe B ?",
+  opts:["/8 (255.0.0.0)","/16 (255.255.0.0)","/24 (255.255.255.0)","/12 (255.240.0.0)"],
+  ans:1,
+  expl:"Classe B : masque /16 = 255.255.0.0. Classe A : /8. Classe C : /24. La plage privée B est 172.16.0.0/12 (172.16-31.x.x)."
+},
+{
+  level:"expert", domain:"Shell", pts:3,
+  q:"Quelle commande extrait le dernier argument de la commande précédente en bash ?",
+  opts:["!!","!^","!$","!-1"],
+  ans:2,
+  expl:"<code>!$</code> représente le dernier argument de la commande précédente. <code>!^</code> = premier argument. Exemple : après <code>cat /etc/nginx/nginx.conf</code>, taper <code>vim !$</code>."
+},
+{
+  level:"expert", domain:"Modules kernel", pts:3,
+  q:"Comment empêcher définitivement le chargement automatique d'un module kernel au démarrage ?",
+  opts:["rmmod module au démarrage","modprobe -r module dans rc.local","Ajouter 'blacklist module' dans /etc/modprobe.d/blacklist.conf","Supprimer le fichier .ko du module"],
+  ans:2,
+  expl:"Ajouter <code>blacklist nomdumodule</code> dans <code>/etc/modprobe.d/blacklist.conf</code> empêche définitivement le chargement au boot. modprobe -r est temporaire."
+},
+{
+  level:"expert", domain:"Sécurité", pts:3,
+  q:"Quelle est la différence fondamentale entre chiffrement symétrique et asymétrique ?",
+  opts:["Symétrique = plus sécurisé, asymétrique = plus rapide","Symétrique = une clé partagée, asymétrique = paire clé publique/privée","Symétrique = pour les emails, asymétrique = pour le web","Symétrique = logiciel, asymétrique = matériel"],
+  ans:1,
+  expl:"Symétrique (AES, DES) = une seule clé partagée, rapide. Asymétrique (RSA, ECC) = paire clé publique/privée, lent mais résout le problème d'échange de clés."
+},
+{
+  level:"expert", domain:"Cloud", pts:3,
+  q:"Heroku et Google App Engine sont des exemples de quel modèle cloud ?",
+  opts:["IaaS","PaaS","SaaS","DaaS"],
+  ans:1,
+  expl:"<code>PaaS</code> (Platform as a Service) — le développeur déploie son code sans gérer les serveurs. La plateforme gère l'OS, le runtime et le middleware."
+},
+{
+  level:"expert", domain:"Shell", pts:3,
+  q:"Quelle option de find cherche des fichiers dont les permissions ont changé dans les 2 dernières heures ?",
+  opts:["find . -mmin -120","find . -cmin -120","find . -atime -2","find . -ctime -1"],
+  ans:1,
+  expl:"<code>-cmin</code> = change time en <strong>minutes</strong>. <code>-cmin -120</code> = modifié (métadonnées) il y a moins de 120 minutes. -ctime compte en jours."
+},
+{
+  level:"expert", domain:"Sécurité Wi-Fi", pts:3,
+  q:"Quel protocole Wi-Fi utilise SAE (Simultaneous Authentication of Equals) ?",
+  opts:["WEP","WPA","WPA2","WPA3"],
+  ans:3,
+  expl:"<code>WPA3</code> (2018) utilise SAE, résistant aux attaques par dictionnaire offline. WPA2 utilise AES/CCMP. WPA utilise TKIP. WEP utilise RC4."
+},
+{
+  level:"expert", domain:"Packages", pts:3,
+  q:"Quelle commande rpm liste tous les packages installés sur le système ?",
+  opts:["rpm --list --installed","rpm -qa","rpm --query --all","B et C sont correctes"],
+  ans:3,
+  expl:"<code>rpm -qa</code> et <code>rpm --query --all</code> sont équivalents et listent tous les packages RPM installés. Les deux formes sont valides."
+},
+{
+  level:"expert", domain:"Boot", pts:3,
+  q:"Quel est l'ordre correct de la séquence de démarrage Linux ?",
+  opts:["BIOS → GRUB → Kernel → initramfs → init","BIOS → initramfs → GRUB → Kernel → init","GRUB → BIOS → Kernel → initramfs → init","BIOS → Kernel → GRUB → init → initramfs"],
+  ans:0,
+  expl:"BIOS/UEFI → GRUB (bootloader) → Kernel chargé en RAM → initramfs monté → montage du vrai / → init (PID 1) lancé."
+},
+{
+  level:"expert", domain:"Sécurité", pts:3,
+  q:"Dans quel fichier Linux les mots de passe hachés des utilisateurs sont-ils stockés ?",
+  opts:["/etc/passwd","/etc/shadow","/etc/security/passwd","/var/auth/shadow"],
+  ans:1,
+  expl:"<code>/etc/shadow</code> contient les mots de passe hachés (format $algo$sel$hash). <code>/etc/passwd</code> ne contient plus les mots de passe (remplacé par x)."
+},
+{
+  level:"expert", domain:"Shell", pts:3,
+  q:"Quelle commande basename renvoie 'rapport' à partir du chemin '/home/titi/docs/rapport.txt' ?",
+  opts:["basename /home/titi/docs/rapport.txt","basename /home/titi/docs/rapport.txt .txt","dirname /home/titi/docs/rapport.txt","pathinfo /home/titi/docs/rapport.txt"],
+  ans:1,
+  expl:"<code>basename /chemin/fichier.txt .txt</code> supprime le chemin ET l'extension, retournant <code>rapport</code>. Sans le .txt, il retournerait <code>rapport.txt</code>."
+},
+{
+  level:"expert", domain:"Virtualisation", pts:3,
+  q:"Quels éléments doivent obligatoirement être modifiés lors du clonage d'une VM Linux ?",
+  opts:["Partition et type de FS","Machine ID et clés SSH hôte","Permissions root et type de kernel","Interfaces réseau et fstab"],
+  ans:1,
+  expl:"Le <strong>Machine ID</strong> (<code>/etc/machine-id</code>) et les <strong>clés SSH hôte</strong> (<code>/etc/ssh/ssh_host_*</code>) doivent être régénérés pour éviter conflits et failles de sécurité."
+}
+];
+
+// Mélanger les questions
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = 0;
+let results = [];
+
+const MAX_SCORE = 800;
+const PASS_SCORE = 500;
+
+function startQuiz() {
+  questions = shuffle(QUESTIONS);
+  current = 0;
+  score = 0;
+  answered = 0;
+  results = [];
+  document.getElementById('screen-home').style.display = 'none';
+  document.getElementById('screen-quiz').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const pct = Math.round((current / questions.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('nav-info').textContent = `Q${current+1} / ${questions.length}`;
+  document.getElementById('nav-score').textContent = score + ' pts';
+
+  const levelColors = { novice: 'var(--green)', inter: 'var(--amber)', expert: 'var(--red)' };
+  const levelLabels = { novice: 'Novice', inter: 'Intermédiaire', expert: 'Expert' };
+
+  const letters = ['A','B','C','D'];
+  const optsHtml = q.opts.map((o, i) => `
+    <button class="opt" id="opt-${i}" onclick="answer(${i})">
+      <span class="opt-letter">${letters[i]}</span>
+      <span class="opt-text">${o}</span>
+    </button>
+  `).join('');
+
+  document.getElementById('quiz-main').innerHTML = `
+    <div class="q-card">
+      <div class="q-meta">
+        <span class="q-num">Q${current+1}</span>
+        <span class="q-level" style="color:${levelColors[q.level]};border-color:${levelColors[q.level]}33;background:${levelColors[q.level]}11">${levelLabels[q.level]}</span>
+        <span class="q-domain">${q.domain}</span>
+        <span class="q-points">+${q.pts} pt${q.pts > 1 ? 's' : ''}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optsHtml}</div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+        ${current < questions.length - 1 ? 'Question suivante →' : 'Voir les résultats →'}
+      </button>
+    </div>
+  `;
+}
+
+function answer(idx) {
+  const q = questions[current];
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(o => o.disabled = true);
+
+  const correct = idx === q.ans;
+  const fb = document.getElementById('feedback');
+  const btnNext = document.getElementById('btn-next');
+
+  if (correct) {
+    opts[idx].classList.add('correct');
+    score += q.pts;
+    fb.className = 'feedback ok show';
+    fb.innerHTML = `<div class="feedback-title">✓ Correct ! +${q.pts} pt${q.pts>1?'s':''}</div>${q.expl}`;
+  } else {
+    opts[idx].classList.add('wrong');
+    opts[q.ans].classList.add('reveal-correct');
+    fb.className = 'feedback ko show';
+    fb.innerHTML = `<div class="feedback-title">✗ Incorrect</div>${q.expl}`;
+  }
+
+  results.push({ q: q.q, level: q.level, pts: q.pts, correct, chosen: idx, right: q.ans, opts: q.opts });
+  answered++;
+
+  document.getElementById('nav-score').textContent = score + ' pts';
+  btnNext.classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+    window.scrollTo(0,0);
+  }
+}
+
+function showResults() {
+  document.getElementById('screen-quiz').style.display = 'none';
+  document.getElementById('screen-results').style.display = 'block';
+
+  const pass = score >= PASS_SCORE;
+  const pct = Math.round((score / MAX_SCORE) * 100);
+  const correct = results.filter(r => r.correct).length;
+  const wrong = results.filter(r => !r.correct).length;
+
+  document.getElementById('res-badge').textContent = pass ? '✓ RÉUSSI' : '✗ INSUFFISANT';
+  document.getElementById('res-badge').className = 'results-badge ' + (pass ? 'badge-pass' : 'badge-fail');
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-score').className = 'results-score ' + (pass ? 'score-pass' : 'score-fail');
+  document.getElementById('res-correct').textContent = correct;
+  document.getElementById('res-wrong').textContent = wrong;
+  document.getElementById('res-pct').textContent = pct + '%';
+
+  setTimeout(() => {
+    const bar = document.getElementById('res-bar');
+    bar.style.width = Math.min(100, (score / MAX_SCORE) * 100) + '%';
+    bar.className = 'score-bar-fill ' + (pass ? 'fill-pass' : 'fill-fail');
+  }, 100);
+
+  // Par niveau
+  ['novice','inter','expert'].forEach(lv => {
+    const total = results.filter(r => r.level === lv);
+    const ok = total.filter(r => r.correct).length;
+    const pctLv = total.length > 0 ? (ok / total.length) * 100 : 0;
+    const maxQ = lv === 'novice' ? 25 : lv === 'inter' ? 25 : 20;
+    setTimeout(() => {
+      document.getElementById('bar-' + lv).style.width = pctLv + '%';
+    }, 200);
+    document.getElementById('cnt-' + lv).textContent = ok + '/' + total.length;
+  });
+
+  // Erreurs
+  const errors = results.filter(r => !r.correct);
+  const errList = document.getElementById('errors-list');
+  if (errors.length === 0) {
+    errList.innerHTML = '<div style="color:var(--green);font-size:14px;text-align:center;padding:1rem">🎉 Aucune erreur !</div>';
+  } else {
+    errList.innerHTML = errors.map(e => `
+      <div class="error-item">
+        <div class="error-q">${e.q}</div>
+        <div class="error-ans">
+          <span class="error-wrong">✗ ${e.opts[e.chosen]}</span>
+          &nbsp;→&nbsp;
+          <span class="error-right">✓ ${e.opts[e.right]}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.scrollTo(0,0);
+}
+
+function retryQuiz() {
+  document.getElementById('screen-results').style.display = 'none';
+  document.getElementById('screen-home').style.display = 'flex';
+}
+</script>
+</body>
+</html>
