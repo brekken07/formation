@@ -96,21 +96,20 @@
       ]
     },
       {
-	"id": "cheatsheets",
-	"title": "Pense-bêtes",
-	"icon": "📋",
-	"description": "Références rapides à garder sous la main — commandes, syntaxes, bonnes pratiques.",
-	"color": "orange",
-	"modules": [
-	{
-	  "file": "git-cheatsheet.html",
-	  "title": "Git Cheatsheet",
-	  "description": "Toutes les commandes Git essentielles — staging, branches, remote, annulations, stash, tags.",
-	  "tags": ["GIT", "BRANCHES", "REMOTE", "STASH"],
-	  "status": "done"
-	}
+        "id": "cheatsheets",
+        "title": "Pense-bêtes",
+        "icon": "📋",
+        "description": "Références rapides à garder sous la main — commandes, syntaxes, bonnes pratiques.",
+        "color": "orange",
+        "modules": [
+        {
+            "file": "git-cheatsheet.html",
+            "title": "Git Cheatsheet",
+            "description": "Toutes les commandes Git essentielles — staging, branches, remote, annulations, stash, tags.",
+            "tags": ["GIT", "BRANCHES", "REMOTE", "STASH"],
+            "status": "done"
+        }
       ]
      }
-    }
   ]
 }
