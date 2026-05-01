@@ -360,11 +360,7 @@ function renderFormation(f) {
 function renderCard(m, i, theme, tc, icon, formationId) {
   const num = String(i + 1).padStart(2, '0');
   const isClickable = (m.status === 'done' || m.status === 'new') && m.file;
-  const statusHtml = {
-    done: `<span class="status-badge s-done">✓ TERMINÉ</span>`,
-    new:  `<span class="status-badge s-new">● NOUVEAU</span>`,
-    soon: `<span class="status-badge s-soon">BIENTÔT</span>`
-  }[m.status] || '';
+  const statusHtml = '';
   const tagsHtml = m.tags.map(t => `<span class="tag ${tc}">${t}</span>`).join('');
   const href = isClickable ? `${formationId}/${m.file}` : '#';
   return `
@@ -373,7 +369,6 @@ function renderCard(m, i, theme, tc, icon, formationId) {
       <div class="card-top">
         <div class="mod-num">MODULE ${num}</div>
         <div class="mod-icon-wrap">${icon}</div>
-        ${statusHtml}
         <h3>${m.title}</h3>
         <p class="desc">${m.description}</p>
       </div>
