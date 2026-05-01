@@ -8,7 +8,7 @@
       "color": "grey",
       "modules": [
         {
-          "file": "index.html.html",
+          "file": "index.html",
           "title": "Parcours DevCorp",
           "description": "Programme complet de formation DevOps structuré en 8 phases progressives.",
           "tags": ["BASH", "SCRIPTING", "GIT", "CI", "CD", "DOCKER", "ANSIBLE", "TERRAFORM", "MONITORING"],
