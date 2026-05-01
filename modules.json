@@ -1,6 +1,21 @@
 {
   "formations": [
     {
+      "id": "devcorp",
+      "title": "Parcours DevCorp",
+      "icon": "🚀",
+      "description": "Formation devops — zero to hero",
+      "color": "grey",
+      "modules": [
+        {
+          "file": "index.html.html",
+          "title": "Parcours DevCorp",
+          "description": "Programme complet de formation DevOps structuré en 8 phases progressives.",
+          "tags": ["BASH", "SCRIPTING", "GIT", "CI", "CD", "DOCKER", "ANSIBLE", "TERRAFORM", "MONITORING"],
+          "status": "done"
+        }
+       ]
+      },
       "id": "devops",
       "title": "DevOps",
       "icon": "🚀",
@@ -109,7 +124,7 @@
             "tags": ["GIT", "BRANCHES", "REMOTE", "STASH"],
             "status": "done"
         }
-      ]
-     }
+       ]
+      }
   ]
 }
