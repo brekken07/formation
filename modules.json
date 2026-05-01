@@ -5,7 +5,7 @@
       "title": "Parcours DevCorp",
       "icon": "🚀",
       "description": "Formation devops — zero to hero",
-      "color": "grey",
+      "color": "pink",
       "modules": [
         {
           "file": "index.html",
