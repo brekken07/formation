@@ -36,11 +36,11 @@
           "status": "new"
         },
         {
-          "file": "",
-          "title": "Workflows avancés",
-          "description": "Secrets GitHub, jobs multiples, conditions, environments staging/production.",
-          "tags": ["SECRETS", "ACTIONS"],
-          "status": "soon"
+          "file": "module5_docker-pratique.html",
+          "title": "Docker en pratique",
+          "description": "Layers, cache, debugging, variables d'environnement et Docker Compose — consolider Docker par la manipulation.",
+          "tags": ["LAYERS", "DEBUG", "COMPOSE"],
+          "status": "new"
         },
         {
           "file": "",
