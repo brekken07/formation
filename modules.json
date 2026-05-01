@@ -15,7 +15,8 @@
           "status": "done"
         }
        ]
-      },
+    },
+    {
       "id": "devops",
       "title": "DevOps",
       "icon": "🚀",
@@ -128,3 +129,4 @@
       }
   ]
 }
+
