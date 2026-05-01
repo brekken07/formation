@@ -43,11 +43,11 @@
           "status": "new"
         },
         {
-          "file": "",
+          "file": "module6_kubernetes.html",
           "title": "Introduction Kubernetes",
           "description": "Déployer des conteneurs à l'échelle avec K8s — pods, services, déploiements.",
           "tags": ["K8S", "PODS"],
-          "status": "soon"
+          "status": "new"
         }
       ]
     },
