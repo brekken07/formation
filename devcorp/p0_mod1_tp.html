@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P0·M1 TP — Bash Scripting | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary:    #0d1117;
+    --bg-secondary:  #161b22;
+    --bg-card:       #1c2128;
+    --bg-hover:      #21262d;
+    --bg-code:       #161b22;
+    --border:        #30363d;
+    --border-bright: #484f58;
+    --text-primary:  #e6edf3;
+    --text-secondary:#8b949e;
+    --text-muted:    #484f58;
+    --accent-green:  #3fb950;
+    --accent-blue:   #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-orange: #f0883e;
+    --accent-yellow: #d29922;
+    --accent-red:    #f85149;
+    --accent-teal:   #39d353;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --sidebar-width: 260px;
+    --topbar-height: 56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+  }
+
+  .topbar-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-green);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .topbar-sep { color: var(--border-bright); }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    flex: 1;
+  }
+
+  .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent-orange); }
+  .breadcrumb .current { color: var(--accent-orange); }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid;
+    transition: all 0.15s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .btn-cours {
+    background: rgba(88,166,255,0.1);
+    color: var(--accent-blue);
+    border-color: rgba(88,166,255,0.3);
+  }
+  .btn-cours:hover { background: rgba(88,166,255,0.2); }
+
+  .btn-nav {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border);
+  }
+  .btn-nav:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    padding-top: var(--topbar-height);
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: var(--topbar-height);
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding: 24px 0;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
+
+  .sidebar-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .sidebar-item.active { background: rgba(240,136,62,0.1); color: var(--accent-orange); }
+
+  .sidebar-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border-bright);
+    flex-shrink: 0;
+  }
+
+  .sidebar-item .tp-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  .sidebar-item.active .tp-num {
+    background: rgba(240,136,62,0.15);
+    border-color: rgba(240,136,62,0.3);
+    color: var(--accent-orange);
+  }
+
+  .sidebar-divider { height: 1px; background: var(--border); margin: 12px 16px; }
+
+  /* ── CONTENT ── */
+  .content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    max-width: 860px;
+    padding: 48px 56px;
+  }
+
+  /* ── HEADER ── */
+  .module-header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-path {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .module-title {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .module-title span { color: var(--accent-orange); }
+
+  .module-desc {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .module-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+  }
+  .meta-item .val { color: var(--text-secondary); }
+
+  /* ── INTRO BOX ── */
+  .intro-box {
+    background: rgba(240,136,62,0.06);
+    border: 1px solid rgba(240,136,62,0.2);
+    border-left: 3px solid var(--accent-orange);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+
+  .intro-box h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-orange);
+    margin-bottom: 12px;
+  }
+
+  .intro-box p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .intro-box p:last-child { margin-bottom: 0; }
+
+  /* ── TP CARD ── */
+  .tp-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 40px;
+    overflow: hidden;
+    scroll-margin-top: 80px;
+  }
+
+  .tp-card-header {
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .tp-badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tp-badge.tp1 { background: rgba(88,166,255,0.12); color: var(--accent-blue); border: 1px solid rgba(88,166,255,0.3); }
+  .tp-badge.tp2 { background: rgba(63,185,80,0.12); color: var(--accent-green); border: 1px solid rgba(63,185,80,0.3); }
+  .tp-badge.tp3 { background: rgba(188,140,255,0.12); color: var(--accent-purple); border: 1px solid rgba(188,140,255,0.3); }
+  .tp-badge.tp4 { background: rgba(240,136,62,0.12); color: var(--accent-orange); border: 1px solid rgba(240,136,62,0.3); }
+
+  .tp-header-text { flex: 1; }
+  .tp-title { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+  .tp-subtitle { font-size: 13px; color: var(--text-secondary); }
+
+  .tp-difficulty {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .diff-easy { color: var(--accent-green); border-color: rgba(63,185,80,0.3); background: rgba(63,185,80,0.06); }
+  .diff-medium { color: var(--accent-yellow); border-color: rgba(210,153,34,0.3); background: rgba(210,153,34,0.06); }
+  .diff-hard { color: var(--accent-red); border-color: rgba(248,81,73,0.3); background: rgba(248,81,73,0.06); }
+
+  .tp-body { padding: 28px; }
+
+  /* ── SETUP BOX ── */
+  .setup-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+
+  .setup-box h5 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  /* ── SECTIONS DANS TP ── */
+  .tp-section { margin-bottom: 28px; }
+
+  .tp-section h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tp-section h4::before {
+    content: '';
+    width: 3px; height: 16px;
+    background: var(--accent-orange);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .tp-section p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.7;
+  }
+
+  .tp-section p code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg-secondary);
+    color: var(--accent-orange);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .tp-section ul, .tp-section ol {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .tp-section li { line-height: 1.6; }
+
+  .tp-section li code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg-secondary);
+    color: var(--accent-orange);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .code-copy {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+  .code-copy:hover { background: var(--bg-hover); color: var(--text-secondary); }
+
+  .code-block pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-primary);
+  }
+
+  .cm { color: #6e7681; font-style: italic; }
+  .kw { color: #ff7b72; }
+  .fn { color: var(--accent-blue); }
+  .st { color: #a5d6ff; }
+  .va { color: var(--accent-purple); }
+  .nu { color: var(--accent-orange); }
+  .sh { color: #6e7681; }
+
+  /* ── EXPECTED OUTPUT ── */
+  .expected-output {
+    background: #010409;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-green);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+  }
+
+  .expected-output .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-green);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .expected-output pre {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #7ee787;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  /* ── VALIDATION ── */
+  .validation-box {
+    background: rgba(63,185,80,0.05);
+    border: 1px solid rgba(63,185,80,0.2);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 20px;
+  }
+
+  .validation-box h5 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-green);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .validation-box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .validation-box li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .validation-box li::before {
+    content: '☐';
+    color: var(--text-muted);
+    font-family: var(--mono);
+    flex-shrink: 0;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .callout-body { flex: 1; color: var(--text-secondary); }
+  .callout-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+
+  .callout.tip { background: rgba(63,185,80,0.06); border: 1px solid rgba(63,185,80,0.2); }
+  .callout.tip .callout-title { color: var(--accent-green); }
+  .callout.warning { background: rgba(210,153,34,0.06); border: 1px solid rgba(210,153,34,0.2); }
+  .callout.warning .callout-title { color: var(--accent-yellow); }
+  .callout.info { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); }
+  .callout.info .callout-title { color: var(--accent-blue); }
+
+  /* ── COMMIT SECTION ── */
+  .commit-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 16px;
+  }
+
+  .commit-section h5 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  /* ── NAV BOTTOM ── */
+  .nav-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-bottom a {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-bottom a:hover {
+    border-color: var(--border-bright);
+    color: var(--text-primary);
+    background: var(--bg-hover);
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a>
+    <span class="topbar-sep">›</span>
+    <a href="#">Phase 0</a>
+    <span class="topbar-sep">›</span>
+    <span class="current">M1 · Bash Scripting · TP</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase0-module1-cours.html" class="btn btn-cours">📖 Retour au cours</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">// Cahier de TP</div>
+      <a href="#tp1" class="sidebar-item active">
+        <span class="dot" style="background:var(--accent-blue)"></span>
+        TP 1.1 — Rapport système
+        <span class="tp-num">01</span>
+      </a>
+      <a href="#tp2" class="sidebar-item">
+        <span class="dot" style="background:var(--accent-green)"></span>
+        TP 1.2 — Check VPS
+        <span class="tp-num">02</span>
+      </a>
+      <a href="#tp3" class="sidebar-item">
+        <span class="dot" style="background:var(--accent-purple)"></span>
+        TP 1.3 — Backup
+        <span class="tp-num">03</span>
+      </a>
+      <a href="#tp4" class="sidebar-item">
+        <span class="dot" style="background:var(--accent-orange)"></span>
+        TP 1.4 — Déploiement simulé
+        <span class="tp-num">04</span>
+      </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">// Navigation</div>
+      <a href="phase0-module1-cours.html" class="sidebar-item">
+        <span class="dot"></span>Retour au cours
+      </a>
+      <a href="index.html" class="sidebar-item">
+        <span class="dot"></span>← Dashboard
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- HEADER -->
+    <div class="module-header">
+      <div class="module-path">phase-0 / module-1 / travaux-pratiques</div>
+      <h1 class="module-title">Cahier de TP — <span>Bash Scripting</span></h1>
+      <p class="module-desc">
+        4 exercices progressifs à réaliser sur ton VPS OVH. Chaque TP est à valider
+        avant de passer au suivant.
+      </p>
+      <div class="module-meta">
+        <span class="meta-item">⚡ <span class="val">4 exercices</span></span>
+        <span class="meta-item">⏱ <span class="val">~4h au total</span></span>
+        <span class="meta-item">📦 <span class="val">Dépôt : devcorp/tp-bash/</span></span>
+      </div>
+    </div>
+
+    <!-- INTRO -->
+    <div class="intro-box">
+      <h4>// Avant de commencer</h4>
+      <p>Tous les scripts sont à créer dans <code>~/tp-bash/</code> sur ton VPS, versionné dans ton dépôt GitHub <code>devcorp</code>.</p>
+      <p>Chaque script doit passer <code>bash -n script.sh</code> (vérification syntaxique) avant d'être commité.</p>
+      <p>Utilise des <strong>conventional commits</strong> : <code>feat(bash): add VPS health check script</code></p>
+    </div>
+
+    <!-- SETUP -->
+    <div class="setup-box" style="margin-bottom:40px;">
+      <h5>// Setup initial</h5>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="cm"># Sur ton VPS</span>
+<span class="fn">mkdir</span> -p ~/tp-bash
+<span class="fn">cd</span> ~/tp-bash
+<span class="fn">git</span> init
+<span class="fn">git</span> remote add origin git@github.com:&lt;ton-user&gt;/devcorp.git
+<span class="fn">git</span> checkout -b feature/phase0-bash</pre>
+      </div>
+    </div>
+
+    <!-- TP 1.1 -->
+    <div class="tp-card" id="tp1">
+      <div class="tp-card-header">
+        <span class="tp-badge tp1">TP 1.1</span>
+        <div class="tp-header-text">
+          <div class="tp-title">Rapport d'informations système</div>
+          <div class="tp-subtitle">Variables, paramètres, substitution de commande</div>
+        </div>
+        <span class="tp-difficulty diff-easy">Débutant</span>
+      </div>
+      <div class="tp-body">
+
+        <div class="tp-section">
+          <h4>Objectif</h4>
+          <p>
+            Créer un script <code>infos_systeme.sh</code> qui affiche un rapport d'informations
+            système formaté. Le script prend un nom d'environnement en paramètre optionnel
+            (défaut : <code>local</code>).
+          </p>
+        </div>
+
+        <div class="tp-section">
+          <h4>Sortie attendue</h4>
+          <div class="expected-output">
+            <div class="label">// exemple de sortie</div>
+            <pre>══════════════════════════════════════
+  Rapport système — production
+  2024-01-15 10:32:07
+══════════════════════════════════════
+
+Hostname     : vps-devcorp
+Utilisateur  : titi
+OS           : Debian GNU/Linux 12 (bookworm)
+Kernel       : 6.1.0-17-amd64
+Uptime       : up 3 days, 4 hours, 12 minutes
+IP publique  : 51.75.XXX.XXX</pre>
+          </div>
+        </div>
+
+        <div class="tp-section">
+          <h4>Contraintes</h4>
+          <ul>
+            <li><code>set -euo pipefail</code> obligatoire</li>
+            <li>Toutes les valeurs dynamiques dans des variables</li>
+            <li>Si plus d'un paramètre est fourni → afficher l'usage et quitter avec code <code>1</code></li>
+            <li>Tester les 3 cas : sans arg, avec un arg valide, avec deux args (doit échouer)</li>
+          </ul>
+        </div>
+
+        <div class="tp-section">
+          <h4>Commandes à découvrir</h4>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span></div>
+            <pre><span class="fn">hostname</span>                          <span class="cm"># nom de la machine</span>
+<span class="fn">whoami</span>                            <span class="cm"># utilisateur courant</span>
+<span class="fn">uname</span> -r                          <span class="cm"># version du kernel</span>
+<span class="fn">lsb_release</span> -d | <span class="fn">cut</span> -f2         <span class="cm"># nom de l'OS</span>
+<span class="fn">uptime</span> -p                         <span class="cm"># durée depuis le démarrage</span>
+<span class="fn">date</span> <span class="st">'+%Y-%m-%d %H:%M:%S'</span>        <span class="cm"># date formatée</span>
+<span class="fn">curl</span> -s ifconfig.me               <span class="cm"># IP publique</span></pre>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <span>💡</span>
+          <div class="callout-body">
+            <div class="callout-title">Astuce</div>
+            Pour l'IP publique, ajoute un timeout : <code>curl -s --max-time 3 ifconfig.me</code>
+            pour éviter que le script reste bloqué si le réseau est lent.
+          </div>
+        </div>
+
+        <div class="validation-box">
+          <h5>✓ Critères de validation</h5>
+          <ul>
+            <li><code>bash -n infos_systeme.sh</code> sans erreur</li>
+            <li><code>./infos_systeme.sh</code> affiche le rapport avec "local"</li>
+            <li><code>./infos_systeme.sh production</code> affiche le rapport avec "production"</li>
+            <li><code>./infos_systeme.sh a b</code> affiche l'usage et retourne code 1</li>
+            <li>Toutes les valeurs sont correctes (vérifier manuellement)</li>
+          </ul>
+        </div>
+
+        <div class="commit-section">
+          <h5>// Commit attendu</h5>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">git</span> add infos_systeme.sh
+<span class="fn">git</span> commit -m <span class="st">"feat(bash): add system info report script"</span></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TP 1.2 -->
+    <div class="tp-card" id="tp2">
+      <div class="tp-card-header">
+        <span class="tp-badge tp2">TP 1.2</span>
+        <div class="tp-header-text">
+          <div class="tp-title">Vérification de santé du VPS</div>
+          <div class="tp-subtitle">Fonctions, conditions, logging coloré</div>
+        </div>
+        <span class="tp-difficulty diff-medium">Intermédiaire</span>
+      </div>
+      <div class="tp-body">
+
+        <div class="tp-section">
+          <h4>Objectif</h4>
+          <p>
+            Créer un script <code>check_vps.sh</code> qui vérifie l'état de santé du VPS
+            et produit un rapport structuré. Ce script sera lancé au démarrage de chaque
+            session de travail.
+          </p>
+        </div>
+
+        <div class="tp-section">
+          <h4>Ce que le script doit vérifier</h4>
+          <ol>
+            <li>Espace disque → alerte si &gt; 80%, erreur si &gt; 95%</li>
+            <li>RAM disponible → alerte si &lt; 500 Mo libres</li>
+            <li>Charge CPU (load average) → alerte si load &gt; nombre de CPUs</li>
+            <li>Services : <code>ssh</code>, <code>cron</code>, <code>ufw</code></li>
+            <li>Connectivité réseau → ping vers <code>8.8.8.8</code></li>
+          </ol>
+        </div>
+
+        <div class="tp-section">
+          <h4>Sortie attendue</h4>
+          <div class="expected-output">
+            <div class="label">// exemple de sortie</div>
+            <pre>[10:32:15] ───▶  Vérification VPS — production
+[10:32:15] INFO    Disque  : 23% utilisé ✓
+[10:32:15] INFO    RAM     : 6.2 Go disponibles ✓
+[10:32:15] INFO    CPU     : load 0.42 / 4 CPUs ✓
+[10:32:15] INFO    ssh     : actif ✓
+[10:32:15] INFO    cron    : actif ✓
+[10:32:15] WARNING ufw     : inactif ✗
+[10:32:15] INFO    Réseau  : connecté ✓
+────────────────────────────────────────
+[10:32:16] WARNING 1 avertissement(s) — vérifier les points signalés</pre>
+          </div>
+        </div>
+
+        <div class="tp-section">
+          <h4>Commandes utiles</h4>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span></div>
+            <pre><span class="fn">df</span> / | <span class="fn">awk</span> <span class="st">'NR==2 {gsub(/%/,""); print $5}'</span>   <span class="cm"># % disque utilisé</span>
+<span class="fn">free</span> -m | <span class="fn">awk</span> <span class="st">'/^Mem/ {print $7}'</span>             <span class="cm"># RAM dispo en Mo</span>
+<span class="fn">cat</span> /proc/loadavg | <span class="fn">awk</span> <span class="st">'{print $1}'</span>           <span class="cm"># load average 1 min</span>
+<span class="fn">nproc</span>                                           <span class="cm"># nombre de CPUs</span>
+<span class="fn">ping</span> -c 1 -W 2 8.8.8.8 &gt;/dev/null <span class="nu">2</span>&gt;&amp;<span class="nu">1</span>         <span class="cm"># test réseau</span>
+<span class="fn">systemctl</span> is-active --quiet ssh                 <span class="cm"># service actif ?</span></pre>
+          </div>
+        </div>
+
+        <div class="tp-section">
+          <h4>Contraintes</h4>
+          <ul>
+            <li>Utiliser les fonctions <code>log_info</code>, <code>log_warning</code>, <code>log_error</code> du cours</li>
+            <li>Créer une fonction <code>check_service()</code> réutilisable</li>
+            <li>Compter les warnings et les erreurs, afficher le bilan en fin</li>
+            <li>Code de sortie : <code>0</code> = tout OK, <code>1</code> = erreurs, <code>2</code> = seulement warnings</li>
+          </ul>
+        </div>
+
+        <div class="callout warning">
+          <span>⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Point d'attention</div>
+            La comparaison du load average nécessite de convertir le flottant (ex: <code>0.42</code>)
+            en entier pour la comparer avec <code>nproc</code>. Utilise
+            <code>LC_ALL=C awk '{print int($1+0.5)}'</code> pour arrondir proprement.
+          </div>
+        </div>
+
+        <div class="validation-box">
+          <h5>✓ Critères de validation</h5>
+          <ul>
+            <li>Le script retourne 0 quand tout va bien</li>
+            <li>Le script retourne 2 si un service est inactif (warning)</li>
+            <li>Les couleurs s'affichent correctement dans le terminal</li>
+            <li>La fonction <code>check_service</code> est réutilisable (testée avec 3 services différents)</li>
+            <li>Le comptage des warnings/erreurs est correct</li>
+          </ul>
+        </div>
+
+        <div class="commit-section">
+          <h5>// Commit attendu</h5>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">git</span> add check_vps.sh
+<span class="fn">git</span> commit -m <span class="st">"feat(bash): add VPS health check script"</span></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TP 1.3 -->
+    <div class="tp-card" id="tp3">
+      <div class="tp-card-header">
+        <span class="tp-badge tp3">TP 1.3</span>
+        <div class="tp-header-text">
+          <div class="tp-title">Script de sauvegarde</div>
+          <div class="tp-subtitle">Boucles, manipulation de fichiers, trap</div>
+        </div>
+        <span class="tp-difficulty diff-medium">Intermédiaire</span>
+      </div>
+      <div class="tp-body">
+
+        <div class="tp-section">
+          <h4>Objectif</h4>
+          <p>
+            Créer un script <code>backup.sh</code> qui sauvegarde un ou plusieurs répertoires
+            en archives compressées horodatées, avec rotation automatique.
+          </p>
+          <p><strong>Usage :</strong> <code>./backup.sh &lt;source1&gt; [source2] [source3]</code></p>
+        </div>
+
+        <div class="tp-section">
+          <h4>Ce que le script doit faire</h4>
+          <ol>
+            <li>Vérifier que chaque répertoire source existe</li>
+            <li>Créer <code>/var/backups/devcorp/</code> si inexistant</li>
+            <li>Pour chaque source → archive <code>&lt;nom&gt;_YYYYMMDD_HHMMSS.tar.gz</code></li>
+            <li>Vérifier que chaque archive n'est pas vide (<code>-s</code>)</li>
+            <li>Afficher la taille de chaque archive créée</li>
+            <li>Supprimer les archives de plus de 7 jours</li>
+            <li>Nettoyer les archives partielles si interruption (<code>trap</code>)</li>
+          </ol>
+        </div>
+
+        <div class="tp-section">
+          <h4>Sortie attendue</h4>
+          <div class="expected-output">
+            <div class="label">// exemple de sortie</div>
+            <pre>[11:05:22] ───▶  Sauvegarde de 2 répertoire(s)
+[11:05:22] INFO    Sauvegarde de /etc/ssh...
+[11:05:22] INFO    Archive : ssh_20240115_110522.tar.gz (4.2K)
+[11:05:22] INFO    Sauvegarde de /home/titi/tp-bash...
+[11:05:23] INFO    Archive : tp-bash_20240115_110522.tar.gz (18K)
+[11:05:23] INFO    Rotation : 0 archive(s) supprimée(s) (> 7 jours)
+[11:05:23] INFO    Sauvegarde terminée avec succès</pre>
+          </div>
+        </div>
+
+        <div class="tp-section">
+          <h4>Commandes utiles</h4>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span></div>
+            <pre><span class="fn">tar</span> -czf archive.tar.gz /path/to/dir   <span class="cm"># créer archive</span>
+<span class="fn">du</span> -sh archive.tar.gz                  <span class="cm"># taille lisible</span>
+<span class="fn">find</span> /dir -name <span class="st">"*.tar.gz"</span> -mtime +7  <span class="cm"># fichiers > 7 jours</span>
+<span class="fn">find</span> /dir -name <span class="st">"*.tar.gz"</span> -mtime +7 -delete  <span class="cm"># supprimer</span>
+<span class="fn">basename</span> /path/to/dir                  <span class="cm"># nom du dossier seul</span>
+<span class="fn">mktemp</span> -d                              <span class="cm"># dossier temporaire unique</span>
+<span class="va">$EUID</span>                                  <span class="cm"># UID de l'utilisateur courant (0 = root)</span></pre>
+          </div>
+        </div>
+
+        <div class="tp-section">
+          <h4>Contraintes</h4>
+          <ul>
+            <li>Le script <strong>ne doit pas</strong> s'exécuter en root (vérifier <code>$EUID</code>)</li>
+            <li>Utiliser <code>mktemp</code> pour les fichiers temporaires intermédiaires</li>
+            <li><code>trap cleanup EXIT INT TERM</code> pour nettoyer en cas d'interruption</li>
+            <li>Ne pas écraser une archive existante (timestamp garantit l'unicité)</li>
+          </ul>
+        </div>
+
+        <div class="validation-box">
+          <h5>✓ Critères de validation</h5>
+          <ul>
+            <li><code>./backup.sh /etc/ssh /home/titi</code> crée 2 archives correctement</li>
+            <li><code>./backup.sh /dossier/inexistant</code> échoue avec un message clair</li>
+            <li>Lancer le script en root → refus avec message explicite</li>
+            <li>CTRL+C pendant l'exécution → pas d'archive partielle laissée</li>
+            <li>Les archives sont bien dans <code>/var/backups/devcorp/</code></li>
+          </ul>
+        </div>
+
+        <div class="commit-section">
+          <h5>// Commit attendu</h5>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">git</span> add backup.sh
+<span class="fn">git</span> commit -m <span class="st">"feat(bash): add backup script with rotation and trap"</span></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TP 1.4 -->
+    <div class="tp-card" id="tp4">
+      <div class="tp-card-header">
+        <span class="tp-badge tp4">TP 1.4</span>
+        <div class="tp-header-text">
+          <div class="tp-title">Déploiement simulé — TP de synthèse</div>
+          <div class="tp-subtitle">Assemblage de tous les concepts · Projet DevCorp</div>
+        </div>
+        <span class="tp-difficulty diff-hard">Avancé</span>
+      </div>
+      <div class="tp-body">
+
+        <div class="tp-section">
+          <h4>Contexte</h4>
+          <p>
+            Tu simules le déploiement de l'application DevCorp. Pas encore de vraie app —
+            les étapes sont simulées avec des <code>echo</code> et des <code>sleep</code>.
+            Ce script est la base de ce qui deviendra ton vrai pipeline de déploiement
+            dans les phases suivantes.
+          </p>
+          <p><strong>Usage :</strong> <code>./deploy.sh &lt;environnement&gt; &lt;version&gt;</code></p>
+        </div>
+
+        <div class="tp-section">
+          <h4>Étapes du déploiement</h4>
+          <ol>
+            <li><strong>Validation des paramètres</strong> — env (dev/staging/production) + version (X.Y.Z)</li>
+            <li><strong>Vérifications pré-déploiement</strong> — appel de <code>check_vps.sh</code>, présence de Git, réseau</li>
+            <li><strong>Simulation du déploiement</strong> — 4 étapes avec sleep et messages de log</li>
+            <li><strong>Health check</strong> — simulé (succès ou échec aléatoire avec <code>$RANDOM</code>)</li>
+            <li><strong>Rollback</strong> — si health check échoue, simuler un rollback et exit 1</li>
+            <li><strong>Rapport final</strong> — durée, env, version, statut + log dans un fichier</li>
+          </ol>
+        </div>
+
+        <div class="tp-section">
+          <h4>Sortie attendue (cas succès)</h4>
+          <div class="expected-output">
+            <div class="label">// exemple de sortie</div>
+            <pre>[14:22:10] ───▶  Déploiement DevCorp v1.0.0 → staging
+[14:22:10] INFO    Pré-vérifications...
+[14:22:11] INFO    VPS OK
+[14:22:11] INFO    Git détecté : git version 2.39.2
+[14:22:11] INFO    Réseau OK
+[14:22:11] ───▶  Déploiement en cours...
+[14:22:11] INFO    Téléchargement image devcorp:1.0.0...
+[14:22:13] INFO    Arrêt ancienne version...
+[14:22:14] INFO    Démarrage nouvelle version...
+[14:22:16] INFO    Vérification health check...
+[14:22:17] INFO    Health check OK ✓
+────────────────────────────────────────────────
+[14:22:17] INFO    Déploiement réussi en 7s
+[14:22:17] INFO    Environnement : staging | Version : 1.0.0
+[14:22:17] INFO    Log : /tmp/deploy_staging_20240115.log</pre>
+          </div>
+        </div>
+
+        <div class="tp-section">
+          <h4>Points techniques clés</h4>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span></div>
+            <pre><span class="cm"># Mesurer la durée</span>
+<span class="va">START_TIME</span>=<span class="va">$SECONDS</span>
+<span class="cm"># ... traitements ...</span>
+<span class="va">DURATION</span>=<span class="op">$((</span><span class="va">SECONDS</span> - <span class="va">START_TIME</span><span class="op">))</span>
+
+<span class="cm"># Health check aléatoire (pour simuler succès/échec)</span>
+<span class="kw">if</span> <span class="op">[[</span> <span class="op">$((</span><span class="va">RANDOM</span> % 5<span class="op">))</span> <span class="op">-eq</span> <span class="nu">0</span> <span class="op">]]</span>; <span class="kw">then</span>
+    <span class="cm"># 1 chance sur 5 d'échouer</span>
+    <span class="fn">log_error</span> <span class="st">"Health check échoué — rollback..."</span>
+    <span class="fn">exit</span> <span class="nu">1</span>
+<span class="kw">fi</span>
+
+<span class="cm"># Logger dans un fichier ET afficher en même temps</span>
+<span class="va">LOG_FILE</span>=<span class="st">"/tmp/deploy_<span class="va">${ENV}</span>_<span class="op">$(</span>date +%Y%m%d<span class="op">)</span>.log"</span>
+<span class="fn">log_info</span> <span class="st">"Message"</span> | <span class="fn">tee</span> -a <span class="st">"<span class="va">$LOG_FILE</span>"</span>
+
+<span class="cm"># Vérifier qu'une commande est disponible</span>
+<span class="kw">if</span> ! <span class="fn">command</span> -v git &gt;/dev/null <span class="nu">2</span>&gt;&amp;<span class="nu">1</span>; <span class="kw">then</span>
+    <span class="fn">log_error</span> <span class="st">"Git non installé"</span>
+    <span class="fn">exit</span> <span class="nu">1</span>
+<span class="kw">fi</span></pre>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <span>ℹ️</span>
+          <div class="callout-body">
+            <div class="callout-title">Conseil d'architecture</div>
+            Organise ton script en sections claires avec des fonctions :
+            <code>validate_params()</code>, <code>pre_checks()</code>, <code>deploy()</code>,
+            <code>health_check()</code>, <code>rollback()</code>, <code>final_report()</code>.
+            Le <code>main()</code> appelle chaque fonction dans l'ordre. C'est le pattern
+            qu'on retrouve dans tous les scripts de prod sérieux.
+          </div>
+        </div>
+
+        <div class="validation-box">
+          <h5>✓ Critères de validation</h5>
+          <ul>
+            <li><code>./deploy.sh production 1.0.0</code> — déploiement complet avec succès</li>
+            <li><code>./deploy.sh dev</code> — erreur propre (paramètre manquant)</li>
+            <li><code>./deploy.sh production 1.0</code> — erreur propre (format version invalide)</li>
+            <li><code>./deploy.sh invalid 1.0.0</code> — erreur propre (env invalide)</li>
+            <li>Le fichier de log est créé et contient les mêmes lignes que la sortie terminal</li>
+            <li>La durée affichée est correcte</li>
+            <li>Le rollback est simulé si le health check échoue (tester plusieurs fois)</li>
+          </ul>
+        </div>
+
+        <div class="commit-section">
+          <h5>// Commits attendus</h5>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">git</span> add deploy.sh
+<span class="fn">git</span> commit -m <span class="st">"feat(bash): add deployment simulation script"</span>
+
+<span class="cm"># Merger dans develop quand tout est validé</span>
+<span class="fn">git</span> checkout develop
+<span class="fn">git</span> merge --no-ff feature/phase0-bash
+<span class="fn">git</span> push origin develop</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="nav-bottom">
+      <a href="phase0-module1-cours.html">← Retour au cours</a>
+      <a href="index.html">Dashboard →</a>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ copié';
+    setTimeout(() => btn.textContent = 'copier', 2000);
+  });
+}
+
+// Sidebar active on scroll
+const tps = document.querySelectorAll('.tp-card');
+const sideItems = document.querySelectorAll('.sidebar-item[href^="#"]');
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      sideItems.forEach(i => i.classList.toggle('active', i.getAttribute('href') === '#' + id));
+    }
+  });
+}, { rootMargin: '-10% 0px -70% 0px' });
+
+tps.forEach(t => obs.observe(t));
+</script>
+</body>
+</html>
