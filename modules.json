@@ -1,6 +1,22 @@
 {
   "formations": [
     {
+      "id": "devcorp",
+      "title": "Parcours DevCorp",
+      "icon": "🚀",
+      "description": "Formation devops — zero to hero",
+      "color": "pink",
+      "modules": [
+        {
+          "file": "index.html",
+          "title": "Parcours DevCorp",
+          "description": "Programme complet de formation DevOps structuré en 8 phases progressives.",
+          "tags": ["BASH", "SCRIPTING", "GIT", "CI", "CD", "DOCKER", "ANSIBLE", "TERRAFORM", "MONITORING"],
+          "status": "done"
+        }
+       ]
+    },
+    {
       "id": "devops",
       "title": "DevOps",
       "icon": "🚀",
@@ -36,18 +52,18 @@
           "status": "new"
         },
         {
-          "file": "",
-          "title": "Workflows avancés",
-          "description": "Secrets GitHub, jobs multiples, conditions, environments staging/production.",
-          "tags": ["SECRETS", "ACTIONS"],
-          "status": "soon"
+          "file": "module5_docker-pratique.html",
+          "title": "Docker en pratique",
+          "description": "Layers, cache, debugging, variables d'environnement et Docker Compose — consolider Docker par la manipulation.",
+          "tags": ["LAYERS", "DEBUG", "COMPOSE"],
+          "status": "new"
         },
         {
-          "file": "",
+          "file": "module6_kubernetes.html",
           "title": "Introduction Kubernetes",
           "description": "Déployer des conteneurs à l'échelle avec K8s — pods, services, déploiements.",
           "tags": ["K8S", "PODS"],
-          "status": "soon"
+          "status": "new"
         }
       ]
     },
@@ -109,7 +125,7 @@
             "tags": ["GIT", "BRANCHES", "REMOTE", "STASH"],
             "status": "done"
         }
-      ]
-     }
+       ]
+      }
   ]
 }
