@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 5 — Docker en pratique</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #071318;
+  --s1: #0a1c24;
+  --s2: #0d2430;
+  --s3: #112c3a;
+  --border: #163545;
+  --border2: #1e4a60;
+  --text: #d6f0ff;
+  --muted: #3d7a99;
+  --accent: #00b4d8;
+  --green: #4ade80;
+  --orange: #fb923c;
+  --red: #f87171;
+  --purple: #a78bfa;
+  --yellow: #facc15;
+  --teal: #2dd4bf;
+  --whale: #0077b6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px; line-height: 1.75;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,180,216,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,180,216,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none; z-index: 0;
+}
+.orb { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; }
+.orb1 { width: 600px; height: 350px; background: rgba(0,119,182,0.1); top: -80px; left: 50%; transform: translateX(-50%); }
+.orb2 { width: 300px; height: 300px; background: rgba(0,180,216,0.06); bottom: 0; right: -60px; }
+
+.page { position: relative; z-index: 1; }
+
+/* HEADER */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 54px 24px 44px; text-align: center;
+  background: linear-gradient(180deg, rgba(0,119,182,0.08) 0%, transparent 100%);
+}
+.mod-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,180,216,0.1); border: 1px solid rgba(0,180,216,0.3);
+  color: var(--accent); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 20px; letter-spacing: 2px;
+}
+header h1 {
+  font-size: clamp(28px,4.5vw,46px); font-weight: 900;
+  background: linear-gradient(135deg, #d6f0ff 10%, #00b4d8 55%, #2dd4bf 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 12px; line-height: 1.15;
+}
+header p { color: var(--muted); font-size: 15px; max-width: 540px; margin: 0 auto 28px; }
+.tech-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tpill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--s2); border: 1px solid var(--border);
+  padding: 5px 13px; border-radius: 20px; font-size: 12px;
+  font-family: 'JetBrains Mono', monospace; color: var(--muted);
+}
+
+/* YAML WARNING BANNER */
+.yaml-banner {
+  background: rgba(251,146,60,0.08);
+  border: 1px solid rgba(251,146,60,0.3);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 20px 0;
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 14px;
+}
+.yaml-banner .yi { font-size: 20px; flex-shrink: 0; }
+.yaml-banner p { color: #fdba74; line-height: 1.6; }
+.yaml-banner strong { color: var(--orange); }
+
+/* PROGRESS */
+.prog {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(7,19,24,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+}
+.pl { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.pt { flex: 1; height: 5px; background: var(--s2); border-radius: 10px; overflow: hidden; }
+.pf { height: 100%; background: linear-gradient(90deg, var(--whale), var(--accent)); border-radius: 10px; transition: width .5s ease; width: 0%; }
+.pp { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); white-space: nowrap; }
+
+/* WRAP */
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* DOTS NAV */
+.dnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+.dn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--s1);
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.dn:hover { border-color: var(--accent); color: var(--accent); }
+.dn.done { border-color: var(--green); background: rgba(74,222,128,.1); color: var(--green); }
+.dn.open { border-color: var(--accent); background: rgba(0,180,216,.12); color: var(--accent); }
+
+/* CARD */
+.card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; margin-bottom: 12px;
+  overflow: hidden; transition: border-color .25s;
+}
+.card.open { border-color: var(--accent); }
+.card.done { border-color: rgba(74,222,128,.35); }
+
+.card-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; cursor: pointer; user-select: none; transition: background .15s;
+}
+.card-head:hover { background: rgba(255,255,255,.02); }
+
+.cnum {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
+  flex-shrink: 0; background: var(--s2); border: 2px solid var(--border);
+  color: var(--muted); transition: all .2s;
+}
+.card.open .cnum { background: rgba(0,180,216,.15); border-color: var(--accent); color: var(--accent); }
+.card.done .cnum { background: rgba(74,222,128,.15); border-color: var(--green); color: var(--green); }
+
+.cmeta { flex: 1; }
+.cmeta h3 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.cmeta p  { font-size: 12px; color: var(--muted); }
+
+.cbadge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 3px 9px; border-radius: 5px; border: 1px solid; white-space: nowrap;
+}
+.b-tp     { color: var(--accent);  border-color: rgba(0,180,216,.35);   background: rgba(0,180,216,.07); }
+.b-debug  { color: var(--orange);  border-color: rgba(251,146,60,.35);  background: rgba(251,146,60,.07); }
+.b-layers { color: var(--teal);    border-color: rgba(45,212,191,.35);  background: rgba(45,212,191,.07); }
+.b-cicd   { color: var(--purple);  border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.07); }
+.b-synth  { color: var(--green);   border-color: rgba(74,222,128,.35);  background: rgba(74,222,128,.07); }
+
+.chev { color: var(--muted); font-size: 11px; transition: transform .3s; flex-shrink: 0; }
+.card-head.op .chev { transform: rotate(180deg); }
+
+/* BODY */
+.cbody { display: none; border-top: 1px solid var(--border); padding: 26px 22px 20px; }
+.cbody.vis { display: block; }
+
+/* GOAL */
+.goal {
+  display: flex; gap: 12px;
+  background: rgba(0,180,216,.05); border: 1px solid rgba(0,180,216,.2);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 22px;
+}
+.goal .gi { font-size: 20px; flex-shrink: 0; }
+.goal p { font-size: 14px; color: #7dd3fc; }
+.goal strong { color: var(--accent); }
+
+/* SECTION TITLE */
+.st {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1.5px; margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.st::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+p { margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+
+/* CODE */
+.cw { background: #030d12; border: 1px solid var(--border); border-radius: 10px; margin: 10px 0 16px; overflow: hidden; }
+.ch { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--s2); border-bottom: 1px solid var(--border); }
+.cl { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.cpb {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 3px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; transition: all .2s;
+}
+.cpb:hover { color: var(--text); border-color: var(--accent); }
+.cpb.ok { color: var(--green); border-color: var(--green); }
+pre {
+  padding: 16px; overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #d6f0ff;
+}
+.c  { color: #1e4a60; font-style: italic; }
+.k  { color: #f472b6; }
+.s  { color: #86efac; }
+.n  { color: #7dd3fc; }
+.w  { color: var(--orange); }
+.dk { color: #38bdf8; font-weight: 600; }
+.dv { color: #86efac; }
+
+/* BOXES */
+.box {
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: 14px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6;
+}
+.box .bi { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.tip  { background: rgba(74,222,128,.05);  border: 1px solid rgba(74,222,128,.2); }
+.tip p  { color: #86efac; }
+.warn { background: rgba(251,146,60,.05);  border: 1px solid rgba(251,146,60,.2); }
+.warn p { color: #fdba74; }
+.info { background: rgba(0,180,216,.05);   border: 1px solid rgba(0,180,216,.2); }
+.info p { color: #7dd3fc; }
+.note { background: rgba(167,139,250,.05); border: 1px solid rgba(167,139,250,.2); }
+.note p { color: #c4b5fd; }
+
+/* LAYERS SCHEMA */
+.layers {
+  background: #030d12; border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; margin: 12px 0 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+}
+.layer {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 8px; margin-bottom: 6px;
+  border: 1px solid;
+}
+.layer:last-child { margin-bottom: 0; }
+.layer-num { color: var(--muted); font-size: 10px; width: 20px; text-align: right; flex-shrink: 0; }
+.layer-cmd { font-weight: 700; flex-shrink: 0; min-width: 60px; }
+.layer-desc { color: var(--muted); font-size: 11px; flex: 1; }
+.layer-size { color: var(--muted); font-size: 10px; text-align: right; }
+.l-from  { background: rgba(0,119,182,.08);  border-color: rgba(0,119,182,.25); }
+.l-from  .layer-cmd { color: #38bdf8; }
+.l-work  { background: rgba(45,212,191,.06); border-color: rgba(45,212,191,.2); }
+.l-work  .layer-cmd { color: #2dd4bf; }
+.l-copy  { background: rgba(250,204,21,.06); border-color: rgba(250,204,21,.2); }
+.l-copy  .layer-cmd { color: #facc15; }
+.l-run   { background: rgba(167,139,250,.06); border-color: rgba(167,139,250,.2); }
+.l-run   .layer-cmd { color: #a78bfa; }
+.l-cmd   { background: rgba(74,222,128,.06); border-color: rgba(74,222,128,.2); }
+.l-cmd   .layer-cmd { color: #4ade80; }
+.layer-cached {
+  font-size: 9px; color: var(--green);
+  background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.2);
+  padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+}
+.layer-rebuilt {
+  font-size: 9px; color: var(--orange);
+  background: rgba(251,146,60,.1); border: 1px solid rgba(251,146,60,.2);
+  padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+}
+
+/* SCENARIO */
+.scenario {
+  background: var(--s2); border: 1px solid var(--border2);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 12px 0 16px; font-size: 14px;
+}
+.sc-label {
+  font-size: 10px; font-weight: 700; color: var(--orange);
+  text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* CHECKLIST */
+.clist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 16px; }
+.clist li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+.chkb {
+  width: 20px; height: 20px; border: 2px solid var(--border2); border-radius: 5px;
+  flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all .2s;
+}
+.chkb.on { background: var(--green); border-color: var(--green); color: #071318; }
+.clist li.struck span { color: var(--muted); text-decoration: line-through; }
+
+/* QUESTION */
+.qblock {
+  background: rgba(250,204,21,.04); border: 1px solid rgba(250,204,21,.25);
+  border-radius: 12px; padding: 18px 20px; margin: 20px 0;
+}
+.qlabel {
+  display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;
+  color: var(--yellow); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.qtext { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+.rbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(250,204,21,.1); border: 1px solid rgba(250,204,21,.3);
+  color: var(--yellow); padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Barlow', sans-serif; transition: all .2s;
+}
+.rbtn:hover { background: rgba(250,204,21,.18); }
+.abox { display: none; margin-top: 14px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 14px 16px; }
+.abox.show { display: block; }
+.alabel { font-size: 10px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.aexpl { font-size: 14px; color: #86efac; margin-top: 8px; line-height: 1.6; }
+
+/* DONE */
+.done-w { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.dbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.3);
+  color: var(--green); padding: 10px 22px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: 'Barlow', sans-serif; transition: all .2s;
+}
+.dbtn:hover { background: rgba(74,222,128,.15); }
+.dbtn.undo { background: rgba(248,113,113,.06); border-color: rgba(248,113,113,.3); color: var(--red); }
+
+/* FOOTER NAV */
+.cfoot {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border); background: var(--s2);
+}
+.fnav {
+  background: var(--s3); border: 1px solid var(--border); color: var(--text);
+  padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: 'Barlow', sans-serif; transition: all .2s;
+}
+.fnav:hover { border-color: var(--accent); color: var(--accent); }
+.fnav.p { background: rgba(0,180,216,.1); border-color: var(--accent); color: var(--accent); }
+
+code {
+  font-family: 'JetBrains Mono', monospace; background: var(--s2);
+  border: 1px solid var(--border); padding: 1px 6px;
+  border-radius: 4px; font-size: 12px; color: var(--orange);
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="page">
+
+<header>
+  <div class="mod-badge">🐳 MODULE 5 · DOCKER EN PRATIQUE</div>
+  <h1>Consolider Docker par la manipulation</h1>
+  <p>Les layers, le cache, le debugging, les variables d'environnement — tout ce qu'on ne voit pas dans un premier module mais qu'on utilise tous les jours.</p>
+  <div class="tech-pills">
+    <div class="tpill">🧱 Layers & Cache</div>
+    <div class="tpill">🔍 Debugging</div>
+    <div class="tpill">🌍 Variables d'env</div>
+    <div class="tpill">📦 docker-compose</div>
+    <div class="tpill">✅ Bonnes pratiques</div>
+  </div>
+</header>
+
+<div class="prog">
+  <span class="pl">PROGRESSION</span>
+  <div class="pt"><div class="pf" id="pf"></div></div>
+  <span class="pp" id="pp">0 / 6</span>
+</div>
+
+<div class="wrap">
+
+  <div class="yaml-banner">
+    <span class="yi">⚠️</span>
+    <p><strong>Rappel important :</strong> tous les fichiers <code>.yml</code> de ce module doivent être créés et modifiés <strong>directement depuis l'éditeur GitHub</strong> (crayon ✏️), jamais via copier-coller depuis ce guide. L'indentation YAML ne survit pas au copier-coller HTML.</p>
+  </div>
+
+  <div class="dnav" id="dnav"></div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 1 — Les layers et le cache
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c1">
+    <div class="card-head" onclick="tog(1)">
+      <div class="cnum">1</div>
+      <div class="cmeta">
+        <h3>Les layers et le cache Docker</h3>
+        <p>Comprendre pourquoi un build est rapide ou lent</p>
+      </div>
+      <span class="cbadge b-layers">LAYERS</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b1">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre comment Docker construit les images couche par couche, et pourquoi l'ordre des instructions dans le Dockerfile change radicalement la vitesse des builds.</p></div>
+      </div>
+
+      <div class="st">Chaque instruction = une couche</div>
+      <p>Docker construit une image comme une pile de couches (<strong>layers</strong>). Chaque instruction du Dockerfile crée une nouvelle couche immuable. Voici ce que ça donne pour ton <code>hello-pipeline</code> :</p>
+
+      <div class="layers">
+        <div class="layer l-from">
+          <span class="layer-num">1</span>
+          <span class="layer-cmd">FROM</span>
+          <span class="layer-desc">python:3.11-slim — image de base</span>
+          <span class="layer-cached">CACHED</span>
+          <span class="layer-size">~150 Mo</span>
+        </div>
+        <div class="layer l-work">
+          <span class="layer-num">2</span>
+          <span class="layer-cmd">WORKDIR</span>
+          <span class="layer-desc">/app — définit le dossier de travail</span>
+          <span class="layer-cached">CACHED</span>
+          <span class="layer-size">0 Mo</span>
+        </div>
+        <div class="layer l-copy">
+          <span class="layer-num">3</span>
+          <span class="layer-cmd">COPY</span>
+          <span class="layer-desc">requirements.txt . — copie les dépendances</span>
+          <span class="layer-cached">CACHED</span>
+          <span class="layer-size">~1 Ko</span>
+        </div>
+        <div class="layer l-run">
+          <span class="layer-num">4</span>
+          <span class="layer-cmd">RUN</span>
+          <span class="layer-desc">pip install -r requirements.txt</span>
+          <span class="layer-cached">CACHED</span>
+          <span class="layer-size">~50 Mo</span>
+        </div>
+        <div class="layer l-copy">
+          <span class="layer-num">5</span>
+          <span class="layer-cmd">COPY</span>
+          <span class="layer-desc">. . — copie tout le code</span>
+          <span class="layer-rebuilt">REBUILT</span>
+          <span class="layer-size">~10 Ko</span>
+        </div>
+        <div class="layer l-cmd">
+          <span class="layer-num">6</span>
+          <span class="layer-cmd">CMD</span>
+          <span class="layer-desc">["python", "app.py"] — commande de démarrage</span>
+          <span class="layer-rebuilt">REBUILT</span>
+          <span class="layer-size">0 Mo</span>
+        </div>
+      </div>
+
+      <p>Quand tu modifies <code>app.py</code>, Docker invalide le cache à partir de la couche 5 seulement — les couches 1 à 4 sont réutilisées. C'est pour ça que le build est rapide après la première fois.</p>
+
+      <div class="box warn"><span class="bi">⚠️</span><p>Si tu avais mis <code>COPY . .</code> <strong>avant</strong> <code>pip install</code>, chaque modification de code invaliderait le cache du pip install — et tu réinstallerais toutes les dépendances à chaque build. C'est l'erreur la plus fréquente des débutants.</p></div>
+
+      <div class="st">Voir les layers en pratique</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — dans hello-pipeline/</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Voir l'historique des layers d'une image</span>
+docker history hello-pipeline
+
+<span class="c"># Version lisible avec les tailles</span>
+docker history hello-pipeline --no-trunc
+
+<span class="c"># Construire et observer les messages CACHED vs REBUILT</span>
+docker build -t hello-pipeline .
+<span class="c"># Modifie app.py, puis rebuild — observe ce qui est CACHED</span>
+docker build -t hello-pipeline .</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu modifies uniquement <code>requirements.txt</code> pour ajouter une nouvelle dépendance. À partir de quelle couche le cache est-il invalidé ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">À partir de la <strong>couche 3</strong> (<code>COPY requirements.txt .</code>). Docker détecte que le fichier a changé, invalide cette couche et toutes celles qui suivent — y compris le <code>pip install</code> qui sera entièrement réexécuté. C'est normal et c'est le comportement attendu : les nouvelles dépendances doivent être installées.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(1)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav p" onclick="go(2)">Leçon suivante →</button></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 2 — Déboguer dans un conteneur
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c2">
+    <div class="card-head" onclick="tog(2)">
+      <div class="cnum">2</div>
+      <div class="cmeta">
+        <h3>Déboguer dans un conteneur</h3>
+        <p>Entrer dans un conteneur, lire les logs, inspecter</p>
+      </div>
+      <span class="cbadge b-debug">DEBUG</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b2">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> savoir diagnostiquer un problème dans un conteneur — entrer dedans, lire les logs, inspecter sa configuration. C'est la compétence numéro 1 du quotidien DevOps.</p></div>
+      </div>
+
+      <div class="st">Entrer dans un conteneur en cours d'exécution</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lancer un conteneur en mode interactif avec un terminal</span>
+docker run -it hello-pipeline bash
+
+<span class="c"># Tu es maintenant DANS le conteneur — dans /app</span>
+<span class="c"># Tu peux explorer les fichiers :</span>
+ls -la
+cat app.py
+python app.py
+
+<span class="c"># Quitter le conteneur</span>
+exit</pre>
+      </div>
+
+      <div class="st">Exécuter une commande dans un conteneur déjà lancé</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lancer un conteneur en arrière-plan (détaché)</span>
+docker run -d --name mon-app hello-pipeline sleep infinity
+
+<span class="c"># Exécuter une commande dans le conteneur actif</span>
+docker exec -it mon-app bash
+
+<span class="c"># Ou juste une commande sans ouvrir de shell</span>
+docker exec mon-app python app.py
+
+<span class="c"># Arrêter et supprimer le conteneur</span>
+docker stop mon-app
+docker rm mon-app</pre>
+      </div>
+
+      <div class="st">Lire les logs d'un conteneur</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Voir les logs d'un conteneur (même arrêté)</span>
+docker logs mon-app
+
+<span class="c"># Suivre les logs en temps réel (comme tail -f)</span>
+docker logs -f mon-app
+
+<span class="c"># Les 20 dernières lignes seulement</span>
+docker logs --tail 20 mon-app</pre>
+      </div>
+
+      <div class="st">Inspecter un conteneur ou une image</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Toutes les infos d'un conteneur (JSON)</span>
+docker inspect mon-app
+
+<span class="c"># Voir les variables d'environnement d'un conteneur</span>
+docker inspect mon-app | grep -A 10 '"Env"'
+
+<span class="c"># Voir les stats en temps réel (CPU, mémoire)</span>
+docker stats mon-app</pre>
+      </div>
+
+      <div class="st">Exercice — explorer ton image</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — manipule sur hello-pipeline</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># 1. Lance un conteneur interactif</span>
+docker run -it hello-pipeline bash
+
+<span class="c"># 2. Une fois dedans, réponds à ces questions :</span>
+<span class="c">#    - Dans quel dossier es-tu ? (pwd)</span>
+<span class="c">#    - Quels fichiers sont présents ? (ls -la)</span>
+<span class="c">#    - Quelle version de Python est installée ? (python --version)</span>
+<span class="c">#    - Est-ce que pytest est disponible ? (pytest --version)</span>
+exit</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Quelle est la différence entre <code>docker run -it image bash</code> et <code>docker exec -it conteneur bash</code> ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>docker run</code> crée un <strong>nouveau conteneur</strong> depuis une image et y ouvre un terminal. À chaque <code>run</code>, tu as un conteneur vierge.<br><br><code>docker exec</code> ouvre un terminal dans un <strong>conteneur déjà en cours d'exécution</strong>. C'est utilisé pour déboguer un conteneur qui tourne en production sans l'arrêter.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(2)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(1)">← Précédent</button>
+      <button class="fnav p" onclick="go(3)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 3 — Variables d'environnement
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c3">
+    <div class="card-head" onclick="tog(3)">
+      <div class="cnum">3</div>
+      <div class="cmeta">
+        <h3>Variables d'environnement dans Docker</h3>
+        <p>Configurer un conteneur sans modifier son image</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b3">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre et utiliser les variables d'environnement pour configurer un conteneur différemment selon l'environnement (dev, staging, prod) sans changer l'image.</p></div>
+      </div>
+
+      <div class="st">Pourquoi les variables d'environnement ?</div>
+      <p>L'image Docker doit être <strong>identique</strong> entre dev, staging et prod. Ce qui change selon l'environnement — URL de base de données, clés API, mode debug — passe par des variables d'environnement injectées au démarrage du conteneur.</p>
+
+      <div class="st">Passer des variables au démarrage</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Passer une variable avec -e</span>
+docker run -e APP_ENV=production hello-pipeline env
+
+<span class="c"># Passer plusieurs variables</span>
+docker run -e APP_ENV=production -e DEBUG=false hello-pipeline env
+
+<span class="c"># Passer un fichier de variables (.env)</span>
+docker run --env-file .env hello-pipeline env</pre>
+      </div>
+
+      <div class="st">Utiliser les variables dans app.py</div>
+      <p>Mets à jour <code>app.py</code> pour lire une variable d'environnement :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">python — app.py mis à jour</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="k">import</span> os
+
+
+<span class="k">def</span> <span class="n">greet</span>(name: str) -> str:
+    <span class="s">"""Retourne un message de bienvenue."""</span>
+    <span class="k">if not</span> name:
+        <span class="k">raise</span> ValueError(<span class="s">"Le nom ne peut pas être vide"</span>)
+    env = os.getenv(<span class="s">"APP_ENV"</span>, <span class="s">"development"</span>)
+    <span class="k">return</span> <span class="s">f"Hello, {name}! Pipeline is alive 🚀 [{env}]"</span>
+
+
+<span class="k">def</span> <span class="n">add</span>(a: int, b: int) -> int:
+    <span class="s">"""Additionne deux nombres."""</span>
+    <span class="k">return</span> a + b
+
+
+<span class="k">def</span> <span class="n">multiply</span>(a: int, b: int) -> int:
+    <span class="s">"""Multiplie deux nombres."""</span>
+    <span class="k">return</span> a * b
+
+
+<span class="k">def</span> <span class="n">subtract</span>(a: int, b: int) -> int:
+    <span class="s">"""Soustrait b de a."""</span>
+    <span class="k">return</span> a - b
+
+
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    print(greet(<span class="s">"DevOps"</span>))
+    print(<span class="s">f"2 + 3 = {add(2, 3)}"</span>)</pre>
+      </div>
+
+      <div class="box warn"><span class="bi">⚠️</span><p>Après avoir modifié <code>app.py</code>, le test <code>test_greet_normal</code> va échouer car le message a changé. Mets à jour le test pour qu'il accepte n'importe quelle valeur de <code>APP_ENV</code> — ou passe la variable dans la commande pytest.</p></div>
+
+      <div class="st">Tester avec différents environnements</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Rebuild l'image avec le nouveau app.py</span>
+docker build -t hello-pipeline .
+
+<span class="c"># En mode development (défaut)</span>
+docker run hello-pipeline python app.py
+<span class="c"># → Hello, DevOps! Pipeline is alive 🚀 [development]</span>
+
+<span class="c"># En mode production</span>
+docker run -e APP_ENV=production hello-pipeline python app.py
+<span class="c"># → Hello, DevOps! Pipeline is alive 🚀 [production]</span></pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Pourquoi est-il important de ne jamais mettre des secrets (mots de passe, clés API) directement dans le Dockerfile avec une instruction <code>ENV MOT_DE_PASSE=secret</code> ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Parce que les layers d'une image sont permanents et visibles. Même si tu supprimes la variable dans une couche ultérieure, elle reste accessible dans l'historique de l'image via <code>docker history</code>. Tout le monde qui a accès à l'image peut lire le secret.<br><br>La bonne pratique : injecter les secrets uniquement au démarrage du conteneur via <code>-e</code> ou <code>--env-file</code>, ou via les secrets GitHub Actions / Kubernetes secrets.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(3)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(2)">← Précédent</button>
+      <button class="fnav p" onclick="go(4)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 4 — Docker Compose
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c4">
+    <div class="card-head" onclick="tog(4)">
+      <div class="cnum">4</div>
+      <div class="cmeta">
+        <h3>Introduction à Docker Compose</h3>
+        <p>Orchestrer plusieurs conteneurs avec un seul fichier</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b4">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre Docker Compose et créer un fichier <code>compose.yml</code> pour lancer ton application en une seule commande, avec ses variables d'environnement configurées.</p></div>
+      </div>
+
+      <div class="st">Pourquoi Docker Compose ?</div>
+      <p>Quand une application a plusieurs composants (app + base de données + cache), lancer chaque conteneur à la main avec <code>docker run</code> devient vite compliqué. Docker Compose permet de tout décrire dans un fichier YAML et de tout démarrer en une commande.</p>
+
+      <div class="box info"><span class="bi">💡</span><p>Même pour une application simple comme <code>hello-pipeline</code>, Compose est utile pour figer les options de lancement (<code>-e</code>, ports, volumes) et ne plus avoir à les retaper à chaque fois.</p></div>
+
+      <div class="st">Créer compose.yml</div>
+      <p>Crée le fichier <code>compose.yml</code> à la racine de <code>hello-pipeline</code> :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">yaml — compose.yml</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Version minimale — un seul service</span>
+services:
+  app:
+    build: .
+    environment:
+      - APP_ENV=development
+    command: python app.py</pre>
+      </div>
+
+      <div class="st">Les commandes Compose essentielles</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — dans hello-pipeline/</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Construire et démarrer tous les services</span>
+docker compose up
+
+<span class="c"># En arrière-plan (détaché)</span>
+docker compose up -d
+
+<span class="c"># Voir les logs</span>
+docker compose logs
+
+<span class="c"># Arrêter les services</span>
+docker compose down
+
+<span class="c"># Rebuild forcé de l'image avant de démarrer</span>
+docker compose up --build
+
+<span class="c"># Lancer une commande dans le service app</span>
+docker compose run app pytest tests/ -v</pre>
+      </div>
+
+      <div class="st">Ajouter un service de test séparé</div>
+      <p>Une bonne pratique : avoir un service dédié aux tests dans Compose :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">yaml — compose.yml étendu</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre>services:
+  app:
+    build: .
+    environment:
+      - APP_ENV=development
+    command: python app.py
+
+  test:
+    build: .
+    environment:
+      - APP_ENV=test
+    command: pytest tests/ -v</pre>
+      </div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lancer uniquement les tests</span>
+docker compose run test
+
+<span class="c"># Lancer uniquement l'app</span>
+docker compose run app</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu as modifié <code>app.py</code> et tu veux relancer les tests avec Compose en t'assurant que l'image est bien reconstruite. Quelle commande utilises-tu ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre>docker compose run --build test</pre>
+          </div>
+          <p class="aexpl">Le flag <code>--build</code> force la reconstruction de l'image avant de lancer le conteneur. Sans ce flag, Compose utilise l'image existante même si le code a changé.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(4)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(3)">← Précédent</button>
+      <button class="fnav p" onclick="go(5)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 5 — Bonnes pratiques Dockerfile
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c5">
+    <div class="card-head" onclick="tog(5)">
+      <div class="cnum">5</div>
+      <div class="cmeta">
+        <h3>Bonnes pratiques Dockerfile</h3>
+        <p>Images légères, sécurisées, maintenables</p>
+      </div>
+      <span class="cbadge b-layers">BEST PRACTICES</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b5">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> appliquer les bonnes pratiques qui font la différence entre une image "qui marche" et une image prête pour la production — légère, sécurisée, maintenable.</p></div>
+      </div>
+
+      <div class="st">1 — Utiliser une image de base slim ou alpine</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">— comparaison des tailles —</span></div>
+        <pre>python:3.11          <span class="c">~ 900 Mo  (pleine — tout inclus)</span>
+python:3.11-slim     <span class="c">~ 150 Mo  (sans les outils de build)</span>
+python:3.11-alpine   <span class="c">~  50 Mo  (minimaliste — Linux Alpine)</span></pre>
+      </div>
+      <div class="box info"><span class="bi">💡</span><p><code>slim</code> est le meilleur compromis pour Python — <code>alpine</code> peut causer des problèmes de compatibilité avec certaines librairies C. Pour commencer, reste sur <code>slim</code>.</p></div>
+
+      <div class="st">2 — Ne pas lancer en root</div>
+      <p>Par défaut, Docker tourne en <code>root</code> dans le conteneur — une faille de sécurité. Crée un utilisateur dédié :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">Dockerfile — version sécurisée</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="dk">FROM</span> <span class="dv">python:3.11-slim</span>
+
+<span class="dk">WORKDIR</span> <span class="dv">/app</span>
+
+<span class="dk">COPY</span> <span class="dv">requirements.txt .</span>
+<span class="dk">RUN</span> <span class="dv">pip install --no-cache-dir -r requirements.txt</span>
+
+<span class="dk">COPY</span> <span class="dv">. .</span>
+
+<span class="c"># Crée un utilisateur non-root et bascule dessus</span>
+<span class="dk">RUN</span> <span class="dv">useradd -m appuser</span>
+<span class="dk">USER</span> <span class="dv">appuser</span>
+
+<span class="dk">CMD</span> <span class="dv">["python", "app.py"]</span></pre>
+      </div>
+
+      <div class="st">3 — Regrouper les RUN pour réduire les layers</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">— mauvaise pratique vs bonne pratique —</span></div>
+        <pre><span class="c"># ❌ 3 layers séparés inutilement</span>
+<span class="dk">RUN</span> <span class="dv">apt-get update</span>
+<span class="dk">RUN</span> <span class="dv">apt-get install -y curl</span>
+<span class="dk">RUN</span> <span class="dv">apt-get clean</span>
+
+<span class="c"># ✅ 1 seul layer — plus léger</span>
+<span class="dk">RUN</span> <span class="dv">apt-get update \</span>
+    <span class="dv">&& apt-get install -y curl \</span>
+    <span class="dv">&& apt-get clean \</span>
+    <span class="dv">&& rm -rf /var/lib/apt/lists/*</span></pre>
+      </div>
+
+      <div class="st">4 — Vérifier la taille de ton image</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Voir la taille de toutes les images</span>
+docker images
+
+<span class="c"># Analyse détaillée avec dive (outil externe)</span>
+<span class="c"># Installation : sudo apt install dive</span>
+dive hello-pipeline</pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Dans ton Dockerfile actuel, quelle instruction empêche les fichiers inutiles d'être copiés dans l'image ? Comment fonctionne-t-elle ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Le fichier <strong><code>.dockerignore</code></strong> à la racine du projet. Il fonctionne exactement comme <code>.gitignore</code> mais pour Docker : il liste les fichiers et dossiers à exclure lors du <code>COPY . .</code>. Sans lui, Docker copierait <code>.git/</code>, <code>__pycache__/</code>, <code>.pytest_cache/</code> etc. dans l'image, l'alourdissant inutilement.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(5)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(4)">← Précédent</button>
+      <button class="fnav p" onclick="go(6)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 6 — Quiz & récap
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c6">
+    <div class="card-head" onclick="tog(6)">
+      <div class="cnum">6</div>
+      <div class="cmeta">
+        <h3>Récap & quiz de clôture</h3>
+        <p>Mémo commandes + 3 questions de synthèse</p>
+      </div>
+      <span class="cbadge b-synth">SYNTHÈSE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b6">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> avoir une référence complète sur Docker et valider les acquis des modules 4 et 5 avec 3 questions de synthèse.</p></div>
+      </div>
+
+      <div class="st">Mémo — toutes les commandes Docker</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — référence complète</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c">── IMAGES ────────────────────────────────────────</span>
+docker build -t nom .         <span class="c"># construire une image</span>
+docker images                 <span class="c"># lister les images</span>
+docker rmi nom                <span class="c"># supprimer une image</span>
+docker history nom            <span class="c"># voir les layers</span>
+docker pull image:tag         <span class="c"># télécharger une image</span>
+docker push image:tag         <span class="c"># pousser vers un registry</span>
+
+<span class="c">── CONTENEURS ────────────────────────────────────</span>
+docker run nom                <span class="c"># créer et lancer</span>
+docker run -it nom bash       <span class="c"># terminal interactif</span>
+docker run -d nom             <span class="c"># en arrière-plan</span>
+docker run -e VAR=val nom     <span class="c"># avec variable d'env</span>
+docker run --name mon-app nom <span class="c"># avec un nom</span>
+docker ps                     <span class="c"># conteneurs actifs</span>
+docker ps -a                  <span class="c"># tous les conteneurs</span>
+docker stop nom               <span class="c"># arrêter</span>
+docker rm nom                 <span class="c"># supprimer</span>
+docker logs nom               <span class="c"># voir les logs</span>
+docker logs -f nom            <span class="c"># logs en temps réel</span>
+docker exec -it nom bash      <span class="c"># entrer dans un actif</span>
+docker inspect nom            <span class="c"># toutes les infos (JSON)</span>
+docker stats nom              <span class="c"># CPU/mémoire en temps réel</span>
+
+<span class="c">── COMPOSE ───────────────────────────────────────</span>
+docker compose up             <span class="c"># démarrer tous les services</span>
+docker compose up -d          <span class="c"># en arrière-plan</span>
+docker compose up --build     <span class="c"># rebuild + démarrer</span>
+docker compose down           <span class="c"># arrêter et supprimer</span>
+docker compose logs           <span class="c"># voir les logs</span>
+docker compose run service cmd <span class="c"># lancer une commande</span>
+
+<span class="c">── NETTOYAGE ─────────────────────────────────────</span>
+docker system prune           <span class="c"># nettoyer tout l'inutilisé</span>
+docker system prune -a        <span class="c"># tout supprimer (images comprises)</span></pre>
+      </div>
+
+      <div class="st">Quiz de clôture</div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 1 / 3</div>
+        <div class="qtext">Tu veux vérifier qu'un conteneur en cours d'exécution a bien reçu la variable <code>APP_ENV=production</code>. Sans l'arrêter, quelle commande utilises-tu ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre><span class="c"># Option 1 — inspecter le conteneur</span>
+docker inspect nom-conteneur | grep APP_ENV
+
+<span class="c"># Option 2 — exécuter env dans le conteneur</span>
+docker exec nom-conteneur env | grep APP_ENV</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 2 / 3</div>
+        <div class="qtext">Un collègue te dit que son build Docker prend 3 minutes à chaque fois qu'il modifie une ligne de code. Sans voir son Dockerfile, quelle est la cause probable et comment le corriger ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Il a probablement mis <code>COPY . .</code> <strong>avant</strong> le <code>pip install</code>. Du coup, chaque modification de code invalide le cache du pip install et réinstalle toutes les dépendances depuis zéro.<br><br>La correction : toujours copier <code>requirements.txt</code> en premier, installer les dépendances, puis copier le reste du code.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 3 / 3</div>
+        <div class="qtext">Quelle est la prochaine étape logique après ce module ? Qu'est-ce qu'on va pouvoir faire avec les workflows avancés GitHub Actions qu'on ne pouvait pas faire avant ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Maintenant qu'on maîtrise Docker, les workflows avancés vont permettre de :<br><br>
+          — Utiliser des <strong>secrets GitHub</strong> pour stocker des tokens de registry de façon sécurisée<br>
+          — Créer des <strong>jobs multiples</strong> (build, test, publish) qui s'enchaînent ou tournent en parallèle<br>
+          — Ajouter des <strong>conditions</strong> (déployer seulement sur certaines branches)<br>
+          — Utiliser des <strong>environments</strong> (staging / production) avec des approbations manuelles<br><br>
+          En résumé : assembler tout ce qu'on a appris en un pipeline professionnel complet.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(6)">🎉 Module 5 terminé !</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav" onclick="go(5)">← Précédent</button></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const TOTAL = 6;
+const doneSet = new Set();
+const openSet = new Set();
+
+function buildNav() {
+  const nav = document.getElementById('dnav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dn' + (doneSet.has(i) ? ' done' : '') + (openSet.has(i) ? ' open' : '');
+    d.textContent = i;
+    d.onclick = () => go(i);
+    nav.appendChild(d);
+  }
+}
+
+function updProg() {
+  const pct = (doneSet.size / TOTAL) * 100;
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pp').textContent = doneSet.size + ' / ' + TOTAL;
+}
+
+function tog(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  const isOpen = body.classList.contains('vis');
+  if (isOpen) {
+    body.classList.remove('vis'); head.classList.remove('op');
+    openSet.delete(n); if (!doneSet.has(n)) card.classList.remove('open');
+  } else {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  buildNav();
+}
+
+function go(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  if (!body.classList.contains('vis')) {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  buildNav();
+}
+
+function mkDone(n) {
+  const btn = document.querySelector('#b' + n + ' .dbtn');
+  const card = document.getElementById('c' + n);
+  if (doneSet.has(n)) {
+    doneSet.delete(n);
+    btn.textContent = n === 6 ? '🎉 Module 5 terminé !' : '✓ Leçon terminée';
+    btn.classList.remove('undo'); card.classList.remove('done');
+    if (openSet.has(n)) card.classList.add('open');
+  } else {
+    doneSet.add(n);
+    btn.textContent = '↩ Marquer comme non terminée';
+    btn.classList.add('undo'); card.classList.remove('open'); card.classList.add('done');
+  }
+  updProg(); buildNav();
+}
+
+function cp(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copié'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function rev(btn) {
+  btn.nextElementSibling.classList.add('show');
+  btn.style.display = 'none';
+}
+
+buildNav(); updProg(); tog(1);
+</script>
+</body>
+</html>
