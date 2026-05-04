@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 6 — Introduction Kubernetes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Lexend:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #050d1a;
+  --s1: #071525;
+  --s2: #0a1c30;
+  --s3: #0d243c;
+  --border: #0f2f4a;
+  --border2: #154060;
+  --text: #cce7ff;
+  --muted: #2d6a9f;
+  --accent: #326ce5;
+  --green: #4ade80;
+  --orange: #fb923c;
+  --red: #f87171;
+  --purple: #a78bfa;
+  --yellow: #facc15;
+  --teal: #2dd4bf;
+  --sky: #38bdf8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Lexend', sans-serif;
+  font-size: 15px; line-height: 1.75;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(50,108,229,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(50,108,229,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none; z-index: 0;
+}
+.orb { position: fixed; border-radius: 50%; filter: blur(140px); pointer-events: none; z-index: 0; }
+.orb1 { width: 600px; height: 400px; background: rgba(50,108,229,0.1); top: -100px; left: 50%; transform: translateX(-50%); }
+.orb2 { width: 350px; height: 350px; background: rgba(56,189,248,0.06); bottom: 0; right: -80px; }
+
+.page { position: relative; z-index: 1; }
+
+/* HEADER */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 54px 24px 44px; text-align: center;
+  background: linear-gradient(180deg, rgba(50,108,229,0.08) 0%, transparent 100%);
+}
+.mod-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(50,108,229,0.1); border: 1px solid rgba(50,108,229,0.35);
+  color: var(--sky); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 20px; letter-spacing: 2px;
+}
+header h1 {
+  font-size: clamp(28px,4.5vw,46px); font-weight: 900;
+  background: linear-gradient(135deg, #cce7ff 10%, #326ce5 55%, #38bdf8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 12px; line-height: 1.15;
+}
+header p { color: var(--muted); font-size: 15px; max-width: 540px; margin: 0 auto 28px; }
+.tech-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tpill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--s2); border: 1px solid var(--border);
+  padding: 5px 13px; border-radius: 20px; font-size: 12px;
+  font-family: 'JetBrains Mono', monospace; color: var(--muted);
+}
+
+/* PROGRESS */
+.prog {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(5,13,26,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+}
+.pl { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.pt { flex: 1; height: 5px; background: var(--s2); border-radius: 10px; overflow: hidden; }
+.pf { height: 100%; background: linear-gradient(90deg, var(--accent), var(--sky)); border-radius: 10px; transition: width .5s ease; width: 0%; }
+.pp { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--sky); white-space: nowrap; }
+
+/* WRAP */
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 80px; }
+
+/* DOTS NAV */
+.dnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+.dn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--border); background: var(--s1);
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.dn:hover { border-color: var(--sky); color: var(--sky); }
+.dn.done { border-color: var(--green); background: rgba(74,222,128,.1); color: var(--green); }
+.dn.open { border-color: var(--sky); background: rgba(56,189,248,.1); color: var(--sky); }
+
+/* CARD */
+.card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; margin-bottom: 12px;
+  overflow: hidden; transition: border-color .25s;
+}
+.card.open { border-color: var(--sky); }
+.card.done { border-color: rgba(74,222,128,.35); }
+
+.card-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; cursor: pointer; user-select: none; transition: background .15s;
+}
+.card-head:hover { background: rgba(255,255,255,.02); }
+
+.cnum {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
+  flex-shrink: 0; background: var(--s2); border: 2px solid var(--border);
+  color: var(--muted); transition: all .2s;
+}
+.card.open .cnum { background: rgba(56,189,248,.12); border-color: var(--sky); color: var(--sky); }
+.card.done .cnum { background: rgba(74,222,128,.15); border-color: var(--green); color: var(--green); }
+
+.cmeta { flex: 1; }
+.cmeta h3 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.cmeta p  { font-size: 12px; color: var(--muted); }
+
+.cbadge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 3px 9px; border-radius: 5px; border: 1px solid; white-space: nowrap;
+}
+.b-concept { color: var(--teal);   border-color: rgba(45,212,191,.35);  background: rgba(45,212,191,.07); }
+.b-tp      { color: var(--sky);    border-color: rgba(56,189,248,.35);  background: rgba(56,189,248,.07); }
+.b-yaml    { color: var(--orange); border-color: rgba(251,146,60,.35);  background: rgba(251,146,60,.07); }
+.b-pro     { color: var(--green);  border-color: rgba(74,222,128,.35);  background: rgba(74,222,128,.07); }
+.b-synth   { color: var(--purple); border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.07); }
+
+.chev { color: var(--muted); font-size: 11px; transition: transform .3s; flex-shrink: 0; }
+.card-head.op .chev { transform: rotate(180deg); }
+
+/* BODY */
+.cbody { display: none; border-top: 1px solid var(--border); padding: 26px 22px 20px; }
+.cbody.vis { display: block; }
+
+/* GOAL */
+.goal {
+  display: flex; gap: 12px;
+  background: rgba(50,108,229,.05); border: 1px solid rgba(50,108,229,.2);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 22px;
+}
+.goal .gi { font-size: 20px; flex-shrink: 0; }
+.goal p { font-size: 14px; color: #93c5fd; }
+.goal strong { color: var(--sky); }
+
+/* SECTION TITLE */
+.st {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1.5px; margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.st::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+p { margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+
+/* CODE */
+.cw { background: #02080f; border: 1px solid var(--border); border-radius: 10px; margin: 10px 0 16px; overflow: hidden; }
+.ch { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--s2); border-bottom: 1px solid var(--border); }
+.cl { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.cpb {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 3px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; transition: all .2s;
+}
+.cpb:hover { color: var(--text); border-color: var(--sky); }
+.cpb.ok { color: var(--green); border-color: var(--green); }
+pre {
+  padding: 16px; overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #cce7ff;
+}
+.c  { color: #0f2f4a; font-style: italic; }
+.k  { color: #f472b6; }
+.s  { color: #86efac; }
+.n  { color: #7dd3fc; }
+.w  { color: var(--orange); }
+.yk { color: #7dd3fc; }
+.yv { color: #86efac; }
+.ya { color: #fb923c; }
+
+/* BOXES */
+.box {
+  border-radius: 10px; padding: 12px 16px; margin: 12px 0;
+  font-size: 14px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6;
+}
+.box .bi { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.tip  { background: rgba(74,222,128,.05);  border: 1px solid rgba(74,222,128,.2); }
+.tip p  { color: #86efac; }
+.warn { background: rgba(251,146,60,.05);  border: 1px solid rgba(251,146,60,.2); }
+.warn p { color: #fdba74; }
+.info { background: rgba(56,189,248,.05);  border: 1px solid rgba(56,189,248,.2); }
+.info p { color: #7dd3fc; }
+.note { background: rgba(167,139,250,.05); border: 1px solid rgba(167,139,250,.2); }
+.note p { color: #c4b5fd; }
+
+/* K8S SCHEMA */
+.k8s-schema {
+  background: #02080f; border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 20px; margin: 12px 0 16px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  line-height: 2.2; overflow-x: auto;
+}
+.ks-cluster { color: #326ce5; font-weight: 700; }
+.ks-node    { color: #38bdf8; font-weight: 700; }
+.ks-pod     { color: #4ade80; font-weight: 700; }
+.ks-svc     { color: #fb923c; font-weight: 700; }
+.ks-deploy  { color: #a78bfa; font-weight: 700; }
+.ks-label   { color: #2d6a9f; font-size: 11px; }
+.ks-arrow   { color: #0f2f4a; }
+.ks-user    { color: #facc15; }
+
+/* CHECKLIST */
+.clist { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 16px; }
+.clist li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+.chkb {
+  width: 20px; height: 20px; border: 2px solid var(--border2); border-radius: 5px;
+  flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all .2s;
+}
+.chkb.on { background: var(--green); border-color: var(--green); color: #050d1a; }
+.clist li.struck span { color: var(--muted); text-decoration: line-through; }
+
+/* QUESTION */
+.qblock {
+  background: rgba(250,204,21,.04); border: 1px solid rgba(250,204,21,.25);
+  border-radius: 12px; padding: 18px 20px; margin: 20px 0;
+}
+.qlabel {
+  display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700;
+  color: var(--yellow); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.qtext { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+.rbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(250,204,21,.1); border: 1px solid rgba(250,204,21,.3);
+  color: var(--yellow); padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: 'Lexend', sans-serif; transition: all .2s;
+}
+.rbtn:hover { background: rgba(250,204,21,.18); }
+.abox { display: none; margin-top: 14px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 14px 16px; }
+.abox.show { display: block; }
+.alabel { font-size: 10px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.aexpl { font-size: 14px; color: #86efac; margin-top: 8px; line-height: 1.6; }
+
+/* DONE */
+.done-w { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.dbtn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.3);
+  color: var(--green); padding: 10px 22px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: 'Lexend', sans-serif; transition: all .2s;
+}
+.dbtn:hover { background: rgba(74,222,128,.15); }
+.dbtn.undo { background: rgba(248,113,113,.06); border-color: rgba(248,113,113,.3); color: var(--red); }
+
+/* FOOTER NAV */
+.cfoot {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border); background: var(--s2);
+}
+.fnav {
+  background: var(--s3); border: 1px solid var(--border); color: var(--text);
+  padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: 'Lexend', sans-serif; transition: all .2s;
+}
+.fnav:hover { border-color: var(--sky); color: var(--sky); }
+.fnav.p { background: rgba(56,189,248,.1); border-color: var(--sky); color: var(--sky); }
+
+code {
+  font-family: 'JetBrains Mono', monospace; background: var(--s2);
+  border: 1px solid var(--border); padding: 1px 6px;
+  border-radius: 4px; font-size: 12px; color: var(--orange);
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="page">
+
+<header>
+  <div class="mod-badge">☸️ MODULE 6 · KUBERNETES</div>
+  <h1>Introduction à Kubernetes</h1>
+  <p>Comprendre pourquoi K8s existe, manipuler un cluster local avec Minikube, déployer <code>hello-pipeline</code> dans des Pods.</p>
+  <div class="tech-pills">
+    <div class="tpill">☸️ Kubernetes</div>
+    <div class="tpill">🖥️ Minikube</div>
+    <div class="tpill">📦 Pods</div>
+    <div class="tpill">🔁 Deployments</div>
+    <div class="tpill">🌐 Services</div>
+  </div>
+</header>
+
+<div class="prog">
+  <span class="pl">PROGRESSION</span>
+  <div class="pt"><div class="pf" id="pf"></div></div>
+  <span class="pp" id="pp">0 / 6</span>
+</div>
+
+<div class="wrap">
+  <div class="dnav" id="dnav"></div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 1 — Pourquoi Kubernetes ?
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c1">
+    <div class="card-head" onclick="tog(1)">
+      <div class="cnum">1</div>
+      <div class="cmeta">
+        <h3>Pourquoi Kubernetes ?</h3>
+        <p>Le problème qu'il résout — depuis Docker jusqu'à K8s</p>
+      </div>
+      <span class="cbadge b-concept">CONCEPT</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b1">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre pourquoi Docker seul ne suffit pas en production, et quel problème précis Kubernetes résout — avant d'écrire la moindre commande.</p></div>
+      </div>
+
+      <div class="st">Le problème avec Docker en production</div>
+      <p>Docker résout le problème de l'environnement. Mais en production, d'autres questions se posent :</p>
+      <div class="k8s-schema">
+<span class="ks-label">Avec Docker seul :</span>
+
+<span class="ks-label">— Que se passe-t-il si le conteneur plante ?</span>   <span class="ks-arrow">→</span> il reste mort
+<span class="ks-label">— Comment gérer 10 serveurs avec 50 conteneurs ?</span> <span class="ks-arrow">→</span> à la main...
+<span class="ks-label">— Comment passer de 1 à 10 instances sous charge ?</span> <span class="ks-arrow">→</span> manuellement
+<span class="ks-label">— Comment déployer sans interruption de service ?</span>  <span class="ks-arrow">→</span> compliqué
+<span class="ks-label">— Comment répartir le trafic entre les conteneurs ?</span> <span class="ks-arrow">→</span> outil externe
+      </div>
+      <p><strong>Kubernetes</strong> répond à toutes ces questions automatiquement. C'est un <strong>orchestrateur de conteneurs</strong> — il décide où, quand et comment lancer tes conteneurs sur un ensemble de machines.</p>
+
+      <div class="st">L'analogie — Docker vs Kubernetes</div>
+      <div class="k8s-schema">
+<span class="ks-label">Docker</span>  <span class="ks-arrow">= </span>un cuisiner qui prépare un plat
+<span class="ks-label">K8s</span>    <span class="ks-arrow">= </span>le chef qui gère toute la brigade, les commandes,
+          les remplacements en cas d'absence, et la salle
+      </div>
+
+      <div class="st">Les concepts clés — vue d'ensemble</div>
+      <div class="k8s-schema">
+<span class="ks-cluster">Cluster K8s</span>  <span class="ks-label">= ensemble de machines (nodes) gérées par K8s</span>
+  <span class="ks-arrow">├──</span> <span class="ks-node">Node</span>        <span class="ks-label">= une machine (VM ou physique) dans le cluster</span>
+  <span class="ks-arrow">│   └──</span> <span class="ks-pod">Pod</span>      <span class="ks-label">= la plus petite unité K8s — 1 ou plusieurs conteneurs</span>
+  <span class="ks-arrow">├──</span> <span class="ks-deploy">Deployment</span>  <span class="ks-label">= gère le nombre de Pods et les mises à jour</span>
+  <span class="ks-arrow">└──</span> <span class="ks-svc">Service</span>     <span class="ks-label">= expose les Pods sur le réseau (point d'entrée stable)</span>
+      </div>
+
+      <div class="box info"><span class="bi">💡</span><p>On parle souvent de K8s (raccourci de Kubernetes — 8 lettres entre K et s). C'est le standard de facto pour orchestrer des conteneurs en entreprise. AWS, Azure, GCP proposent tous leur version managée (EKS, AKS, GKE).</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu as une application Docker qui tourne en production sur un seul serveur. Le conteneur plante à 3h du matin. Avec Docker seul, que se passe-t-il ? Qu'apporte Kubernetes dans ce cas ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Avec Docker seul, le conteneur reste mort jusqu'à ce que quelqu'un le redémarre manuellement — l'application est hors ligne.<br><br>Kubernetes surveille en permanence l'état des Pods. Si un Pod plante, il en relance automatiquement un nouveau en quelques secondes, sans intervention humaine. C'est ce qu'on appelle le <strong>self-healing</strong>.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(1)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav p" onclick="go(2)">Leçon suivante →</button></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 2 — Installer Minikube
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c2">
+    <div class="card-head" onclick="tog(2)">
+      <div class="cnum">2</div>
+      <div class="cmeta">
+        <h3>Installer Minikube — cluster local</h3>
+        <p>Un cluster K8s sur ta machine pour apprendre</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b2">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> installer Minikube et kubectl sur ta machine, démarrer un cluster local, et vérifier qu'il fonctionne. À la fin de cette leçon tu as un vrai cluster K8s qui tourne.</p></div>
+      </div>
+
+      <div class="st">C'est quoi Minikube ?</div>
+      <p>Minikube crée un cluster Kubernetes en local — une seule machine qui joue le rôle de tout le cluster. C'est l'outil standard pour apprendre K8s sans avoir accès à un cloud.</p>
+      <p><code>kubectl</code> est la ligne de commande pour parler au cluster — comme <code>git</code> est la CLI de Git.</p>
+
+      <div class="st">1 — Installer kubectl</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — Ubuntu/Debian</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Télécharger kubectl</span>
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+<span class="c"># Rendre exécutable et déplacer</span>
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+
+<span class="c"># Vérifier</span>
+kubectl version --client</pre>
+      </div>
+
+      <div class="st">2 — Installer Minikube</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — Ubuntu/Debian</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Télécharger et installer Minikube</span>
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+<span class="c"># Vérifier</span>
+minikube version</pre>
+      </div>
+
+      <div class="st">3 — Démarrer le cluster</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Démarrer Minikube avec Docker comme driver</span>
+minikube start --driver=docker
+
+<span class="c"># Vérifier que le cluster est actif</span>
+kubectl cluster-info
+
+<span class="c"># Voir les nodes du cluster (il n'y en a qu'un — minikube)</span>
+kubectl get nodes</pre>
+      </div>
+
+      <div class="box tip"><span class="bi">✅</span><p>Si <code>kubectl get nodes</code> affiche un node avec le statut <code>Ready</code>, ton cluster est opérationnel. La première fois, Minikube télécharge une image — ça peut prendre quelques minutes.</p></div>
+
+      <div class="st">Les commandes Minikube essentielles</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — référence</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre>minikube start          <span class="c"># démarrer le cluster</span>
+minikube stop           <span class="c"># arrêter (sans tout supprimer)</span>
+minikube delete         <span class="c"># supprimer complètement le cluster</span>
+minikube status         <span class="c"># état du cluster</span>
+minikube dashboard      <span class="c"># interface web (optionnel)</span>
+minikube ip             <span class="c"># IP du cluster local</span></pre>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Quelle est la différence entre <code>minikube stop</code> et <code>minikube delete</code> ? Lequel utilises-tu en fin de journée si tu veux reprendre le lendemain ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>minikube stop</code> arrête le cluster mais conserve tout son état — tes déploiements, services et configurations sont sauvegardés. Le lendemain, <code>minikube start</code> reprend exactement là où tu t'étais arrêté.<br><br><code>minikube delete</code> supprime complètement le cluster et tout ce qu'il contient. À n'utiliser que quand tu veux repartir de zéro.<br><br>En fin de journée : <strong><code>minikube stop</code></strong>.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(2)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(1)">← Précédent</button>
+      <button class="fnav p" onclick="go(3)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 3 — Pods et kubectl
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c3">
+    <div class="card-head" onclick="tog(3)">
+      <div class="cnum">3</div>
+      <div class="cmeta">
+        <h3>Pods et kubectl — premiers pas</h3>
+        <p>Créer, inspecter et supprimer des Pods</p>
+      </div>
+      <span class="cbadge b-tp">PRATIQUE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b3">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre ce qu'est un Pod, créer ton premier Pod avec <code>kubectl</code>, et apprendre les commandes de base pour l'inspecter et le déboguer.</p></div>
+      </div>
+
+      <div class="st">Le Pod — unité de base de K8s</div>
+      <p>Un <strong>Pod</strong> est la plus petite unité déployable dans Kubernetes. Il contient un ou plusieurs conteneurs qui partagent le même réseau et le même stockage. En pratique, la plupart des Pods contiennent un seul conteneur.</p>
+      <div class="k8s-schema">
+<span class="ks-pod">Pod</span>  hello-pipeline-pod
+  <span class="ks-arrow">└──</span> conteneur : hello-pipeline:latest
+       <span class="ks-label">IP : 10.244.0.5  (IP interne au cluster)</span>
+       <span class="ks-label">Port : aucun exposé pour l'instant</span>
+      </div>
+      <div class="box warn"><span class="bi">⚠️</span><p>Un Pod est <strong>éphémère</strong> — si il plante ou est supprimé, il n'est pas recréé automatiquement. C'est pour ça qu'on utilise des <strong>Deployments</strong> en pratique (leçon 4).</p></div>
+
+      <div class="st">Créer un Pod en ligne de commande</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Charger l'image hello-pipeline dans Minikube</span>
+<span class="c"># (Minikube a son propre Docker, différent du tien)</span>
+minikube image load hello-pipeline:latest
+
+<span class="c"># Créer un Pod depuis l'image</span>
+kubectl run hello-pod \
+  --image=hello-pipeline:latest \
+  --image-pull-policy=Never \
+  --restart=Never
+
+<span class="c"># --image-pull-policy=Never = utiliser l'image locale, ne pas chercher sur internet
+# --restart=Never = Pod simple (pas de redémarrage automatique)</span></pre>
+      </div>
+
+      <div class="st">Les commandes kubectl essentielles</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — inspecter les Pods</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Lister tous les Pods</span>
+kubectl get pods
+
+<span class="c"># Infos détaillées sur un Pod (events, état, IP...)</span>
+kubectl describe pod hello-pod
+
+<span class="c"># Voir les logs du Pod</span>
+kubectl logs hello-pod
+
+<span class="c"># Ouvrir un terminal dans le Pod</span>
+kubectl exec -it hello-pod -- bash
+
+<span class="c"># Supprimer le Pod</span>
+kubectl delete pod hello-pod</pre>
+      </div>
+
+      <div class="st">Exercice — créer et explorer</div>
+      <ul class="clist">
+        <li><div class="chkb" onclick="chk(this)"></div><span>Charger l'image dans Minikube avec <code>minikube image load</code></span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span>Créer le Pod <code>hello-pod</code></span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span>Vérifier son statut avec <code>kubectl get pods</code></span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span>Lire ses logs avec <code>kubectl logs hello-pod</code></span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span>L'inspecter avec <code>kubectl describe pod hello-pod</code></span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span>Le supprimer avec <code>kubectl delete pod hello-pod</code></span></li>
+      </ul>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Tu supprimes un Pod avec <code>kubectl delete pod hello-pod</code>. Que se passe-t-il ? Est-ce que le Pod est recréé automatiquement ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Non — le Pod est définitivement supprimé et n'est pas recréé. C'est parce qu'on l'a créé directement avec <code>kubectl run --restart=Never</code>, sans Deployment pour le surveiller.<br><br>C'est précisément pour cette raison qu'en production on n'utilise jamais des Pods "nus" — on passe toujours par un <strong>Deployment</strong> qui surveille les Pods et les recrée automatiquement si nécessaire.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(3)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(2)">← Précédent</button>
+      <button class="fnav p" onclick="go(4)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 4 — Deployments
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c4">
+    <div class="card-head" onclick="tog(4)">
+      <div class="cnum">4</div>
+      <div class="cmeta">
+        <h3>Deployments — la vraie façon de déployer</h3>
+        <p>Fichiers YAML, replicas, self-healing</p>
+      </div>
+      <span class="cbadge b-yaml">YAML</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b4">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> créer un Deployment en écrivant un fichier YAML K8s, comprendre comment il gère les Pods, et observer le self-healing en action.</p></div>
+      </div>
+
+      <div class="st">Pourquoi un Deployment ?</div>
+      <p>Un <strong>Deployment</strong> dit à K8s : <em>"Je veux toujours 3 copies de ce Pod en fonctionnement"</em>. K8s surveille en permanence et recrée automatiquement les Pods qui tombent.</p>
+      <div class="k8s-schema">
+<span class="ks-deploy">Deployment</span>  hello-deployment  (replicas: 3)
+  <span class="ks-arrow">├──</span> <span class="ks-pod">Pod</span>  hello-deployment-abc12  <span class="ks-label">Running</span>
+  <span class="ks-arrow">├──</span> <span class="ks-pod">Pod</span>  hello-deployment-def34  <span class="ks-label">Running</span>
+  <span class="ks-arrow">└──</span> <span class="ks-pod">Pod</span>  hello-deployment-ghi56  <span class="ks-label">Running  ← si celui-ci plante...</span>
+                                           <span class="ks-label">K8s en crée un nouveau automatiquement</span>
+      </div>
+
+      <div class="st">Créer le fichier deployment.yml</div>
+      <p>Crée un fichier <code>k8s/deployment.yml</code> dans <code>hello-pipeline</code> :</p>
+      <div class="cw">
+        <div class="ch"><span class="cl">yaml — k8s/deployment.yml</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="yk">apiVersion:</span> <span class="yv">apps/v1</span>
+<span class="yk">kind:</span> <span class="yv">Deployment</span>
+<span class="yk">metadata:</span>
+  <span class="yk">name:</span> <span class="yv">hello-deployment</span>
+<span class="yk">spec:</span>
+  <span class="yk">replicas:</span> <span class="yv">2</span>           <span class="c"># 2 Pods en permanence</span>
+  <span class="yk">selector:</span>
+    <span class="yk">matchLabels:</span>
+      <span class="yk">app:</span> <span class="yv">hello-pipeline</span>
+  <span class="yk">template:</span>
+    <span class="yk">metadata:</span>
+      <span class="yk">labels:</span>
+        <span class="yk">app:</span> <span class="yv">hello-pipeline</span>  <span class="c"># label pour que le Service trouve ces Pods</span>
+    <span class="yk">spec:</span>
+      <span class="yk">containers:</span>
+        <span class="ya">- name:</span> <span class="yv">hello-pipeline</span>
+          <span class="yk">image:</span> <span class="yv">hello-pipeline:latest</span>
+          <span class="yk">imagePullPolicy:</span> <span class="yv">Never</span>  <span class="c"># image locale Minikube</span>
+          <span class="yk">env:</span>
+            <span class="ya">- name:</span> <span class="yv">APP_ENV</span>
+              <span class="yk">value:</span> <span class="yv">production</span></pre>
+      </div>
+
+      <div class="st">Appliquer le Deployment</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Appliquer le fichier YAML au cluster</span>
+kubectl apply -f k8s/deployment.yml
+
+<span class="c"># Voir les Pods créés</span>
+kubectl get pods
+
+<span class="c"># Voir le Deployment</span>
+kubectl get deployments
+
+<span class="c"># Infos détaillées</span>
+kubectl describe deployment hello-deployment</pre>
+      </div>
+
+      <div class="st">Observer le self-healing</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — simulation de panne</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Note le nom d'un de tes Pods</span>
+kubectl get pods
+
+<span class="c"># Supprime-le brutalement</span>
+kubectl delete pod hello-deployment-XXXXX
+
+<span class="c"># Observe immédiatement — K8s recrée un nouveau Pod</span>
+kubectl get pods
+
+<span class="c"># Tu verras l'ancien Terminating et un nouveau en Creating</span></pre>
+      </div>
+      <div class="box tip"><span class="bi">✨</span><p>C'est le self-healing en action — l'une des fonctionnalités les plus puissantes de Kubernetes. Le Deployment maintient en permanence le nombre de replicas demandé.</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Dans le fichier YAML, à quoi sert le champ <code>selector.matchLabels</code> ? Que se passerait-il si les labels du <code>selector</code> et du <code>template</code> ne correspondaient pas ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl"><code>selector.matchLabels</code> dit au Deployment <em>"surveille les Pods qui ont ce label"</em>. Le Deployment compte les Pods correspondants et en crée ou supprime pour atteindre le nombre de <code>replicas</code>.<br><br>Si les labels ne correspondent pas, le Deployment ne "voit" pas les Pods qu'il a créés — il pense qu'il n'y en a aucun et en crée indéfiniment. K8s refuserait d'ailleurs d'appliquer ce fichier avec une erreur de validation.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(4)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(3)">← Précédent</button>
+      <button class="fnav p" onclick="go(5)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 5 — Services
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c5">
+    <div class="card-head" onclick="tog(5)">
+      <div class="cnum">5</div>
+      <div class="cmeta">
+        <h3>Services — exposer les Pods</h3>
+        <p>Comment accéder à une application dans K8s</p>
+      </div>
+      <span class="cbadge b-yaml">YAML</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b5">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> comprendre pourquoi les Pods seuls ne sont pas accessibles, créer un Service pour exposer ton Deployment, et y accéder depuis ta machine.</p></div>
+      </div>
+
+      <div class="st">Le problème — les Pods ont des IPs éphémères</div>
+      <p>Chaque Pod a une IP interne au cluster — mais cette IP change à chaque recréation du Pod. On ne peut pas s'y connecter directement depuis l'extérieur.</p>
+      <p>Un <strong>Service</strong> est une adresse stable qui pointe vers les Pods correspondants, peu importe leur IP actuelle.</p>
+      <div class="k8s-schema">
+<span class="ks-user">Utilisateur</span>
+  <span class="ks-arrow">↓</span>
+<span class="ks-svc">Service</span>  hello-service  (IP stable: 10.96.0.1)
+  <span class="ks-arrow">├──</span> <span class="ks-pod">Pod</span>  10.244.0.3  <span class="ks-label">(IP change à chaque recréation)</span>
+  <span class="ks-arrow">└──</span> <span class="ks-pod">Pod</span>  10.244.0.4  <span class="ks-label">(K8s répartit le trafic entre les Pods)</span>
+      </div>
+
+      <div class="st">Les types de Services</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">— les 3 types principaux —</span></div>
+        <pre><span class="n">ClusterIP</span>   <span class="c"># accessible uniquement DANS le cluster (défaut)</span>
+<span class="w">NodePort</span>    <span class="c"># expose un port sur chaque node — accessible de l'extérieur</span>
+<span class="n">LoadBalancer</span> <span class="c"># crée un load balancer cloud (AWS, GCP, Azure)</span></pre>
+      </div>
+      <p>Pour Minikube en local, on utilise <code>NodePort</code> pour accéder depuis ta machine.</p>
+
+      <div class="st">Créer le fichier service.yml</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">yaml — k8s/service.yml</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="yk">apiVersion:</span> <span class="yv">v1</span>
+<span class="yk">kind:</span> <span class="yv">Service</span>
+<span class="yk">metadata:</span>
+  <span class="yk">name:</span> <span class="yv">hello-service</span>
+<span class="yk">spec:</span>
+  <span class="yk">type:</span> <span class="yv">NodePort</span>
+  <span class="yk">selector:</span>
+    <span class="yk">app:</span> <span class="yv">hello-pipeline</span>   <span class="c"># même label que dans le Deployment</span>
+  <span class="yk">ports:</span>
+    <span class="ya">- port:</span> <span class="yv">80</span>             <span class="c"># port du Service dans le cluster</span>
+      <span class="yk">targetPort:</span> <span class="yv">8080</span>    <span class="c"># port du conteneur</span>
+      <span class="yk">nodePort:</span> <span class="yv">30080</span>     <span class="c"># port exposé sur le node (30000-32767)</span></pre>
+      </div>
+
+      <div class="cw">
+        <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c"># Appliquer le Service</span>
+kubectl apply -f k8s/service.yml
+
+<span class="c"># Voir les Services</span>
+kubectl get services
+
+<span class="c"># Accéder au service depuis ta machine (Minikube)</span>
+minikube service hello-service --url
+
+<span class="c"># Ou ouvrir directement dans le navigateur</span>
+minikube service hello-service</pre>
+      </div>
+
+      <div class="box info"><span class="bi">💡</span><p>Sur Minikube, <code>minikube service nom-service --url</code> te donne l'URL exacte pour accéder au service depuis ton navigateur. En production cloud, le LoadBalancer te donnerait directement une IP publique.</p></div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question</div>
+        <div class="qtext">Comment le Service sait-il vers quels Pods rediriger le trafic ? Quel mécanisme K8s utilise-t-il ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Le Service utilise les <strong>labels</strong>. Dans son fichier YAML, <code>selector.app: hello-pipeline</code> dit au Service de rediriger vers tous les Pods qui ont le label <code>app: hello-pipeline</code>.<br><br>C'est le même système de labels que dans le Deployment — c'est pour ça que les deux doivent utiliser exactement le même label. K8s met à jour dynamiquement la liste des Pods cibles au fur et à mesure qu'ils sont créés ou supprimés.</p>
+        </div>
+      </div>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(5)">✓ Leçon terminée</button></div>
+    </div>
+    <div class="cfoot">
+      <button class="fnav" onclick="go(4)">← Précédent</button>
+      <button class="fnav p" onclick="go(6)">Leçon suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEÇON 6 — Récap & quiz
+  ══════════════════════════════════════════ -->
+  <div class="card" id="c6">
+    <div class="card-head" onclick="tog(6)">
+      <div class="cnum">6</div>
+      <div class="cmeta">
+        <h3>Récap & quiz de clôture</h3>
+        <p>Mémo kubectl + 3 questions de synthèse</p>
+      </div>
+      <span class="cbadge b-synth">SYNTHÈSE</span>
+      <span class="chev">▼</span>
+    </div>
+    <div class="cbody" id="b6">
+
+      <div class="goal">
+        <span class="gi">🎯</span>
+        <div><p><strong>Objectif :</strong> avoir une référence complète des commandes kubectl et valider ta compréhension de l'architecture K8s avec 3 questions de synthèse.</p></div>
+      </div>
+
+      <div class="st">Vue d'ensemble — ce que tu as déployé</div>
+      <div class="k8s-schema">
+<span class="ks-cluster">Cluster Minikube</span>
+  <span class="ks-arrow">└──</span> <span class="ks-node">Node</span>  minikube
+        <span class="ks-arrow">├──</span> <span class="ks-deploy">Deployment</span>  hello-deployment  (2 replicas)
+        <span class="ks-arrow">│   ├──</span> <span class="ks-pod">Pod</span>  hello-deployment-abc  <span class="ks-label">APP_ENV=production</span>
+        <span class="ks-arrow">│   └──</span> <span class="ks-pod">Pod</span>  hello-deployment-def  <span class="ks-label">APP_ENV=production</span>
+        <span class="ks-arrow">└──</span> <span class="ks-svc">Service</span>  hello-service  (NodePort:30080)
+            <span class="ks-arrow">↑</span>
+        <span class="ks-user">Ta machine</span>  →  minikube service hello-service
+      </div>
+
+      <div class="st">Mémo — commandes kubectl essentielles</div>
+      <div class="cw">
+        <div class="ch"><span class="cl">bash — référence complète</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+        <pre><span class="c">── LISTER ────────────────────────────────────────</span>
+kubectl get pods                 <span class="c"># lister les Pods</span>
+kubectl get pods -o wide         <span class="c"># avec IPs et nodes</span>
+kubectl get deployments          <span class="c"># lister les Deployments</span>
+kubectl get services             <span class="c"># lister les Services</span>
+kubectl get all                  <span class="c"># tout lister</span>
+
+<span class="c">── INSPECTER ─────────────────────────────────────</span>
+kubectl describe pod nom         <span class="c"># détails d'un Pod</span>
+kubectl describe deployment nom  <span class="c"># détails d'un Deployment</span>
+kubectl logs pod-nom             <span class="c"># logs d'un Pod</span>
+kubectl logs -f pod-nom          <span class="c"># logs en temps réel</span>
+kubectl exec -it pod-nom -- bash <span class="c"># terminal dans un Pod</span>
+
+<span class="c">── DÉPLOYER ──────────────────────────────────────</span>
+kubectl apply -f fichier.yml     <span class="c"># appliquer un fichier YAML</span>
+kubectl apply -f k8s/            <span class="c"># appliquer tous les YAML d'un dossier</span>
+kubectl delete -f fichier.yml    <span class="c"># supprimer ce qui est dans le YAML</span>
+
+<span class="c">── SCALER ────────────────────────────────────────</span>
+kubectl scale deployment nom --replicas=5  <span class="c"># changer le nb de Pods</span>
+
+<span class="c">── SUPPRIMER ─────────────────────────────────────</span>
+kubectl delete pod nom           <span class="c"># supprimer un Pod</span>
+kubectl delete deployment nom    <span class="c"># supprimer un Deployment</span>
+kubectl delete service nom       <span class="c"># supprimer un Service</span></pre>
+      </div>
+
+      <div class="st">Quiz de clôture</div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 1 / 3</div>
+        <div class="qtext">Quelle est la différence entre un Pod et un Deployment ? Pourquoi utilise-t-on toujours un Deployment en production plutôt que des Pods directs ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Un <strong>Pod</strong> est une instance unique et éphémère — s'il plante, il reste mort.<br><br>Un <strong>Deployment</strong> est un contrôleur qui surveille ses Pods et maintient en permanence le nombre demandé (<code>replicas</code>). Si un Pod plante, le Deployment en recrée un automatiquement.<br><br>En production on utilise toujours un Deployment pour le self-healing, la gestion des mises à jour progressives (rolling updates), et le scaling facile.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 2 / 3</div>
+        <div class="qtext">Tu veux passer ton application de 2 à 5 replicas sans modifier le fichier YAML. Quelle commande kubectl utilises-tu ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <div class="cw" style="margin:0">
+            <div class="ch"><span class="cl">bash</span><button class="cpb" onclick="cp(this)">Copier</button></div>
+            <pre>kubectl scale deployment hello-deployment --replicas=5</pre>
+          </div>
+          <p class="aexpl">K8s crée immédiatement 3 nouveaux Pods pour atteindre 5. C'est le scaling horizontal en action — ajouter des instances plutôt qu'augmenter les ressources d'une seule machine.</p>
+        </div>
+      </div>
+
+      <div class="qblock">
+        <div class="qlabel">🧠 Question 3 / 3</div>
+        <div class="qtext">Explique le rôle des labels dans Kubernetes. Comment le Deployment et le Service s'en servent-ils pour fonctionner ensemble ?</div>
+        <button class="rbtn" onclick="rev(this)">💡 Voir la réponse</button>
+        <div class="abox">
+          <div class="alabel">✅ Réponse</div>
+          <p class="aexpl">Les <strong>labels</strong> sont des paires clé/valeur attachées aux objets K8s (Pods, Services, etc.). Ils permettent de sélectionner des groupes d'objets.<br><br>Le <strong>Deployment</strong> utilise <code>selector.matchLabels</code> pour savoir quels Pods il doit surveiller et gérer.<br><br>Le <strong>Service</strong> utilise <code>selector</code> pour savoir vers quels Pods rediriger le trafic entrant.<br><br>Les deux utilisent le même label (<code>app: hello-pipeline</code>) — c'est ce qui les lie ensemble sans référence directe. C'est un système de découverte par labels, très flexible.</p>
+        </div>
+      </div>
+
+      <div class="st">Pour aller plus loin</div>
+      <ul class="clist">
+        <li><div class="chkb" onclick="chk(this)"></div><span><strong>ConfigMaps & Secrets</strong> — gérer la configuration et les données sensibles dans K8s</span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span><strong>Ingress</strong> — exposer plusieurs services sous un seul domaine avec du routage HTTP</span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span><strong>GitLab CI/CD + K8s</strong> — déployer automatiquement sur le cluster depuis le pipeline</span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span><strong>Helm</strong> — gestionnaire de paquets pour K8s (comme apt pour Linux)</span></li>
+        <li><div class="chkb" onclick="chk(this)"></div><span><strong>Namespaces</strong> — isoler les environnements (dev, staging, prod) dans le même cluster</span></li>
+      </ul>
+
+      <div class="done-w"><button class="dbtn" onclick="mkDone(6)">🎉 Module 6 terminé !</button></div>
+    </div>
+    <div class="cfoot"><button class="fnav" onclick="go(5)">← Précédent</button></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const TOTAL = 6;
+const doneSet = new Set();
+const openSet = new Set();
+
+function buildNav() {
+  const nav = document.getElementById('dnav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dn' + (doneSet.has(i) ? ' done' : '') + (openSet.has(i) ? ' open' : '');
+    d.textContent = i;
+    d.onclick = () => go(i);
+    nav.appendChild(d);
+  }
+}
+
+function updProg() {
+  const pct = (doneSet.size / TOTAL) * 100;
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pp').textContent = doneSet.size + ' / ' + TOTAL;
+}
+
+function tog(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  const isOpen = body.classList.contains('vis');
+  if (isOpen) {
+    body.classList.remove('vis'); head.classList.remove('op');
+    openSet.delete(n); if (!doneSet.has(n)) card.classList.remove('open');
+  } else {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  buildNav();
+}
+
+function go(n) {
+  const body = document.getElementById('b' + n);
+  const card = document.getElementById('c' + n);
+  const head = card.querySelector('.card-head');
+  if (!body.classList.contains('vis')) {
+    body.classList.add('vis'); head.classList.add('op');
+    openSet.add(n); if (!doneSet.has(n)) card.classList.add('open');
+  }
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  buildNav();
+}
+
+function mkDone(n) {
+  const btn = document.querySelector('#b' + n + ' .dbtn');
+  const card = document.getElementById('c' + n);
+  if (doneSet.has(n)) {
+    doneSet.delete(n);
+    btn.textContent = n === 6 ? '🎉 Module 6 terminé !' : '✓ Leçon terminée';
+    btn.classList.remove('undo'); card.classList.remove('done');
+    if (openSet.has(n)) card.classList.add('open');
+  } else {
+    doneSet.add(n);
+    btn.textContent = '↩ Marquer comme non terminée';
+    btn.classList.add('undo'); card.classList.remove('open'); card.classList.add('done');
+  }
+  updProg(); buildNav();
+}
+
+function cp(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copié'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function rev(btn) {
+  btn.nextElementSibling.classList.add('show');
+  btn.style.display = 'none';
+}
+
+function chk(el) {
+  el.classList.toggle('on');
+  el.parentElement.classList.toggle('struck');
+}
+
+buildNav(); updProg(); tog(1);
+</script>
+</body>
+</html>
