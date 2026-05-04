@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P0·M1 Cours — Bash Scripting | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary:    #0d1117;
+    --bg-secondary:  #161b22;
+    --bg-card:       #1c2128;
+    --bg-hover:      #21262d;
+    --bg-code:       #161b22;
+    --border:        #30363d;
+    --border-bright: #484f58;
+    --text-primary:  #e6edf3;
+    --text-secondary:#8b949e;
+    --text-muted:    #484f58;
+    --accent-green:  #3fb950;
+    --accent-blue:   #58a6ff;
+    --accent-purple: #bc8cff;
+    --accent-orange: #f0883e;
+    --accent-yellow: #d29922;
+    --accent-red:    #f85149;
+    --accent-teal:   #39d353;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --sidebar-width: 260px;
+    --topbar-height: 56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+  }
+
+  .topbar-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-green);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .topbar-sep { color: var(--border-bright); }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    flex: 1;
+  }
+
+  .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent-blue); }
+  .breadcrumb .current { color: var(--accent-blue); }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid;
+    transition: all 0.15s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .btn-tp {
+    background: rgba(240,136,62,0.1);
+    color: var(--accent-orange);
+    border-color: rgba(240,136,62,0.3);
+  }
+  .btn-tp:hover {
+    background: rgba(240,136,62,0.2);
+  }
+
+  .btn-nav {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border);
+  }
+  .btn-nav:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    padding-top: var(--topbar-height);
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: var(--topbar-height);
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding: 24px 0;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .sidebar-section {
+    padding: 0 16px;
+    margin-bottom: 24px;
+  }
+
+  .sidebar-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .sidebar-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  .sidebar-item.active {
+    background: rgba(88,166,255,0.1);
+    color: var(--accent-blue);
+  }
+
+  .sidebar-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border-bright);
+    flex-shrink: 0;
+  }
+
+  .sidebar-item.active .dot { background: var(--accent-blue); }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 16px;
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    max-width: 860px;
+    padding: 48px 56px;
+  }
+
+  /* ── MODULE HEADER ── */
+  .module-header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-path {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .module-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .module-subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .module-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text-muted);
+  }
+
+  .meta-item .val { color: var(--text-secondary); }
+
+  /* ── OBJECTIVES ── */
+  .objectives {
+    background: rgba(88,166,255,0.06);
+    border: 1px solid rgba(88,166,255,0.2);
+    border-left: 3px solid var(--accent-blue);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+
+  .objectives h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-blue);
+    margin-bottom: 12px;
+  }
+
+  .objectives ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .objectives ul li {
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .objectives ul li::before {
+    content: '→';
+    color: var(--accent-blue);
+    font-family: var(--mono);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 56px;
+    scroll-margin-top: 80px;
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  .section p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.75;
+  }
+
+  .section p code,
+  .section li code {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--bg-card);
+    color: var(--accent-orange);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .section ul, .section ol {
+    color: var(--text-secondary);
+    padding-left: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .code-copy {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+
+  .code-copy:hover {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+  }
+
+  .code-block pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+
+  .code-block pre::-webkit-scrollbar { height: 4px; }
+  .code-block pre::-webkit-scrollbar-track { background: transparent; }
+  .code-block pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Syntax highlighting */
+  .cm  { color: #6e7681; font-style: italic; }  /* comment */
+  .kw  { color: #ff7b72; }                       /* keyword */
+  .fn  { color: var(--accent-blue); }            /* function/builtin */
+  .st  { color: #a5d6ff; }                       /* string */
+  .va  { color: var(--accent-purple); }          /* variable */
+  .nu  { color: var(--accent-orange); }          /* number */
+  .op  { color: #ff7b72; }                       /* operator */
+  .sh  { color: #6e7681; }                       /* shebang */
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    gap: 12px;
+  }
+
+  .callout-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .callout-body { flex: 1; }
+
+  .callout-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .callout-body p {
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+
+  .callout.warning {
+    background: rgba(210,153,34,0.08);
+    border: 1px solid rgba(210,153,34,0.25);
+  }
+  .callout.warning .callout-title { color: var(--accent-yellow); }
+
+  .callout.tip {
+    background: rgba(63,185,80,0.06);
+    border: 1px solid rgba(63,185,80,0.2);
+  }
+  .callout.tip .callout-title { color: var(--accent-green); }
+
+  .callout.info {
+    background: rgba(88,166,255,0.06);
+    border: 1px solid rgba(88,166,255,0.2);
+  }
+  .callout.info .callout-title { color: var(--accent-blue); }
+
+  .callout.danger {
+    background: rgba(248,81,73,0.06);
+    border: 1px solid rgba(248,81,73,0.2);
+  }
+  .callout.danger .callout-title { color: var(--accent-red); }
+
+  /* ── NAV BOTTOM ── */
+  .nav-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-bottom a {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-bottom a:hover {
+    border-color: var(--border-bright);
+    color: var(--text-primary);
+    background: var(--bg-hover);
+  }
+
+  /* ── SUMMARY TABLE ── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 20px 0;
+  }
+
+  .summary-table th {
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+
+  .summary-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+
+  .summary-table td:first-child {
+    font-family: var(--mono);
+    color: var(--accent-orange);
+    white-space: nowrap;
+  }
+
+  .summary-table tr:nth-child(even) td {
+    background: rgba(255,255,255,0.01);
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a>
+    <span class="topbar-sep">›</span>
+    <a href="#">Phase 0</a>
+    <span class="topbar-sep">›</span>
+    <span class="current">M1 · Bash Scripting · Cours</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase0-module1-tp.html" class="btn btn-tp">⚡ Aller aux TP</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">// Phase 0 · M1</div>
+      <a href="#section-pourquoi" class="sidebar-item active" onclick="setActive(this)">
+        <span class="dot"></span>Pourquoi ce module
+      </a>
+      <a href="#section-structure" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Structure d'un script
+      </a>
+      <a href="#section-variables" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Variables
+      </a>
+      <a href="#section-params" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Paramètres & validation
+      </a>
+      <a href="#section-conditions" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Conditions & tests
+      </a>
+      <a href="#section-boucles" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Boucles
+      </a>
+      <a href="#section-fonctions" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Fonctions
+      </a>
+      <a href="#section-erreurs" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Gestion des erreurs
+      </a>
+      <a href="#section-recap" class="sidebar-item" onclick="setActive(this)">
+        <span class="dot"></span>Récapitulatif
+      </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">// Navigation</div>
+      <a href="phase0-module1-tp.html" class="sidebar-item">
+        <span class="dot" style="background:var(--accent-orange)"></span>Cahier de TP
+      </a>
+      <a href="index.html" class="sidebar-item">
+        <span class="dot"></span>← Dashboard
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- MODULE HEADER -->
+    <div class="module-header">
+      <div class="module-path">phase-0 / module-1 / cours</div>
+      <h1 class="module-title">Bash Scripting</h1>
+      <p class="module-subtitle">
+        Écrire des scripts robustes, lisibles et prêts pour la production.
+      </p>
+      <div class="module-meta">
+        <span class="meta-item">📅 <span class="val">Semaine 1</span></span>
+        <span class="meta-item">⏱ <span class="val">~6h de lecture + pratique</span></span>
+        <span class="meta-item">🎯 <span class="val">Phase 0 · Module 1</span></span>
+        <span class="meta-item">📦 <span class="val">Projet : DevCorp</span></span>
+      </div>
+    </div>
+
+    <!-- OBJECTIVES -->
+    <div class="objectives">
+      <h4>// Objectifs du module</h4>
+      <ul>
+        <li>Maîtriser la structure et les bonnes pratiques d'un script de production</li>
+        <li>Manipuler variables, paramètres, conditions et boucles avec confiance</li>
+        <li>Structurer son code en fonctions réutilisables et bien loggées</li>
+        <li>Gérer les erreurs proprement avec <code>trap</code> et des codes de retour explicites</li>
+        <li>Produire du Bash lisible par n'importe quel ingénieur de ton équipe</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 1 -->
+    <section class="section" id="section-pourquoi">
+      <div class="section-num">// 01</div>
+      <h2>Pourquoi le Bash avant tout le reste ?</h2>
+      <p>
+        Avant même de toucher à Docker ou Ansible, tu vas écrire des scripts.
+        Pas parce que c'est un prérequis théorique — parce que dès la Phase 1,
+        tu vas lire, modifier et déboguer des scripts dans des Dockerfiles,
+        des pipelines CI/CD, des playbooks Ansible. Si le Bash t'est opaque,
+        tu subis les outils au lieu de les maîtriser.
+      </p>
+      <p>
+        L'objectif de ce module n'est pas de faire de toi un expert en Bash.
+        C'est de te rendre <strong>autonome</strong> : capable d'écrire un script de 50 lignes
+        propre, robuste, et lisible par quelqu'un d'autre.
+      </p>
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <div class="callout-title">Posture formateur</div>
+          <p>Pour tes futurs apprenants : ancre le Bash dans le quotidien système.
+          "Vous avez déjà tapé des commandes dans un terminal ? Un script, c'est juste
+          une liste de ces commandes que vous sauvegardez pour ne pas les retaper."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section class="section" id="section-structure">
+      <div class="section-num">// 02</div>
+      <h2>Structure d'un script professionnel</h2>
+      <p>
+        Tout script de prod commence par le même squelette. Pas par habitude — par nécessité.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="sh">#!/bin/bash</span>
+<span class="cm"># ══════════════════════════════════════════════════════
+# Nom        : deploy.sh
+# Description: Script de déploiement DevCorp
+# Auteur     : Titi
+# Date       : 2024-01-01
+# Usage      : ./deploy.sh &lt;environnement&gt; [--dry-run]
+# ══════════════════════════════════════════════════════</span>
+<span class="fn">set</span> <span class="st">-euo pipefail</span></pre>
+      </div>
+
+      <h3>Le shebang <code>#!/bin/bash</code></h3>
+      <p>
+        Il indique au système quel interpréteur utiliser quand on exécute le fichier
+        directement (<code>./script.sh</code>). Sans lui, le système utilise le shell courant —
+        ce qui peut varier d'une machine à l'autre et créer des comportements imprévisibles.
+      </p>
+
+      <h3>Le <code>set -euo pipefail</code> — ta ligne la plus importante</h3>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Comportement sans</th>
+            <th>Comportement avec</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>-e</td>
+            <td>Le script continue malgré les erreurs</td>
+            <td>Arrêt immédiat à la première erreur</td>
+          </tr>
+          <tr>
+            <td>-u</td>
+            <td>Variable non définie = chaîne vide silencieuse</td>
+            <td>Erreur explicite si variable non définie</td>
+          </tr>
+          <tr>
+            <td>-o pipefail</td>
+            <td>Un pipe retourne le code de la dernière commande</td>
+            <td>Un pipe échoue si n'importe quelle commande échoue</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout danger">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <div class="callout-title">Piège classique</div>
+          <p>Sans <code>set -e</code> : <code>rm -rf /app/config</code> échoue silencieusement,
+          <code>systemctl restart app</code> s'exécute quand même avec une config vide → prod cassée.
+          Avec <code>set -e</code> : arrêt immédiat, dégât limité.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3 -->
+    <section class="section" id="section-variables">
+      <div class="section-num">// 03</div>
+      <h2>Variables</h2>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="cm"># ── Variables simples ──────────────────────────────────</span>
+<span class="va">APP_NAME</span>=<span class="st">"devcorp"</span>       <span class="cm"># pas d'espaces autour du = !</span>
+<span class="va">PORT</span>=<span class="nu">8080</span>              <span class="cm"># les nombres sans guillemets</span>
+<span class="kw">readonly</span> <span class="va">LOG_DIR</span>=<span class="st">"/var/log/<span class="va">${APP_NAME}</span>"</span>  <span class="cm"># constante</span>
+
+<span class="cm"># ── Utilisation ────────────────────────────────────────</span>
+<span class="fn">echo</span> <span class="st">"App : <span class="va">$APP_NAME</span>"</span>
+<span class="fn">echo</span> <span class="st">"Logs : <span class="va">${LOG_DIR}</span>"</span>    <span class="cm"># {} recommandés</span>
+
+<span class="cm"># Cas où les accolades sont OBLIGATOIRES</span>
+<span class="va">filename</span>=<span class="st">"rapport"</span>
+<span class="fn">echo</span> <span class="st">"<span class="va">${filename}</span>_final.pdf"</span>  <span class="cm"># ✓ rapport_final.pdf</span>
+<span class="fn">echo</span> <span class="st">"<span class="va">$filename_final</span>.pdf"</span>  <span class="cm"># ✗ bash cherche $filename_final</span>
+
+<span class="cm"># ── Variables spéciales ────────────────────────────────</span>
+<span class="fn">echo</span> <span class="va">$0</span>   <span class="cm"># nom du script</span>
+<span class="fn">echo</span> <span class="va">$1</span>   <span class="cm"># premier argument</span>
+<span class="fn">echo</span> <span class="va">$#</span>   <span class="cm"># nombre d'arguments</span>
+<span class="fn">echo</span> <span class="va">$@</span>   <span class="cm"># tous les arguments</span>
+<span class="fn">echo</span> <span class="va">$$</span>   <span class="cm"># PID du script</span>
+<span class="fn">echo</span> <span class="va">$?</span>   <span class="cm"># code retour de la dernière commande</span>
+
+<span class="cm"># ── Substitution de commande ───────────────────────────</span>
+<span class="va">current_date</span>=<span class="op">$(</span><span class="fn">date</span> +%Y-%m-%d<span class="op">)</span>
+<span class="va">disk_usage</span>=<span class="op">$(</span><span class="fn">df</span> -h / | <span class="fn">awk</span> <span class="st">'NR==2 {print $5}'</span><span class="op">)</span>
+
+<span class="cm"># ── Valeurs par défaut ─────────────────────────────────</span>
+<span class="va">ENV</span>=<span class="st">"<span class="va">${1:-production}</span>"</span>   <span class="cm"># défaut si $1 absent</span>
+<span class="va">DB_PASS</span>=<span class="st">"<span class="va">${DB_PASS:?DB_PASS doit être définie}</span>"</span>  <span class="cm"># erreur si vide</span></pre>
+      </div>
+    </section>
+
+    <!-- SECTION 4 -->
+    <section class="section" id="section-params">
+      <div class="section-num">// 04</div>
+      <h2>Paramètres & validation</h2>
+      <p>
+        Un script robuste vérifie ce qu'on lui donne avant de faire quoi que ce soit.
+        C'est ce qui distingue un script amateur d'un script de production.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="sh">#!/bin/bash</span>
+<span class="fn">set</span> <span class="st">-euo pipefail</span>
+
+<span class="fn">usage</span><span class="op">()</span> <span class="op">{</span>
+    <span class="fn">echo</span> <span class="st">"Usage: <span class="va">$0</span> &lt;env&gt; &lt;version&gt;"</span>
+    <span class="fn">echo</span> <span class="st">"  env     : dev | staging | production"</span>
+    <span class="fn">echo</span> <span class="st">"  version : format X.Y.Z"</span>
+    <span class="fn">exit</span> <span class="nu">1</span>
+<span class="op">}</span>
+
+<span class="cm"># Vérifier le nombre d'arguments</span>
+<span class="kw">if</span> <span class="op">[[</span> <span class="va">$#</span> <span class="op">-ne</span> <span class="nu">2</span> <span class="op">]]</span>; <span class="kw">then</span>
+    <span class="fn">echo</span> <span class="st">"Erreur : <span class="va">$#</span> argument(s) reçu(s), 2 attendus"</span> &gt;&amp;2
+    <span class="fn">usage</span>
+<span class="kw">fi</span>
+
+<span class="va">ENV</span>=<span class="st">"<span class="va">$1</span>"</span>
+<span class="va">VERSION</span>=<span class="st">"<span class="va">$2</span>"</span>
+
+<span class="cm"># Valider l'environnement</span>
+<span class="kw">case</span> <span class="st">"<span class="va">$ENV</span>"</span> <span class="kw">in</span>
+    dev|staging|production<span class="op">)</span>
+        <span class="fn">echo</span> <span class="st">"Environnement : <span class="va">$ENV</span>"</span> ;;
+    <span class="op">*)</span>
+        <span class="fn">echo</span> <span class="st">"Erreur : '<span class="va">$ENV</span>' invalide"</span> &gt;&amp;2
+        <span class="fn">usage</span> ;;
+<span class="kw">esac</span>
+
+<span class="cm"># Valider le format de version (regex)</span>
+<span class="kw">if</span> <span class="op">[[</span> ! <span class="st">"<span class="va">$VERSION</span>"</span> <span class="op">=~</span> ^[0-9]+\.[0-9]+\.[0-9]+$ <span class="op">]]</span>; <span class="kw">then</span>
+    <span class="fn">echo</span> <span class="st">"Erreur : '<span class="va">$VERSION</span>' invalide (format : X.Y.Z)"</span> &gt;&amp;2
+    <span class="fn">exit</span> <span class="nu">1</span>
+<span class="kw">fi</span></pre>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <div class="callout-title">Bonne pratique</div>
+          <p>Toujours rediriger les messages d'erreur vers <code>stderr</code> avec <code>&gt;&amp;2</code>.
+          Ça permet aux outils appelants de séparer la sortie normale des erreurs.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5 -->
+    <section class="section" id="section-conditions">
+      <div class="section-num">// 05</div>
+      <h2>Conditions & tests</h2>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="cm"># ── Tests sur les fichiers ─────────────────────────────</span>
+<span class="op">[[</span> -f <span class="st">"<span class="va">$FILE</span>"</span> <span class="op">]]</span>   <span class="cm"># fichier régulier</span>
+<span class="op">[[</span> -d <span class="st">"<span class="va">$DIR</span>"</span>  <span class="op">]]</span>   <span class="cm"># répertoire</span>
+<span class="op">[[</span> -r <span class="st">"<span class="va">$FILE</span>"</span> <span class="op">]]</span>   <span class="cm"># lisible</span>
+<span class="op">[[</span> -w <span class="st">"<span class="va">$FILE</span>"</span> <span class="op">]]</span>   <span class="cm"># modifiable</span>
+<span class="op">[[</span> -x <span class="st">"<span class="va">$FILE</span>"</span> <span class="op">]]</span>   <span class="cm"># exécutable</span>
+<span class="op">[[</span> -e <span class="st">"<span class="va">$FILE</span>"</span> <span class="op">]]</span>   <span class="cm"># existe</span>
+<span class="op">[[</span> -s <span class="st">"<span class="va">$FILE</span>"</span> <span class="op">]]</span>   <span class="cm"># existe et non vide</span>
+
+<span class="cm"># ── Tests sur les chaînes ──────────────────────────────</span>
+<span class="op">[[</span> -z <span class="st">"<span class="va">$STR</span>"</span>      <span class="op">]]</span>  <span class="cm"># vide (zero length)</span>
+<span class="op">[[</span> -n <span class="st">"<span class="va">$STR</span>"</span>      <span class="op">]]</span>  <span class="cm"># non vide</span>
+<span class="op">[[</span> <span class="st">"<span class="va">$STR</span>"</span> == <span class="st">"x"</span> <span class="op">]]</span>  <span class="cm"># égalité</span>
+<span class="op">[[</span> <span class="st">"<span class="va">$STR</span>"</span> =~ ^hel <span class="op">]]</span>  <span class="cm"># regex</span>
+
+<span class="cm"># ── Tests numériques ───────────────────────────────────</span>
+<span class="op">[[</span> <span class="va">$N</span> <span class="op">-eq</span> <span class="nu">42</span> <span class="op">]]</span>  <span class="cm"># égal      (equal)</span>
+<span class="op">[[</span> <span class="va">$N</span> <span class="op">-ne</span>  <span class="nu">0</span> <span class="op">]]</span>  <span class="cm"># différent (not equal)</span>
+<span class="op">[[</span> <span class="va">$N</span> <span class="op">-gt</span> <span class="nu">10</span> <span class="op">]]</span>  <span class="cm"># supérieur (greater than)</span>
+<span class="op">[[</span> <span class="va">$N</span> <span class="op">-lt</span> <span class="nu">100</span> <span class="op">]]</span> <span class="cm"># inférieur (less than)</span>
+<span class="op">[[</span> <span class="va">$N</span> <span class="op">-ge</span> <span class="nu">42</span> <span class="op">]]</span>  <span class="cm"># supérieur ou égal</span>
+
+<span class="cm"># ── Opérateurs logiques ────────────────────────────────</span>
+<span class="op">[[</span> -f <span class="st">"<span class="va">$F</span>"</span> <span class="op">&&</span> -r <span class="st">"<span class="va">$F</span>"</span> <span class="op">]]</span>    <span class="cm"># ET</span>
+<span class="op">[[</span> <span class="st">"<span class="va">$E</span>"</span> == <span class="st">"dev"</span> <span class="op">||</span> <span class="st">"<span class="va">$E</span>"</span> == <span class="st">"staging"</span> <span class="op">]]</span>  <span class="cm"># OU</span>
+<span class="op">[[</span> ! -d <span class="st">"<span class="va">$DIR</span>"</span> <span class="op">]]</span>              <span class="cm"># NON</span></pre>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <div class="callout-title">[ ] vs [[ ]]</div>
+          <p>Toujours utiliser <code>[[ ]]</code> (double crochets) en Bash.
+          Plus robuste, supporte les regex avec <code>=~</code>, gère mieux les espaces dans les variables.
+          <code>[ ]</code> est l'ancienne syntaxe POSIX sh — à éviter dans des scripts Bash modernes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6 -->
+    <section class="section" id="section-boucles">
+      <div class="section-num">// 06</div>
+      <h2>Boucles</h2>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="cm"># ── for sur tableau (pattern DevOps très courant) ──────</span>
+<span class="va">SERVICES</span>=(<span class="st">"nginx"</span> <span class="st">"postgresql"</span> <span class="st">"redis"</span>)
+
+<span class="kw">for</span> <span class="va">service</span> <span class="kw">in</span> <span class="st">"<span class="va">${SERVICES[@]}</span>"</span>; <span class="kw">do</span>
+    <span class="kw">if</span> <span class="fn">systemctl</span> is-active --quiet <span class="st">"<span class="va">$service</span>"</span>; <span class="kw">then</span>
+        <span class="fn">echo</span> <span class="st">"✓ <span class="va">$service</span> actif"</span>
+    <span class="kw">else</span>
+        <span class="fn">echo</span> <span class="st">"✗ <span class="va">$service</span> inactif"</span>
+    <span class="kw">fi</span>
+<span class="kw">done</span>
+
+<span class="cm"># ── Lire un fichier ligne par ligne ────────────────────</span>
+<span class="kw">while</span> <span class="va">IFS</span>= <span class="fn">read</span> -r <span class="va">line</span>; <span class="kw">do</span>
+    <span class="op">[[</span> <span class="st">"<span class="va">$line</span>"</span> <span class="op">=~</span> ^# <span class="op">]]</span> <span class="op">&&</span> <span class="kw">continue</span>   <span class="cm"># ignorer commentaires</span>
+    <span class="op">[[</span> -z <span class="st">"<span class="va">$line</span>"</span>     <span class="op">]]</span> <span class="op">&&</span> <span class="kw">continue</span>   <span class="cm"># ignorer lignes vides</span>
+    <span class="fn">echo</span> <span class="st">"Traitement : <span class="va">$line</span>"</span>
+<span class="kw">done</span> &lt; <span class="st">"/etc/hosts"</span>
+
+<span class="cm"># ── Pattern retry (attendre qu'un service démarre) ─────</span>
+<span class="va">MAX</span>=<span class="nu">10</span>; <span class="va">RETRY</span>=<span class="nu">0</span>
+<span class="kw">until</span> <span class="fn">curl</span> -sf <span class="st">"http://localhost:8080/health"</span> &gt;/dev/null <span class="nu">2</span>&gt;&amp;<span class="nu">1</span>; <span class="kw">do</span>
+    <span class="va">RETRY</span>=<span class="op">$((</span><span class="va">RETRY</span> + 1<span class="op">))</span>
+    <span class="kw">if</span> <span class="op">[[</span> <span class="va">$RETRY</span> <span class="op">-ge</span> <span class="va">$MAX</span> <span class="op">]]</span>; <span class="kw">then</span>
+        <span class="fn">echo</span> <span class="st">"Erreur : service indisponible"</span> &gt;&amp;<span class="nu">2</span>
+        <span class="fn">exit</span> <span class="nu">1</span>
+    <span class="kw">fi</span>
+    <span class="fn">echo</span> <span class="st">"Attente... (<span class="va">$RETRY</span>/<span class="va">$MAX</span>)"</span>
+    <span class="fn">sleep</span> <span class="nu">5</span>
+<span class="kw">done</span></pre>
+      </div>
+    </section>
+
+    <!-- SECTION 7 -->
+    <section class="section" id="section-fonctions">
+      <div class="section-num">// 07</div>
+      <h2>Fonctions</h2>
+      <p>
+        Les fonctions transforment un script de 100 lignes illisible en un code structuré.
+        Règle absolue : toute variable déclarée dans une fonction doit être <code>local</code>.
+        Sans ça, tu pollues l'espace global et tu crées des bugs impossibles à déboguer.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="cm"># ── Fonctions de logging (réutilise dans tous tes scripts) ─</span>
+<span class="va">RED</span>=<span class="st">'\033[0;31m'</span>; <span class="va">GREEN</span>=<span class="st">'\033[0;32m'</span>
+<span class="va">YELLOW</span>=<span class="st">'\033[1;33m'</span>; <span class="va">BLUE</span>=<span class="st">'\033[0;34m'</span>
+<span class="va">NC</span>=<span class="st">'\033[0m'</span>
+
+<span class="fn">log_info</span><span class="op">()</span>    <span class="op">{</span> <span class="fn">echo</span> -e <span class="st">"<span class="va">${GREEN}</span>[<span class="op">$(</span>date '+%H:%M:%S'<span class="op">)</span>] INFO<span class="va">${NC}</span>    <span class="va">$*</span>"</span>; <span class="op">}</span>
+<span class="fn">log_warning</span><span class="op">()</span> <span class="op">{</span> <span class="fn">echo</span> -e <span class="st">"<span class="va">${YELLOW}</span>[<span class="op">$(</span>date '+%H:%M:%S'<span class="op">)</span>] WARNING<span class="va">${NC}</span> <span class="va">$*</span>"</span>; <span class="op">}</span>
+<span class="fn">log_error</span><span class="op">()</span>   <span class="op">{</span> <span class="fn">echo</span> -e <span class="st">"<span class="va">${RED}</span>[<span class="op">$(</span>date '+%H:%M:%S'<span class="op">)</span>] ERROR<span class="va">${NC}</span>   <span class="va">$*</span>"</span> &gt;&amp;<span class="nu">2</span>; <span class="op">}</span>
+<span class="fn">log_step</span><span class="op">()</span>    <span class="op">{</span> <span class="fn">echo</span> -e <span class="st">"<span class="va">${BLUE}</span>[<span class="op">$(</span>date '+%H:%M:%S'<span class="op">)</span>] ───▶<span class="va">${NC}</span>    <span class="va">$*</span>"</span>; <span class="op">}</span>
+
+<span class="cm"># ── Fonction avec paramètres ───────────────────────────────</span>
+<span class="fn">check_service</span><span class="op">()</span> <span class="op">{</span>
+    <span class="kw">local</span> <span class="va">service_name</span>=<span class="st">"<span class="va">$1</span>"</span>   <span class="cm"># TOUJOURS local</span>
+
+    <span class="kw">if</span> <span class="fn">systemctl</span> is-active --quiet <span class="st">"<span class="va">$service_name</span>"</span> <span class="nu">2</span>&gt;/dev/null; <span class="kw">then</span>
+        <span class="kw">return</span> <span class="nu">0</span>
+    <span class="kw">else</span>
+        <span class="kw">return</span> <span class="nu">1</span>
+    <span class="kw">fi</span>
+<span class="op">}</span>
+
+<span class="cm"># ── Retourner une valeur textuelle ─────────────────────────</span>
+<span class="fn">get_disk_usage</span><span class="op">()</span> <span class="op">{</span>
+    <span class="kw">local</span> <span class="va">mount</span>=<span class="st">"<span class="va">${1:-/}</span>"</span>
+    <span class="kw">local</span> <span class="va">usage</span>
+    <span class="va">usage</span>=<span class="op">$(</span><span class="fn">df</span> <span class="st">"<span class="va">$mount</span>"</span> | <span class="fn">awk</span> <span class="st">'NR==2 {gsub(/%/,""); print $5}'</span><span class="op">)</span>
+    <span class="fn">echo</span> <span class="st">"<span class="va">$usage</span>"</span>   <span class="cm"># "retourner" une valeur → via echo + $(...)</span>
+<span class="op">}</span>
+
+<span class="cm"># ── Utilisation ────────────────────────────────────────────</span>
+<span class="kw">if</span> <span class="fn">check_service</span> <span class="st">"ssh"</span>; <span class="kw">then</span>
+    <span class="fn">log_info</span> <span class="st">"SSH actif"</span>
+<span class="kw">else</span>
+    <span class="fn">log_error</span> <span class="st">"SSH inactif !"</span>
+<span class="kw">fi</span>
+
+<span class="va">DISK</span>=<span class="op">$(</span><span class="fn">get_disk_usage</span> <span class="st">"/"</span><span class="op">)</span>
+<span class="fn">log_info</span> <span class="st">"Disque : <span class="va">${DISK}</span>%"</span></pre>
+      </div>
+    </section>
+
+    <!-- SECTION 8 -->
+    <section class="section" id="section-erreurs">
+      <div class="section-num">// 08</div>
+      <h2>Gestion des erreurs & trap</h2>
+      <p>
+        Le <code>trap</code> garantit qu'un script ne laisse jamais le système dans un état sale,
+        qu'il se termine normalement, sur une erreur, ou sur un CTRL+C.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="code-copy" onclick="copyCode(this)">copier</button>
+        </div>
+        <pre><span class="sh">#!/bin/bash</span>
+<span class="fn">set</span> <span class="st">-euo pipefail</span>
+
+<span class="va">TEMP_DIR</span>=<span class="st">""</span>
+
+<span class="fn">cleanup</span><span class="op">()</span> <span class="op">{</span>
+    <span class="kw">local</span> <span class="va">exit_code</span>=<span class="va">$?</span>
+    <span class="kw">if</span> <span class="op">[[</span> -n <span class="st">"<span class="va">$TEMP_DIR</span>"</span> <span class="op">&&</span> -d <span class="st">"<span class="va">$TEMP_DIR</span>"</span> <span class="op">]]</span>; <span class="kw">then</span>
+        <span class="fn">rm</span> -rf <span class="st">"<span class="va">$TEMP_DIR</span>"</span>
+        <span class="fn">echo</span> <span class="st">"Nettoyage effectué"</span>
+    <span class="kw">fi</span>
+    <span class="kw">if</span> <span class="op">[[</span> <span class="va">$exit_code</span> <span class="op">-ne</span> <span class="nu">0</span> <span class="op">]]</span>; <span class="kw">then</span>
+        <span class="fn">echo</span> <span class="st">"Sortie avec erreur : <span class="va">$exit_code</span>"</span> &gt;&amp;<span class="nu">2</span>
+    <span class="kw">fi</span>
+    <span class="fn">exit</span> <span class="va">$exit_code</span>
+<span class="op">}</span>
+
+<span class="cm"># Enregistrer AVANT toute opération risquée</span>
+<span class="kw">trap</span> <span class="fn">cleanup</span> EXIT
+<span class="kw">trap</span> <span class="fn">cleanup</span> INT TERM    <span class="cm"># CTRL+C et kill</span>
+
+<span class="cm"># Même si ça échoue, cleanup() sera appelé</span>
+<span class="va">TEMP_DIR</span>=<span class="op">$(</span><span class="fn">mktemp</span> -d<span class="op">)</span>
+<span class="fn">cp</span> /etc/hosts <span class="st">"<span class="va">$TEMP_DIR</span>/"</span>
+<span class="cm"># ... traitement ...</span>
+<span class="fn">echo</span> <span class="st">"Terminé proprement."</span></pre>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <div class="callout-title">Règle de sécurité</div>
+          <p>Toujours déclarer <code>TEMP_DIR=""</code> avant le <code>trap</code>.
+          Si la variable n'est pas initialisée et que le script échoue avant le <code>mktemp</code>,
+          la fonction cleanup tente de supprimer un chemin vide — ce qui sur certains systèmes
+          peut tenter <code>rm -rf ""</code> avec des conséquences désastreuses.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 9 -->
+    <section class="section" id="section-recap">
+      <div class="section-num">// 09</div>
+      <h2>Récapitulatif</h2>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>À retenir</th>
+            <th>Piège classique</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>set -euo pipefail</td>
+            <td>Toujours en tête de script, sans exception</td>
+            <td>L'oublier et subir des erreurs silencieuses</td>
+          </tr>
+          <tr>
+            <td>Variables</td>
+            <td>Pas d'espaces autour du =, utiliser ${}</td>
+            <td>$filename_ext cherche $filename_ext, pas $filename</td>
+          </tr>
+          <tr>
+            <td>Paramètres</td>
+            <td>Toujours valider avant d'agir</td>
+            <td>Ne pas vérifier $# avant d'utiliser $1</td>
+          </tr>
+          <tr>
+            <td>Tests</td>
+            <td>Utiliser [[ ]] pas [ ]</td>
+            <td>Comparer des nombres avec == au lieu de -eq</td>
+          </tr>
+          <tr>
+            <td>Fonctions</td>
+            <td>Toujours local pour les variables internes</td>
+            <td>Polluer l'espace global sans local</td>
+          </tr>
+          <tr>
+            <td>trap</td>
+            <td>Déclarer avant toute opération risquée</td>
+            <td>Initialiser la variable à "" avant le trap</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- BOTTOM NAV -->
+    <div class="nav-bottom">
+      <a href="index.html">← Dashboard</a>
+      <a href="phase0-module1-tp.html">⚡ Cahier de TP →</a>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function setActive(el) {
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ copié';
+    setTimeout(() => btn.textContent = 'copier', 2000);
+  });
+}
+
+// Highlight sidebar item on scroll
+const sections = document.querySelectorAll('.section');
+const sidebarItems = document.querySelectorAll('.sidebar-item[href^="#"]');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      sidebarItems.forEach(item => {
+        item.classList.toggle('active', item.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
