@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P1·M1 Cours — Fondamentaux Docker | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-hover:#21262d;--bg-code:#161b22;--border:#30363d;--border-bright:#484f58;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#484f58;--accent-green:#3fb950;--accent-blue:#58a6ff;--accent-purple:#bc8cff;--accent-orange:#f0883e;--accent-yellow:#d29922;--accent-red:#f85149;--accent-teal:#39d353;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--sidebar-width:260px;--topbar-height:56px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7}
+.topbar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 24px;height:var(--topbar-height);display:flex;align-items:center;gap:16px;position:fixed;top:0;left:0;right:0;z-index:200}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent-green);text-decoration:none;white-space:nowrap}
+.topbar-sep{color:var(--border-bright)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);font-family:var(--mono);flex:1}
+.breadcrumb a{color:var(--text-secondary);text-decoration:none}.breadcrumb a:hover{color:var(--accent-teal)}.breadcrumb .current{color:var(--accent-teal)}
+.topbar-actions{display:flex;gap:8px;margin-left:auto}
+.btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:6px;text-decoration:none;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-tp{background:rgba(240,136,62,.1);color:var(--accent-orange);border-color:rgba(240,136,62,.3)}.btn-tp:hover{background:rgba(240,136,62,.2)}
+.btn-nav{background:transparent;color:var(--text-secondary);border-color:var(--border)}.btn-nav:hover{background:var(--bg-hover);color:var(--text-primary)}
+.layout{display:flex;padding-top:var(--topbar-height);min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:var(--bg-secondary);border-right:1px solid var(--border);position:fixed;top:var(--topbar-height);left:0;bottom:0;overflow-y:auto;padding:24px 0}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-section{padding:0 16px;margin-bottom:24px}
+.sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 8px;margin-bottom:8px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:all .15s}
+.sidebar-item:hover{background:var(--bg-hover);color:var(--text-primary)}.sidebar-item.active{background:rgba(57,211,83,.1);color:var(--accent-teal)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border-bright);flex-shrink:0}.sidebar-item.active .dot{background:var(--accent-teal)}
+.sidebar-divider{height:1px;background:var(--border);margin:12px 16px}
+.content{margin-left:var(--sidebar-width);flex:1;max-width:860px;padding:48px 56px}
+.module-header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.module-path{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.module-title{font-size:28px;font-weight:600;color:var(--text-primary);line-height:1.2;margin-bottom:12px}
+.module-subtitle{color:var(--text-secondary);font-size:15px;margin-bottom:20px}
+.module-meta{display:flex;gap:20px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text-muted)}.meta-item .val{color:var(--text-secondary)}
+.objectives{background:rgba(57,211,83,.06);border:1px solid rgba(57,211,83,.2);border-left:3px solid var(--accent-teal);border-radius:8px;padding:20px 24px;margin-bottom:40px}
+.objectives h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-teal);margin-bottom:12px}
+.objectives ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.objectives ul li{font-size:14px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px}
+.objectives ul li::before{content:'→';color:var(--accent-teal);font-family:var(--mono);flex-shrink:0;margin-top:1px}
+.section{margin-bottom:56px;scroll-margin-top:80px}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.section h2{font-size:20px;font-weight:600;color:var(--text-primary);margin-bottom:16px;line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text-primary);margin-top:32px;margin-bottom:12px}
+.section p{color:var(--text-secondary);margin-bottom:16px;line-height:1.75}
+.section p code,.section li code{font-family:var(--mono);font-size:13px;background:var(--bg-card);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.section ul,.section ol{color:var(--text-secondary);padding-left:20px;margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.code-lang{font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.code-copy{font-family:var(--mono);font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}.code-copy:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.code-block pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--text-primary)}
+.cm{color:#6e7681;font-style:italic}.kw{color:#ff7b72}.fn{color:var(--accent-blue)}.st{color:#a5d6ff}.va{color:var(--accent-purple)}.nu{color:var(--accent-orange)}.sh{color:#6e7681}
+.schema-block{background:#010409;border:1px solid var(--border);border-radius:10px;padding:20px;margin:20px 0;overflow-x:auto}
+.schema-block pre{font-family:var(--mono);font-size:12px;line-height:1.6;color:#7ee787;white-space:pre}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:12px}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}.callout-body{flex:1}
+.callout-title{font-family:var(--mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.callout-body p{font-size:13px;margin-bottom:0;color:var(--text-secondary)}
+.callout.warning{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25)}.callout.warning .callout-title{color:var(--accent-yellow)}
+.callout.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)}.callout.tip .callout-title{color:var(--accent-green)}
+.callout.info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2)}.callout.info .callout-title{color:var(--accent-blue)}
+.callout.danger{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2)}.callout.danger .callout-title{color:var(--accent-red)}
+.summary-table{width:100%;border-collapse:collapse;font-size:13px;margin:20px 0}
+.summary-table th{background:var(--bg-card);color:var(--text-muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:10px 14px;text-align:left;border:1px solid var(--border)}
+.summary-table td{padding:10px 14px;border:1px solid var(--border);color:var(--text-secondary);vertical-align:top}
+.summary-table td:first-child{font-family:var(--mono);color:var(--accent-orange);white-space:nowrap}
+.summary-table tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:32px;border-top:1px solid var(--border)}
+.nav-bottom a{font-family:var(--mono);font-size:12px;color:var(--text-secondary);text-decoration:none;padding:10px 16px;border:1px solid var(--border);border-radius:8px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.nav-bottom a:hover{border-color:var(--border-bright);color:var(--text-primary);background:var(--bg-hover)}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a><span class="topbar-sep">›</span>
+    <a href="#">Phase 1</a><span class="topbar-sep">›</span>
+    <span class="current">M1 · Fondamentaux Docker · Cours</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase1-module1-tp.html" class="btn btn-tp">⚡ Aller aux TP</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Phase 1 · M1</div>
+    <a href="#s1" class="sidebar-item active"><span class="dot"></span>Pourquoi Docker ?</a>
+    <a href="#s2" class="sidebar-item"><span class="dot"></span>Concepts fondamentaux</a>
+    <a href="#s3" class="sidebar-item"><span class="dot"></span>Installation & premiers pas</a>
+    <a href="#s4" class="sidebar-item"><span class="dot"></span>Images & layers</a>
+    <a href="#s5" class="sidebar-item"><span class="dot"></span>Le Dockerfile</a>
+    <a href="#s6" class="sidebar-item"><span class="dot"></span>Conteneurs & cycle de vie</a>
+    <a href="#s7" class="sidebar-item"><span class="dot"></span>Réseaux Docker</a>
+    <a href="#s8" class="sidebar-item"><span class="dot"></span>Volumes & persistance</a>
+    <a href="#s9" class="sidebar-item"><span class="dot"></span>Registry & Docker Hub</a>
+    <a href="#s10" class="sidebar-item"><span class="dot"></span>Récapitulatif</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Navigation</div>
+    <a href="phase1-module1-tp.html" class="sidebar-item"><span class="dot" style="background:var(--accent-orange)"></span>Cahier de TP</a>
+    <a href="phase0-module2-cours.html" class="sidebar-item"><span class="dot"></span>← M2 Git Avancé</a>
+    <a href="phase1-module2-cours.html" class="sidebar-item"><span class="dot"></span>M2 Docker Compose →</a>
+    <a href="index.html" class="sidebar-item"><span class="dot"></span>Dashboard</a>
+  </div>
+</aside>
+<main class="content">
+  <div class="module-header">
+    <div class="module-path">phase-1 / module-1 / cours</div>
+    <h1 class="module-title">Fondamentaux Docker</h1>
+    <p class="module-subtitle">Comprendre et maîtriser la conteneurisation — images, Dockerfile, cycle de vie des conteneurs, réseaux et volumes.</p>
+    <div class="module-meta">
+      <span class="meta-item">📅 <span class="val">Semaine 3</span></span>
+      <span class="meta-item">⏱ <span class="val">~7h</span></span>
+      <span class="meta-item">🎯 <span class="val">Phase 1 · Module 1</span></span>
+      <span class="meta-item">📦 <span class="val">Projet : DevCorp</span></span>
+    </div>
+  </div>
+
+  <div class="objectives">
+    <h4>// Objectifs du module</h4>
+    <ul>
+      <li>Comprendre pourquoi Docker existe et quel problème concret il résout</li>
+      <li>Maîtriser la différence entre image et conteneur</li>
+      <li>Écrire des Dockerfiles optimisés avec le système de layers</li>
+      <li>Gérer le cycle de vie complet d'un conteneur</li>
+      <li>Configurer réseaux et volumes pour la persistance et la communication</li>
+      <li>Publier et récupérer des images depuis un registry</li>
+    </ul>
+  </div>
+
+  <!-- S1 -->
+  <section class="section" id="s1">
+    <div class="section-num">// 01</div>
+    <h2>Pourquoi Docker ? Le problème qu'il résout</h2>
+    <p>Avant Docker, déployer une application ressemblait à ça : "ça marche sur ma machine" — et personne ne sait pourquoi ça ne marche pas en prod. Les différences de versions de Python, de bibliothèques système, de variables d'environnement entre le poste du développeur et le serveur de production étaient une source permanente de bugs.</p>
+
+    <div class="schema-block"><pre>
+SANS DOCKER                          AVEC DOCKER
+──────────────────────────────────   ────────────────────────────────────
+Dev machine  : Python 3.9            Dev machine  : Docker Engine
+              numpy 1.21                           ┌─────────────────┐
+              Ubuntu 20.04                         │   Container     │
+                  ↓                                │   Python 3.11   │
+              "ça marche !"                        │   numpy 1.24    │
+                                                   │   Ubuntu 22.04  │
+Prod server  : Python 3.7            Prod server  : Docker Engine
+              numpy 1.18                           └─────────────────┘
+              CentOS 7                             même container = même résultat
+                  ↓
+              "ça plante !"
+</pre></div>
+
+    <p>Docker résout ce problème en empaquetant l'application avec tout son environnement d'exécution dans un conteneur. Le conteneur est identique en dev, en staging et en prod.</p>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <div class="callout-title">Conteneur ≠ Machine virtuelle</div>
+        <p>Une VM embarque un OS complet (plusieurs Go). Un conteneur partage le kernel de l'hôte et n'embarque que ce dont l'application a besoin (quelques dizaines de Mo). Démarrage en millisecondes contre minutes pour une VM.</p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">Posture formateur</div>
+        <p>L'analogie qui fonctionne le mieux : un conteneur c'est comme un container maritime — peu importe ce qu'il y a dedans, le bateau (Docker Engine) sait comment le transporter. La standardisation du container permet de le mettre sur n'importe quel bateau.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S2 -->
+  <section class="section" id="s2">
+    <div class="section-num">// 02</div>
+    <h2>Concepts fondamentaux</h2>
+    <p>Quatre concepts à maîtriser absolument avant d'aller plus loin.</p>
+
+    <div class="schema-block"><pre>
+Dockerfile  →  docker build  →  Image  →  docker run  →  Conteneur
+(recette)                      (modèle)                  (instance en cours d'exécution)
+
+Registry (Docker Hub, GHCR...)
+  ↑ docker push     ↓ docker pull
+  Image partagée entre équipes et environnements
+</pre></div>
+
+    <table class="summary-table">
+      <thead><tr><th>Concept</th><th>Analogie</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Dockerfile</td><td>Recette de cuisine</td><td>Fichier texte décrivant comment construire une image</td></tr>
+        <tr><td>Image</td><td>Moule ou template</td><td>Snapshot immutable du système de fichiers + métadonnées</td></tr>
+        <tr><td>Conteneur</td><td>Gâteau fait avec la recette</td><td>Instance en cours d'exécution d'une image</td></tr>
+        <tr><td>Registry</td><td>Bibliothèque d'images</td><td>Dépôt d'images (Docker Hub, GHCR, Harbor...)</td></tr>
+        <tr><td>Layer</td><td>Couche de peinture</td><td>Chaque instruction Dockerfile crée une couche réutilisable</td></tr>
+        <tr><td>Volume</td><td>Disque dur externe</td><td>Stockage persistant en dehors du conteneur</td></tr>
+        <tr><td>Network</td><td>Réseau local</td><td>Canal de communication entre conteneurs</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- S3 -->
+  <section class="section" id="s3">
+    <div class="section-num">// 03</div>
+    <h2>Installation & premiers pas</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — installation sur Debian/Ubuntu</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Méthode officielle recommandée</span>
+<span class="fn">curl</span> -fsSL https://get.docker.com | sh
+
+<span class="cm"># Ajouter son user au groupe docker (évite le sudo)</span>
+<span class="fn">sudo</span> usermod -aG docker $USER
+<span class="fn">newgrp</span> docker          <span class="cm"># activer sans déconnexion</span>
+
+<span class="cm"># Vérifier</span>
+<span class="fn">docker</span> --version
+<span class="fn">docker</span> info
+
+<span class="cm"># Premier conteneur</span>
+<span class="fn">docker</span> run hello-world</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — commandes de base</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Lancer un conteneur interactif Ubuntu</span>
+<span class="fn">docker</span> run -it ubuntu bash
+<span class="cm"># -i : garder stdin ouvert (interactif)</span>
+<span class="cm"># -t : allouer un pseudo-terminal</span>
+
+<span class="cm"># Lancer en arrière-plan (detached)</span>
+<span class="fn">docker</span> run -d --name mon-nginx nginx
+
+<span class="cm"># Voir les conteneurs en cours</span>
+<span class="fn">docker</span> ps
+
+<span class="cm"># Voir tous les conteneurs (arrêtés inclus)</span>
+<span class="fn">docker</span> ps -a
+
+<span class="cm"># Logs d'un conteneur</span>
+<span class="fn">docker</span> logs mon-nginx
+<span class="fn">docker</span> logs -f mon-nginx      <span class="cm"># follow (comme tail -f)</span>
+
+<span class="cm"># Exécuter une commande dans un conteneur qui tourne</span>
+<span class="fn">docker</span> exec -it mon-nginx bash
+
+<span class="cm"># Arrêter, démarrer, supprimer</span>
+<span class="fn">docker</span> stop mon-nginx
+<span class="fn">docker</span> start mon-nginx
+<span class="fn">docker</span> rm mon-nginx           <span class="cm"># le conteneur doit être arrêté</span>
+<span class="fn">docker</span> rm -f mon-nginx        <span class="cm"># force la suppression</span></pre>
+    </div>
+  </section>
+
+  <!-- S4 -->
+  <section class="section" id="s4">
+    <div class="section-num">// 04</div>
+    <h2>Images & layers</h2>
+    <p>Une image Docker est une pile de couches (layers) en lecture seule. Chaque instruction du Dockerfile crée une nouvelle couche. Quand tu lances un conteneur, Docker ajoute une couche en lecture/écriture au-dessus.</p>
+
+    <div class="schema-block"><pre>
+┌─────────────────────────────────┐  ← Layer 5 : RW (conteneur en cours)
+├─────────────────────────────────┤  ← Layer 4 : COPY app/ /app/
+├─────────────────────────────────┤  ← Layer 3 : RUN pip install -r requirements.txt
+├─────────────────────────────────┤  ← Layer 2 : RUN apt-get update && apt-get install...
+├─────────────────────────────────┤  ← Layer 1 : FROM python:3.11-slim
+└─────────────────────────────────┘  (Image de base)
+</pre></div>
+
+    <p>L'intérêt des layers : ils sont mis en cache. Si tu modifies uniquement ton code applicatif (Layer 4), Docker ne re-exécute pas l'installation des dépendances (Layer 3) — il réutilise le cache. C'est pourquoi l'ordre des instructions dans le Dockerfile a une importance critique sur les temps de build.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — gestion des images</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Lister les images locales</span>
+<span class="fn">docker</span> images
+<span class="fn">docker</span> image ls
+
+<span class="cm"># Télécharger une image</span>
+<span class="fn">docker</span> pull python:3.11-slim
+<span class="fn">docker</span> pull nginx:1.25-alpine
+
+<span class="cm"># Inspecter les layers d'une image</span>
+<span class="fn">docker</span> image history python:3.11-slim
+
+<span class="cm"># Supprimer une image</span>
+<span class="fn">docker</span> rmi nginx:1.25-alpine
+
+<span class="cm"># Nettoyage global (images, conteneurs arrêtés, cache)</span>
+<span class="fn">docker</span> system prune -af</pre>
+    </div>
+  </section>
+
+  <!-- S5 -->
+  <section class="section" id="s5">
+    <div class="section-num">// 05</div>
+    <h2>Le Dockerfile</h2>
+    <p>Le Dockerfile est la recette de ton image. Chaque ligne est une instruction qui produit un layer. L'ordre des instructions détermine l'efficacité du cache.</p>
+
+    <h3>Instructions essentielles</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">dockerfile — référence complète</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Image de base — toujours la première instruction</span>
+<span class="kw">FROM</span> python:3.11-slim
+
+<span class="cm"># Métadonnées</span>
+<span class="kw">LABEL</span> maintainer=<span class="st">"titi@capgemini.com"</span>
+<span class="kw">LABEL</span> version=<span class="st">"1.0.0"</span>
+
+<span class="cm"># Variables de build (disponibles uniquement pendant le build)</span>
+<span class="kw">ARG</span> APP_VERSION=<span class="st">"1.0.0"</span>
+
+<span class="cm"># Variables d'environnement (disponibles dans le conteneur)</span>
+<span class="kw">ENV</span> APP_HOME=/app \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+<span class="cm"># Répertoire de travail (créé automatiquement s'il n'existe pas)</span>
+<span class="kw">WORKDIR</span> /app
+
+<span class="cm"># Exécuter des commandes shell pendant le build</span>
+<span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y --no-install-recommends \
+        curl \
+        gcc \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+<span class="cm"># Copier des fichiers depuis le contexte de build</span>
+<span class="kw">COPY</span> requirements.txt .
+<span class="kw">RUN</span> pip install --no-cache-dir -r requirements.txt
+
+<span class="cm"># Copier le code applicatif (après les dépendances !)</span>
+<span class="kw">COPY</span> app/ .
+
+<span class="cm"># Utilisateur non-root (bonne pratique de sécurité)</span>
+<span class="kw">RUN</span> useradd --no-create-home appuser
+<span class="kw">USER</span> appuser
+
+<span class="cm"># Port exposé (documentation uniquement — ne publie pas)</span>
+<span class="kw">EXPOSE</span> 8000
+
+<span class="cm"># Volume pour les données persistantes</span>
+<span class="kw">VOLUME</span> /app/data
+
+<span class="cm"># Commande par défaut au lancement du conteneur</span>
+<span class="kw">CMD</span> [<span class="st">"python"</span>, <span class="st">"app.py"</span>]
+
+<span class="cm"># Ou ENTRYPOINT pour un binaire fixe + CMD pour les arguments</span>
+<span class="cm"># ENTRYPOINT ["python"]</span>
+<span class="cm"># CMD ["app.py"]</span></pre>
+    </div>
+
+    <h3>L'ordre des instructions — optimisation du cache</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">dockerfile — mauvais vs bon ordre</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># ✗ MAUVAIS — le code change souvent, invalide le cache des dépendances</span>
+<span class="kw">FROM</span> python:3.11-slim
+<span class="kw">COPY</span> . /app                          <span class="cm"># moindre modification du code → cache invalidé</span>
+<span class="kw">RUN</span> pip install -r requirements.txt   <span class="cm"># réinstallation complète à chaque fois !</span>
+
+<span class="cm"># ✓ BON — dépendances d'abord, code ensuite</span>
+<span class="kw">FROM</span> python:3.11-slim
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> requirements.txt .              <span class="cm"># ne change que rarement</span>
+<span class="kw">RUN</span> pip install -r requirements.txt   <span class="cm"># mis en cache jusqu'à ce que requirements.txt change</span>
+<span class="kw">COPY</span> . .                             <span class="cm"># le code change souvent → cache invalidé ici seulement</span></pre>
+    </div>
+
+    <h3>Construire et tagger une image</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Construire depuis le répertoire courant</span>
+<span class="fn">docker</span> build -t devcorp-backend:1.0.0 .
+<span class="cm"># -t : tag (nom:version)</span>
+<span class="cm"># .  : contexte de build (répertoire courant)</span>
+
+<span class="cm"># Construire avec un Dockerfile spécifique</span>
+<span class="fn">docker</span> build -f Dockerfile.prod -t devcorp-backend:prod .
+
+<span class="cm"># Voir les étapes de build avec cache info</span>
+<span class="fn">docker</span> build --progress=plain -t devcorp-backend:1.0.0 .
+
+<span class="cm"># Forcer la reconstruction sans cache</span>
+<span class="fn">docker</span> build --no-cache -t devcorp-backend:1.0.0 .</pre>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">Le .dockerignore — indispensable</div>
+        <p>Comme le <code>.gitignore</code>, le <code>.dockerignore</code> évite d'envoyer des fichiers inutiles au démon Docker pendant le build. Sans lui, <code>node_modules</code>, <code>.git</code>, et les logs sont copiés dans l'image — taille et temps de build multipliés.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">.dockerignore</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre>.git
+.gitignore
+node_modules
+__pycache__
+*.pyc
+.env
+*.log
+dist/
+build/
+.vscode/
+README.md
+*.md</pre>
+    </div>
+  </section>
+
+  <!-- S6 -->
+  <section class="section" id="s6">
+    <div class="section-num">// 06</div>
+    <h2>Conteneurs — cycle de vie complet</h2>
+    <div class="schema-block"><pre>
+docker create  →  Created
+docker start   →  Running  →  docker stop  →  Stopped  →  docker rm  →  [supprimé]
+                      ↑                           |
+               docker restart              docker start
+                      |
+               docker pause  →  Paused  →  docker unpause
+</pre></div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — cycle de vie complet</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Lancer avec options complètes</span>
+<span class="fn">docker</span> run \
+  -d \                              <span class="cm"># detached</span>
+  --name devcorp-backend \          <span class="cm"># nom du conteneur</span>
+  --restart unless-stopped \        <span class="cm"># redémarrage automatique</span>
+  -p 8000:8000 \                    <span class="cm"># port hôte:port conteneur</span>
+  -e DATABASE_URL=postgresql://... \ <span class="cm"># variable d'environnement</span>
+  -e APP_ENV=production \
+  -v devcorp-data:/app/data \       <span class="cm"># volume nommé</span>
+  --memory 512m \                   <span class="cm"># limite mémoire</span>
+  --cpus 1.0 \                      <span class="cm"># limite CPU</span>
+  devcorp-backend:1.0.0
+
+<span class="cm"># Inspecter un conteneur (configuration complète en JSON)</span>
+<span class="fn">docker</span> inspect devcorp-backend
+
+<span class="cm"># Stats en temps réel</span>
+<span class="fn">docker</span> stats devcorp-backend
+
+<span class="cm"># Copier un fichier depuis/vers un conteneur</span>
+<span class="fn">docker</span> cp devcorp-backend:/app/config.json ./config-backup.json
+<span class="fn">docker</span> cp ./config.json devcorp-backend:/app/config.json</pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">--restart unless-stopped</div>
+        <p>Cette option redémarre le conteneur automatiquement si le serveur reboot ou si l'application plante — sans intervention manuelle. C'est le comportement attendu en production. <code>always</code> redémarre même si tu l'as arrêté manuellement. <code>unless-stopped</code> respecte un arrêt manuel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S7 -->
+  <section class="section" id="s7">
+    <div class="section-num">// 07</div>
+    <h2>Réseaux Docker</h2>
+    <p>Par défaut, les conteneurs sont isolés du réseau hôte. Docker crée des réseaux virtuels pour permettre la communication entre conteneurs et avec l'extérieur.</p>
+
+    <div class="schema-block"><pre>
+Internet  →  Port mapping (-p)  →  Hôte  →  Bridge network  →  Conteneurs
+
+  ┌─────────────────────────────────────────────┐
+  │              Réseau bridge (devcorp-net)     │
+  │                                             │
+  │  ┌──────────┐    ┌──────────┐  ┌─────────┐  │
+  │  │ frontend │ →  │ backend  │→ │database │  │
+  │  │ :3000    │    │  :8000   │  │  :5432  │  │
+  │  └──────────┘    └──────────┘  └─────────┘  │
+  │       ↑                                     │
+  └───────┼─────────────────────────────────────┘
+          │ -p 3000:3000
+        Hôte → Internet
+</pre></div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Créer un réseau personnalisé</span>
+<span class="fn">docker</span> network create devcorp-net
+
+<span class="cm"># Lancer des conteneurs sur ce réseau</span>
+<span class="fn">docker</span> run -d --name backend --network devcorp-net devcorp-backend:1.0.0
+<span class="fn">docker</span> run -d --name database --network devcorp-net postgres:15
+
+<span class="cm"># Sur un réseau personnalisé, les conteneurs se trouvent par leur NOM</span>
+<span class="cm"># depuis le conteneur backend, on accède à la DB avec : database:5432</span>
+<span class="cm"># (pas besoin d'IP — Docker gère le DNS interne)</span>
+
+<span class="cm"># Lister les réseaux</span>
+<span class="fn">docker</span> network ls
+
+<span class="cm"># Inspecter un réseau (voir les conteneurs connectés)</span>
+<span class="fn">docker</span> network inspect devcorp-net
+
+<span class="cm"># Connecter un conteneur existant à un réseau</span>
+<span class="fn">docker</span> network connect devcorp-net mon-conteneur</pre>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <div class="callout-title">Réseau bridge vs host vs none</div>
+        <p><code>bridge</code> (défaut) : réseau privé isolé, conteneurs communiquent entre eux. <code>host</code> : le conteneur partage le réseau de l'hôte directement (performances max, isolation nulle). <code>none</code> : aucune interface réseau (cas très spécifiques).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S8 -->
+  <section class="section" id="s8">
+    <div class="section-num">// 08</div>
+    <h2>Volumes & persistance des données</h2>
+    <p>Un conteneur est éphémère : quand tu le supprimes, toutes ses données disparaissent. Les volumes permettent de persister les données en dehors du cycle de vie du conteneur.</p>
+
+    <div class="schema-block"><pre>
+Trois types de stockage :
+
+1. Volume nommé (recommandé)
+   docker run -v mon-volume:/app/data ...
+   → Géré par Docker, stocké dans /var/lib/docker/volumes/
+
+2. Bind mount (dev seulement)
+   docker run -v /chemin/hote:/app/data ...
+   → Dossier hôte monté directement, modifs visibles en temps réel
+
+3. tmpfs mount (données temporaires)
+   docker run --tmpfs /app/cache ...
+   → En mémoire uniquement, jamais persisté
+</pre></div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># ── Volumes nommés (production) ───────────────────────────</span>
+<span class="fn">docker</span> volume create devcorp-db-data
+
+<span class="fn">docker</span> run -d \
+  --name postgres \
+  -e POSTGRES_PASSWORD=secret \
+  -v devcorp-db-data:/var/lib/postgresql/data \
+  postgres:15
+
+<span class="cm"># Les données survivent à la suppression du conteneur</span>
+<span class="fn">docker</span> rm -f postgres
+<span class="fn">docker</span> run -d --name postgres -v devcorp-db-data:/var/lib/postgresql/data postgres:15
+<span class="cm"># → les données sont toujours là</span>
+
+<span class="cm"># ── Bind mount (développement) ────────────────────────────</span>
+<span class="fn">docker</span> run -d \
+  --name backend-dev \
+  -v $(pwd)/app:/app \    <span class="cm"># le code local est monté dans le conteneur</span>
+  -p 8000:8000 \
+  devcorp-backend:dev
+<span class="cm"># Modifier app/*.py en local → changement immédiatement visible dans le conteneur</span>
+
+<span class="cm"># ── Gestion des volumes ────────────────────────────────────</span>
+<span class="fn">docker</span> volume ls
+<span class="fn">docker</span> volume inspect devcorp-db-data
+<span class="fn">docker</span> volume rm devcorp-db-data    <span class="cm"># ATTENTION : supprime les données !</span></pre>
+    </div>
+  </section>
+
+  <!-- S9 -->
+  <section class="section" id="s9">
+    <div class="section-num">// 09</div>
+    <h2>Registry & partage d'images</h2>
+    <p>Un registry est un dépôt d'images Docker. Docker Hub est le registry public par défaut. Dans un contexte DevOps, on utilise souvent le registry intégré de GitLab (GHCR, GitLab Registry) pour les images privées.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — Docker Hub</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Se connecter</span>
+<span class="fn">docker</span> login
+
+<span class="cm"># Tagger une image pour Docker Hub (format: user/image:tag)</span>
+<span class="fn">docker</span> tag devcorp-backend:1.0.0 tonuser/devcorp-backend:1.0.0
+<span class="fn">docker</span> tag devcorp-backend:1.0.0 tonuser/devcorp-backend:latest
+
+<span class="cm"># Pousser</span>
+<span class="fn">docker</span> push tonuser/devcorp-backend:1.0.0
+<span class="fn">docker</span> push tonuser/devcorp-backend:latest
+
+<span class="cm"># Récupérer depuis n'importe quelle machine</span>
+<span class="fn">docker</span> pull tonuser/devcorp-backend:1.0.0</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — GitHub Container Registry (GHCR)</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Authentification avec un Personal Access Token GitHub</span>
+<span class="fn">echo</span> $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+
+<span class="cm"># Tagger (format: ghcr.io/user/image:tag)</span>
+<span class="fn">docker</span> tag devcorp-backend:1.0.0 ghcr.io/tonuser/devcorp-backend:1.0.0
+
+<span class="cm"># Pousser</span>
+<span class="fn">docker</span> push ghcr.io/tonuser/devcorp-backend:1.0.0</pre>
+    </div>
+  </section>
+
+  <!-- S10 -->
+  <section class="section" id="s10">
+    <div class="section-num">// 10</div>
+    <h2>Récapitulatif</h2>
+    <table class="summary-table">
+      <thead><tr><th>Commande</th><th>Usage</th><th>Point d'attention</th></tr></thead>
+      <tbody>
+        <tr><td>docker build -t nom:tag .</td><td>Construire une image</td><td>Ordre des instructions = efficacité du cache</td></tr>
+        <tr><td>docker run -d -p H:C --name</td><td>Lancer un conteneur</td><td>--restart unless-stopped en prod</td></tr>
+        <tr><td>docker exec -it nom bash</td><td>Entrer dans un conteneur</td><td>Modifications perdues à la suppression</td></tr>
+        <tr><td>docker logs -f nom</td><td>Suivre les logs</td><td>Configurer un driver de logs en prod</td></tr>
+        <tr><td>docker volume create nom</td><td>Créer un volume persistant</td><td>Ne jamais stocker de données dans le conteneur</td></tr>
+        <tr><td>docker network create nom</td><td>Réseau isolé</td><td>Toujours utiliser un réseau perso, pas bridge défaut</td></tr>
+        <tr><td>docker system prune -af</td><td>Nettoyage complet</td><td>Supprime les images non utilisées — irréversible</td></tr>
+        <tr><td>.dockerignore</td><td>Exclure du contexte de build</td><td>Toujours présent, surtout pour node_modules</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="nav-bottom">
+    <a href="phase0-module2-cours.html">← M2 · Git Avancé</a>
+    <a href="phase1-module1-tp.html">⚡ Cahier de TP →</a>
+  </div>
+</main>
+</div>
+<script>
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ copié';setTimeout(()=>btn.textContent='copier',2000)})}
+const sections=document.querySelectorAll('.section');
+const items=document.querySelectorAll('.sidebar-item[href^="#"]');
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){const id=en.target.id;items.forEach(i=>i.classList.toggle('active',i.getAttribute('href')==='#'+id))}})},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
