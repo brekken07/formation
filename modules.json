@@ -5,7 +5,7 @@
       "title": "Parcours DevCorp",
       "icon": "🚀",
       "description": "Formation devops — zero to hero",
-      "color": "blue",
+      "color": "yellow",
       "modules": [
         {
           "file": "index.html",
@@ -21,7 +21,7 @@
       "title": "DevOps",
       "icon": "🚀",
       "description": "Du CI/CD à Kubernetes — construire, automatiser, déployer.",
-      "color": "purple",
+      "color": "teal",
       "modules": [
         {
           "file": "module1_cicd-github-guide.html",
