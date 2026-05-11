@@ -229,6 +229,41 @@ nav {
 .t-pink h3 { color: #f9a8d4; }
 .t-pink.clickable:hover   { border-color: rgba(244,114,182,0.35); }
 .t-pink .formation-icon   { background: rgba(244,114,182,0.12); }
+/* Nouveaux thèmes */
+.t-red .mod-icon-wrap { background: rgba(248,113,113,0.12); }
+.t-red h3 { color: #fca5a5; }
+.t-red.clickable:hover { border-color: rgba(248,113,113,0.35); }
+.t-red .formation-icon { background: rgba(248,113,113,0.12); }
+
+.t-yellow .mod-icon-wrap { background: rgba(250,204,21,0.12); }
+.t-yellow h3 { color: #fde047; }
+.t-yellow.clickable:hover { border-color: rgba(250,204,21,0.35); }
+.t-yellow .formation-icon { background: rgba(250,204,21,0.12); }
+
+.t-cyan .mod-icon-wrap { background: rgba(34,211,238,0.12); }
+.t-cyan h3 { color: #67e8f9; }
+.t-cyan.clickable:hover { border-color: rgba(34,211,238,0.35); }
+.t-cyan .formation-icon { background: rgba(34,211,238,0.12); }
+
+.t-lime .mod-icon-wrap { background: rgba(163,230,53,0.12); }
+.t-lime h3 { color: #bef264; }
+.t-lime.clickable:hover { border-color: rgba(163,230,53,0.35); }
+.t-lime .formation-icon { background: rgba(163,230,53,0.12); }
+
+.t-rose .mod-icon-wrap { background: rgba(251,113,133,0.12); }
+.t-rose h3 { color: #fda4af; }
+.t-rose.clickable:hover { border-color: rgba(251,113,133,0.35); }
+.t-rose .formation-icon { background: rgba(251,113,133,0.12); }
+
+.t-indigo .mod-icon-wrap { background: rgba(129,140,248,0.12); }
+.t-indigo h3 { color: #a5b4fc; }
+.t-indigo.clickable:hover { border-color: rgba(129,140,248,0.35); }
+.t-indigo .formation-icon { background: rgba(129,140,248,0.12); }
+
+.t-teal .mod-icon-wrap { background: rgba(45,212,191,0.12); }
+.t-teal h3 { color: #5eead4; }
+.t-teal.clickable:hover { border-color: rgba(45,212,191,0.35); }
+.t-teal .formation-icon { background: rgba(45,212,191,0.12); }
 /* TAG COLORS */
 .tc-blue  { color:#60a5fa; border-color:rgba(96,165,250,0.3);  background:rgba(96,165,250,0.07); }
 .tc-purple{ color:#c4b5fd; border-color:rgba(196,181,253,0.3); background:rgba(196,181,253,0.07); }
@@ -236,6 +271,14 @@ nav {
 .tc-orange{ color:#fdba74; border-color:rgba(253,186,116,0.3); background:rgba(253,186,116,0.07); }
 .tc-pink  { color:#f9a8d4; border-color:rgba(249,168,212,0.3); background:rgba(249,168,212,0.07); }
 .tc-muted { color:#5a7494; border-color:rgba(90,116,148,0.3);  background:rgba(90,116,148,0.05); }
+
+.tc-red    { color:#fca5a5; border-color:rgba(252,165,165,0.3); background:rgba(252,165,165,0.07); }
+.tc-yellow { color:#fde047; border-color:rgba(253,224,71,0.3);  background:rgba(253,224,71,0.07); }
+.tc-cyan   { color:#67e8f9; border-color:rgba(103,232,249,0.3); background:rgba(103,232,249,0.07); }
+.tc-lime   { color:#bef264; border-color:rgba(190,242,100,0.3); background:rgba(190,242,100,0.07); }
+.tc-rose   { color:#fda4af; border-color:rgba(253,164,175,0.3); background:rgba(253,164,175,0.07); }
+.tc-indigo { color:#a5b4fc; border-color:rgba(165,180,252,0.3); background:rgba(165,180,252,0.07); }
+.tc-teal   { color:#5eead4; border-color:rgba(94,234,212,0.3);  background:rgba(94,234,212,0.07); }
 /* STATUS COLORS */
 .s-done { color:#34d399; border-color:rgba(52,211,153,0.35);  background:rgba(52,211,153,0.08); }
 .s-new  { color:#4f9cf9; border-color:rgba(79,156,249,0.35);  background:rgba(79,156,249,0.08); }
@@ -299,7 +342,9 @@ const MODULE_ICONS = {
 };
 const TAG_COLOR = {
   blue:'tc-blue', purple:'tc-purple', green:'tc-green',
-  orange:'tc-orange', pink:'tc-pink'
+  orange:'tc-orange', pink:'tc-pink',
+  red:'tc-red', yellow:'tc-yellow', cyan:'tc-cyan',
+  lime:'tc-lime', rose:'tc-rose', indigo:'tc-indigo', teal:'tc-teal'
 };
 async function load() {
   try {
