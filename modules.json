@@ -146,7 +146,7 @@
       "title": "Parcours Terraform",
       "icon": "🚀",
       "description": "Préparation à la certification Terraform",
-      "color": "pink",
+      "color": "blue",
       "modules": [
         {
           "file": ".html",
