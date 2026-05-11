@@ -177,7 +177,7 @@
           "status": "done"
         },
         {
-          "file": ".html",
+          "file": "terraform-exam-hcta003-3.html",
           "title": "Quizz Terraform 3",
           "description": "Quizz Terraform 3 - Examen Terraform 003 Associate en anglais.",
           "tags": ["TERRAFORM"],
