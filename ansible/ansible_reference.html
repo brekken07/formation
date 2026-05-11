@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ansible – Guide de référence rapide</title>
+<style>body{font-family:Arial,Helvetica,sans-serif;line-height:1.6;margin:40px;} pre{background:#f4f4f4;padding:12px;overflow:auto;} table{border-collapse:collapse;margin:20px 0;width:100%;} td,th{border:1px solid #ccc;padding:8px;vertical-align:top;} h1,h2,h3,h4{color:#1F3864;} </style>
+</head><body>
+<p>Ansible</p>
+<p>Guide de référence rapide</p>
+<p>Formation DevOps — Capgemini CIS</p>
+<h1>1. Pourquoi Ansible ?</h1>
+<p>Ansible est un outil d&#x27;automatisation qui permet de gérer des machines Linux (et Windows) à distance, depuis une machine de contrôle, sans installer d&#x27;agent sur les cibles.</p>
+<h3>Le problème qu&#x27;il résout</h3>
+<p>Sans Ansible : connexion SSH manuelle sur chaque serveur, commandes répétées, erreurs humaines, aucune traçabilité.</p>
+<p>Avec Ansible : on décrit l&#x27;état désiré dans un fichier texte, Ansible l&#x27;applique partout, de façon identique et reproductible.</p>
+<h3>Concept clé : l&#x27;idempotence</h3>
+<h3>Comment ça fonctionne</h3>
+<p>Ansible s&#x27;installe uniquement sur la machine de contrôle.</p>
+<p>Il se connecte aux machines cibles via SSH (pas d&#x27;agent à installer sur les cibles).</p>
+<p>Il a besoin de Python 3 sur les machines cibles (présent par défaut sur Debian/Ubuntu modernes).</p>
+<h1>2. Installation</h1>
+<h3>Sur la machine de contrôle uniquement</h3>
+<h3>Prérequis sur les machines cibles</h3>
+<p>Python 3 (présent par défaut sur Debian 12/13)</p>
+<p>Un utilisateur SSH</p>
+<p>De préférence : une clé SSH (évite les mots de passe à chaque exécution)</p>
+<h3>Configuration de la clé SSH</h3>
+<h1>3. L&#x27;Inventory</h1>
+<p>L&#x27;inventory définit quelles machines Ansible peut gérer et comment les atteindre.</p>
+<h3>Structure recommandée</h3>
+<h3>Le fichier hosts.ini — syntaxe</h3>
+<h3>Directives de connexion (mots-clés imposés par Ansible)</h3>
+<h3>Variables dans group_vars/all.yml</h3>
+<p>Ce fichier est chargé automatiquement par Ansible. Toutes les variables qu&#x27;il contient sont disponibles dans les playbooks sans déclaration supplémentaire.</p>
+<h3>Commandes utiles avec l&#x27;inventory</h3>
+<h1>4. Le Playbook</h1>
+<p>Un playbook est un fichier YAML qui décrit les actions à effectuer sur les machines cibles. Il contient un ou plusieurs plays, chacun ciblant un groupe de machines.</p>
+<h3>Anatomie d&#x27;un playbook</h3>
+<h3>Commandes d&#x27;exécution</h3>
+<h3>Lire la sortie d&#x27;un playbook</h3>
+<h1>5. Modules essentiels</h1>
+<p>Un module = une action atomique. Ansible possède plus de 3000 modules. Voici les indispensables pour gérer une infrastructure Linux.</p>
+<h3>ansible.builtin.apt — gestion des paquets (Debian/Ubuntu)</h3>
+<h3>ansible.builtin.service / systemd — gestion des services</h3>
+<h3>ansible.builtin.user — gestion des utilisateurs</h3>
+<h3>ansible.builtin.copy — copier des fichiers</h3>
+<h3>ansible.builtin.template — déployer un fichier Jinja2</h3>
+<h3>ansible.builtin.file — gérer fichiers, dossiers, liens</h3>
+<h3>ansible.builtin.lineinfile — modifier une ligne dans un fichier</h3>
+<h3>ansible.builtin.command et ansible.builtin.shell</h3>
+<h3>ansible.builtin.debug — afficher des informations</h3>
+<h1>6. Variables et Jinja2</h1>
+<h3>Sources de variables (priorité croissante)</h3>
+<p>group_vars/all.yml — variables communes à toutes les machines</p>
+<p>group_vars/nom_groupe.yml — variables du groupe</p>
+<p>host_vars/nom_machine.yml — variables d&#x27;une machine spécifique</p>
+<p>vars: dans le playbook</p>
+<p>--extra-vars en ligne de commande (priorité maximale)</p>
+<h3>Syntaxe Jinja2 dans les playbooks</h3>
+<h3>Boucles avec loop</h3>
+<h3>Capturer le résultat d&#x27;une tâche avec register</h3>
+<h3>Templates Jinja2 (.j2)</h3>
+<p>Le module template génère des fichiers de configuration dynamiques à partir de variables Ansible.</p>
+<h3>Ansible Vault — chiffrer les secrets</h3>
+<h1>7. Les Roles</h1>
+<p>Un role est un regroupement organisé de tâches, variables, templates et handlers liés à une fonctionnalité précise. Il rend les playbooks modulaires et réutilisables.</p>
+<h3>Structure d&#x27;un role</h3>
+<h3>Utiliser un role dans un playbook</h3>
+<h3>Ansible Galaxy — roles communautaires</h3>
+<h1>8. Les Facts Ansible</h1>
+<p>Les facts sont des variables automatiquement collectées par Ansible sur chaque machine au début de chaque play (tâche Gathering Facts). Ils sont disponibles directement dans les playbooks.</p>
+<h3>Facts les plus utiles</h3>
+<h1>9. Erreurs fréquentes à éviter</h1>
+<p>Formation Ansible — Capgemini CIS — Document de référence rapide</p>
+</body></html>

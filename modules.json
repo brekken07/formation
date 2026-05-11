@@ -76,33 +76,33 @@
       "modules": [
         {
           "file": "fiches-revision-lpic1-101-500.html",
-          "title": "Fiches de révision.",
-          "description": "Fiches de révision pour la certification LPIC 1 - 101-500.",
+          "title": "Fiches de révisions.",
+          "description": "Fiches de révisions pour la certification LPIC 1 - 101-500.",
           "tags": ["UDEV", "KERNEL", "SHELL", "BOOT", "INIT", "REPO"],
           "status": "new"
         },
-	{
+	      {
           "file": "lpi-security-essentials-020-100 FR.html",
           "title": "Quizz Security Essentials FR",
           "description": "Quizz par catégories, puis complet en français.",
           "tags": ["SECURITY", "IDENTITY", "PRIVACY", "ENCRYPTION", "VULNERABILITY"],
           "status": "new"
         },
-	{
+	      {
           "file": "lpi-security-essentials-020-100 EN.html",
           "title": "Quizz Security Essentials EN",
           "description": "Quizz par catégories, puis complet en anglais.",
           "tags": ["SECURITY", "IDENTITY", "PRIVACY", "ENCRYPTION", "VULNERABILITY"],
           "status": "new"
         },
-	{
+	      {
           "file": "quiz-lpic1-101-500-FR.html",
           "title": "Quizz LPIC 1 - Examen 101-500 FR",
           "description": "Quizz LPIC 1 - Examen 101-500 en français.",
           "tags": ["SYSTEMD", "BOOT", "GRUB2", "PACKAGE", "FILESYSTEMS"],
           "status": "new"
         },
-	{
+	      {
           "file": "quiz-lpic1-101-500-EN.html",
           "title": "Quizz LPIC 1 - Examen 101-500 EN",
           "description": "Quizz LPIC 1 - Examen 101-500 en anglais.",
@@ -110,6 +110,73 @@
           "status": "new"
         }
       ]
+    },
+    {
+      "id": "ansible",
+      "title": "Parcours Ansible",
+      "icon": "🚀",
+      "description": "Formation Ansible pour les Nuls",
+      "color": "pink",
+      "modules": [
+        {
+          "file": "ansible_reference.html",
+          "title": "Guide de référence rapide",
+          "description": "Guide de référence rapide Ansible.",
+          "tags": ["ANSIBLE", "PLAYBOOK"],
+          "status": "done"
+        },
+        {
+          "file": "ansible_cahier_tp_complet.html",
+          "title": "Cahier de TP Ansible",
+          "description": "Cahier de TP complet pour débuter avec Ansible",
+          "tags": ["ANSIBLE", "PLAYBOOK", "TP"],
+          "status": "done"
+        },
+        {
+          "file": "ansible_tp_fil_rouge.html",
+          "title": "TP Fil rouge Ansible",
+          "description": "TP de mise en situation.",
+          "tags": ["ANSIBLE", "PLAYBOOK", "TP"],
+          "status": "done"
+        }
+       ]
+    },
+    {
+      "id": "terraform",
+      "title": "Parcours Terraform",
+      "icon": "🚀",
+      "description": "Préparation à la certification Terraform",
+      "color": "pink",
+      "modules": [
+        {
+          "file": ".html",
+          "title": "Fiches de révisions",
+          "description": "Fiches de révisions pour la certification Terraform 003 Associate.",
+          "tags": ["TERRAFORM"],
+          "status": "done"
+        },
+        {
+          "file": ".html",
+          "title": "Quizz Terraform 1",
+          "description": "Quizz Terraform 1 - Examen Terraform 003 Associate en anglais.",
+          "tags": ["TERRAFORM"],
+          "status": "done"
+        },
+        {
+          "file": ".html",
+          "title": "Quizz Terraform 2",
+          "description": "Quizz Terraform 2 - Examen Terraform 003 Associate en anglais.",
+          "tags": ["TERRAFORM"],
+          "status": "done"
+        },
+        {
+          "file": ".html",
+          "title": "Quizz Terraform 3",
+          "description": "Quizz Terraform 3 - Examen Terraform 003 Associate en anglais.",
+          "tags": ["TERRAFORM"],
+          "status": "done"
+        }
+       ]
     },
       {
         "id": "cheatsheets",
@@ -123,6 +190,20 @@
             "title": "Git Cheatsheet",
             "description": "Toutes les commandes Git essentielles — staging, branches, remote, annulations, stash, tags.",
             "tags": ["GIT", "BRANCHES", "REMOTE", "STASH"],
+            "status": "done"
+        },
+        {
+            "file": "ansible-cheatsheet.html",
+            "title": "Ansible Cheatsheet",
+            "description": "Toutes les commandes Ansible essentielles.",
+            "tags": ["ANSIBLE", "PLAYBOOK", "HOSTS"],
+            "status": "done"
+        },
+        {
+            "file": "terraform-cheatsheet.html",
+            "title": "Terraform Cheatsheet",
+            "description": "Toutes les commandes Terraform essentielles.",
+            "tags": ["TERRAFORM", "IaC", "WORKFLOW"],
             "status": "done"
         }
        ]
