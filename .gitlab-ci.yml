@@ -5,9 +5,7 @@ stages:
 # ─── HTML ───────────────────────────────────────────────
 lint-html:
   stage: lint
-  image: node:20-alpine
   script:
-    - npm install -g htmlhint
     - htmlhint "**/*.html" --config .htmlhintrc
   rules:
     - changes:
@@ -16,9 +14,7 @@ lint-html:
 # ─── JSON ───────────────────────────────────────────────
 lint-json:
   stage: lint
-  image: node:20-alpine
   script:
-    - npm install -g jsonlint
     - find . -name "*.json" -not -path "./node_modules/*" | xargs jsonlint -q
   rules:
     - changes:
@@ -27,9 +23,7 @@ lint-json:
 # ─── CSS ────────────────────────────────────────────────
 lint-css:
   stage: lint
-  image: node:20-alpine
   script:
-    - npm install -g stylelint stylelint-config-standard
     - stylelint "**/*.css" --config .stylelintrc.json
   rules:
     - changes:
@@ -48,7 +42,6 @@ lint-yaml:
 # ─── PYTHON ─────────────────────────────────────────────
 lint-python:
   stage: lint
-  image: python:3.12-alpine
   script:
     - pip install flake8 pylint
     - flake8 . --max-line-length=120 --exclude=.git,node_modules
@@ -60,7 +53,6 @@ lint-python:
 # ─── TERRAFORM ──────────────────────────────────────────
 lint-terraform:
   stage: lint
-  image: hashicorp/terraform:latest
   script:
     - find . -name "*.tf" -exec dirname {} \; | sort -u | while read dir; do
         echo "Validating $dir";
@@ -74,7 +66,6 @@ lint-terraform:
 # ─── DOCKERFILE ─────────────────────────────────────────
 lint-docker:
   stage: lint
-  image: hadolint/hadolint:latest-alpine
   script:
     - find . -name "Dockerfile*" | xargs hadolint
   rules:
@@ -84,7 +75,6 @@ lint-docker:
 # ─── KUBERNETES ─────────────────────────────────────────
 lint-kubernetes:
   stage: lint
-  image: python:3.12-alpine
   script:
     - pip install kubeval
     - find . -name "*.yaml" -path "*/k8s/*" | xargs kubeval
@@ -96,7 +86,6 @@ lint-kubernetes:
 # ─── BASH ───────────────────────────────────────────────
 lint-bash:
   stage: lint
-  image: koalaman/shellcheck-alpine:stable
   script:
     - find . -name "*.sh" | xargs shellcheck
   rules:
