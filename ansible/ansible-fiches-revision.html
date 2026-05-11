@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiches Ansible – Points à réviser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:       #0d1117;
+    --bg2:      #161b22;
+    --bg3:      #1c2128;
+    --border:   #30363d;
+    --text:     #e6edf3;
+    --text2:    #8b949e;
+    --text3:    #6e7681;
+    --red:      #ff7b72;
+    --red-bg:   rgba(255,123,114,0.08);
+    --red-bd:   rgba(255,123,114,0.25);
+    --green:    #3fb950;
+    --green-bg: rgba(63,185,80,0.08);
+    --green-bd: rgba(63,185,80,0.25);
+    --blue:     #79c0ff;
+    --blue-bg:  rgba(121,192,255,0.08);
+    --blue-bd:  rgba(121,192,255,0.25);
+    --amber:    #e3b341;
+    --amber-bg: rgba(227,179,65,0.08);
+    --amber-bd: rgba(227,179,65,0.25);
+    --purple:   #bc8cff;
+    --ans:      #ee4444;
+    --ans-bg:   rgba(238,68,68,0.08);
+    --ans-bd:   rgba(238,68,68,0.25);
+    --ans-light:#ff8080;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  }
+  .nav-title { font-family: var(--mono); font-size: 12px; color: var(--ans-light); white-space: nowrap; }
+  .nav-count { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+  .search-input {
+    flex: 1; max-width: 220px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 10px;
+    color: var(--text); font-family: var(--sans); font-size: 13px; outline: none;
+  }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus { border-color: var(--ans); }
+
+  main { max-width: 720px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+
+  .cat-header {
+    display: flex; align-items: center; gap: 10px;
+    margin: 2rem 0 0.75rem;
+  }
+  .cat-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .cat-name { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); }
+  .cat-line { flex: 1; height: 1px; background: var(--border); }
+
+  .fiche { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+  .fiche-header {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 13px 14px; cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fiche-header:active { background: var(--bg3); }
+  .fiche-num { font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0; padding-top: 2px; }
+  .fiche-title { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; line-height: 1.45; }
+  .fiche-arrow { color: var(--text3); font-size: 11px; flex-shrink: 0; padding-top: 3px; transition: transform 0.2s; }
+  .fiche-arrow.open { transform: rotate(180deg); }
+
+  .fiche-body { display: none; padding: 0 14px 16px; border-top: 1px solid var(--border); }
+  .fiche-body.open { display: block; }
+
+  .block { border-radius: 8px; padding: 11px 13px; margin-top: 10px; font-size: 13.5px; line-height: 1.65; }
+  .block-label { font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+
+  .block-retenir { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); }
+  .block-retenir .block-label { color: var(--text3); }
+  .block-piege { background: var(--amber-bg); border: 1px solid var(--amber-bd); color: #f0cc7a; }
+  .block-piege .block-label { color: var(--amber); }
+  .block-memo { background: var(--blue-bg); border: 1px solid var(--blue-bd); color: #aad4ff; }
+  .block-memo .block-label { color: var(--blue); }
+  .block-ansible { background: var(--ans-bg); border: 1px solid var(--ans-bd); color: var(--ans-light); }
+  .block-ansible .block-label { color: var(--ans-light); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  th { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border); font-weight: 400; }
+  td { padding: 6px 8px; border-bottom: 1px solid rgba(48,54,61,0.5); color: var(--text2); vertical-align: top; }
+  td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-top: 10px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; color: #c9d1d9; }
+  .c-green  { color: var(--green); }
+  .c-red    { color: var(--red); }
+  .c-amber  { color: var(--amber); }
+  .c-blue   { color: var(--blue); }
+  .c-gray   { color: var(--text3); }
+  .c-purple { color: var(--purple); }
+  .c-ans    { color: var(--ans-light); }
+
+  code { font-family: var(--mono); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--blue); }
+
+  .cat-cli     .cat-icon { background: rgba(238,68,68,0.12); }
+  .cat-inv     .cat-icon { background: rgba(63,185,80,0.12); }
+  .cat-play    .cat-icon { background: rgba(121,192,255,0.12); }
+  .cat-modules .cat-icon { background: rgba(227,179,65,0.12); }
+  .cat-vars    .cat-icon { background: rgba(188,140,255,0.12); }
+  .cat-roles   .cat-icon { background: rgba(63,185,80,0.12); }
+  .cat-vault   .cat-icon { background: rgba(238,68,68,0.12); }
+  .cat-jinja   .cat-icon { background: rgba(121,192,255,0.12); }
+  .cat-pieges  .cat-icon { background: rgba(227,179,65,0.12); }
+
+  .fiche.hidden { display: none; }
+  .tag-ok  { color: var(--green); font-weight: 600; }
+  .tag-no  { color: var(--red);   font-weight: 600; }
+  .tag-warn{ color: var(--amber); font-weight: 600; }
+
+  .back-top { display: block; text-align: center; padding: 0.5rem; color: var(--text3); font-family: var(--mono); font-size: 11px; text-decoration: none; margin-top: 1rem; }
+  .back-top:hover { color: var(--ans-light); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-title">Ansible · Fiches de révision</span>
+  <input class="search-input" type="search" placeholder="Rechercher..." id="search" oninput="doSearch(this.value)">
+  <span class="nav-count" id="nav-count">40 fiches</span>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════
+     CLI
+══════════════════════════════════════ -->
+<div class="cat-header cat-cli">
+  <div class="cat-icon">⚡</div>
+  <span class="cat-name">CLI — Commandes principales</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f1">
+  <div class="fiche-header" onclick="toggle('f1')">
+    <span class="fiche-num">01</span>
+    <span class="fiche-title">ansible vs ansible-playbook — quelle différence ?</span>
+    <span class="fiche-arrow" id="a-f1">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f1">
+    <table>
+      <tr><th>Commande</th><th>Usage</th></tr>
+      <tr><td>ansible</td><td>Commandes <strong>ad-hoc</strong> : une tâche unique, un module, sur la ligne de commande</td></tr>
+      <tr><td>ansible-playbook</td><td>Exécuter un fichier YAML complet avec plusieurs plays et tâches</td></tr>
+    </table>
+    <pre><span class="c-gray"># Ad-hoc : tester la connectivité</span>
+<span class="c-green">ansible all -m ping</span>
+<span class="c-gray"># Ad-hoc : installer nginx sans playbook</span>
+<span class="c-green">ansible webservers -m apt -a "name=nginx state=present" -b</span>
+<span class="c-gray"># Playbook complet</span>
+<span class="c-green">ansible-playbook site.yml</span></pre>
+  </div>
+</div>
+
+<div class="fiche" id="f2">
+  <div class="fiche-header" onclick="toggle('f2')">
+    <span class="fiche-num">02</span>
+    <span class="fiche-title">--check et --diff — le dry-run Ansible</span>
+    <span class="fiche-arrow" id="a-f2">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f2">
+    <table>
+      <tr><th>Flag</th><th>Effet</th></tr>
+      <tr><td>--check</td><td>Simule l'exécution sans modifier l'hôte (dry-run)</td></tr>
+      <tr><td>--diff</td><td>Affiche les différences de fichiers (avant/après)</td></tr>
+      <tr><td>--check --diff</td><td>Combo : simulation + aperçu des diffs — le plus utile</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>--check</code> peut échouer sur des modules qui dépendent de ressources créées dans la même exécution. Si une tâche <em>crée</em> un dossier et une tâche suivante <em>copie</em> dedans, la 2e peut échouer en mode check (le dossier n'a pas été réellement créé).
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f3">
+  <div class="fiche-header" onclick="toggle('f3')">
+    <span class="fiche-num">03</span>
+    <span class="fiche-title">-l, -t, --skip-tags, -e — les flags essentiels</span>
+    <span class="fiche-arrow" id="a-f3">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f3">
+    <table>
+      <tr><th>Flag</th><th>Rôle</th></tr>
+      <tr><td>-l webservers</td><td>Limite l'exécution à un groupe ou hôte</td></tr>
+      <tr><td>-t install,config</td><td>Exécute seulement les tâches ayant ces tags</td></tr>
+      <tr><td>--skip-tags debug</td><td>Ignore les tâches avec ce tag</td></tr>
+      <tr><td>-e "var=valeur"</td><td>Extra vars — priorité maximale sur toutes les variables</td></tr>
+      <tr><td>-e @vars.yml</td><td>Extra vars depuis un fichier</td></tr>
+      <tr><td>-f 10</td><td>Nombre de forks (hôtes en parallèle, défaut: 5)</td></tr>
+      <tr><td>--step</td><td>Confirmation manuelle avant chaque tâche</td></tr>
+      <tr><td>--start-at-task "nom"</td><td>Reprend depuis une tâche spécifique</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>-e</code> (extra-vars) a la priorité la plus haute — il écrase <strong>tout</strong>, y compris les variables définies dans un rôle ou un playbook. Utile en CI/CD, dangereux si mal utilisé.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f4">
+  <div class="fiche-header" onclick="toggle('f4')">
+    <span class="fiche-num">04</span>
+    <span class="fiche-title">ansible-doc — consulter la doc d'un module</span>
+    <span class="fiche-arrow" id="a-f4">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f4">
+    <pre><span class="c-green">ansible-doc ansible.builtin.copy</span>   <span class="c-gray"># doc complète du module copy</span>
+<span class="c-green">ansible-doc -l</span>                     <span class="c-gray"># lister tous les modules disponibles</span>
+<span class="c-green">ansible-doc -s ansible.builtin.apt</span> <span class="c-gray"># snippet YAML d'exemple</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      En exam ou en TP sans internet : <code>ansible-doc module</code> est la référence locale. Connaître les modules par leur nom complet FQCN (Fully Qualified Collection Name).
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f5">
+  <div class="fiche-header" onclick="toggle('f5')">
+    <span class="fiche-num">05</span>
+    <span class="fiche-title">ansible-inventory — inspecter l'inventory</span>
+    <span class="fiche-arrow" id="a-f5">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f5">
+    <pre><span class="c-green">ansible-inventory --list</span>           <span class="c-gray"># JSON complet de l'inventory</span>
+<span class="c-green">ansible-inventory --graph</span>          <span class="c-gray"># arborescence lisible</span>
+<span class="c-green">ansible-inventory --host web1</span>      <span class="c-gray"># variables d'un hôte spécifique</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Outil indispensable pour déboguer un inventory complexe (dynamic inventory, groupes imbriqués). Préférer <code>--graph</code> pour un aperçu rapide.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     INVENTORY
+══════════════════════════════════════ -->
+<div class="cat-header cat-inv">
+  <div class="cat-icon">📋</div>
+  <span class="cat-name">Inventory</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f6">
+  <div class="fiche-header" onclick="toggle('f6')">
+    <span class="fiche-num">06</span>
+    <span class="fiche-title">Inventory INI vs YAML — formats et groupes</span>
+    <span class="fiche-arrow" id="a-f6">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f6">
+    <pre><span class="c-gray"># Format INI :</span>
+[<span class="c-ans">webservers</span>]
+web1.example.com
+web2.example.com  <span class="c-amber">ansible_port</span>=<span class="c-blue">2222</span>
+
+[<span class="c-ans">dbservers</span>]
+db1.example.com
+
+[<span class="c-ans">prod:children</span>]   <span class="c-gray"># groupe de groupes</span>
+webservers
+dbservers
+
+[<span class="c-ans">webservers:vars</span>]  <span class="c-gray"># variables du groupe</span>
+<span class="c-amber">ansible_user</span>=ubuntu</pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>[groupe:children]</code> déclare un <strong>groupe de groupes</strong>. <code>[groupe:vars]</code> déclare des <strong>variables de groupe</strong>. Ces deux syntaxes INI sont souvent confondues.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Patterns de sélection d'hôtes</div>
+      all · webservers · web1 · web* · webservers:dbservers (union) · webservers:!db1 (exclusion) · webservers:&staging (intersection)
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f7">
+  <div class="fiche-header" onclick="toggle('f7')">
+    <span class="fiche-num">07</span>
+    <span class="fiche-title">Variables de connexion ansible_* — les indispensables</span>
+    <span class="fiche-arrow" id="a-f7">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f7">
+    <table>
+      <tr><th>Variable</th><th>Rôle</th></tr>
+      <tr><td>ansible_host</td><td>Adresse IP ou nom d'hôte de connexion</td></tr>
+      <tr><td>ansible_port</td><td>Port SSH (défaut : 22)</td></tr>
+      <tr><td>ansible_user</td><td>Utilisateur SSH</td></tr>
+      <tr><td>ansible_ssh_private_key_file</td><td>Chemin vers la clé privée SSH</td></tr>
+      <tr><td>ansible_become</td><td>Active l'élévation de privilèges (true/false)</td></tr>
+      <tr><td>ansible_become_method</td><td>sudo / su / pbrun…</td></tr>
+      <tr><td>ansible_become_user</td><td>Utilisateur cible (défaut : root)</td></tr>
+      <tr><td>ansible_connection</td><td>ssh / local / docker / winrm</td></tr>
+      <tr><td>ansible_python_interpreter</td><td>Chemin Python sur l'hôte distant</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="fiche" id="f8">
+  <div class="fiche-header" onclick="toggle('f8')">
+    <span class="fiche-num">08</span>
+    <span class="fiche-title">host_vars/ et group_vars/ — organisation des variables</span>
+    <span class="fiche-arrow" id="a-f8">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f8">
+    <pre><span class="c-gray"># Structure recommandée :</span>
+inventory/
+├── hosts.ini
+├── group_vars/
+│   ├── all.yml          <span class="c-gray"># variables pour TOUS les hôtes</span>
+│   ├── webservers.yml   <span class="c-gray"># variables du groupe webservers</span>
+│   └── webservers/      <span class="c-gray"># ou en dossier (plusieurs fichiers)</span>
+│       ├── vars.yml
+│       └── vault.yml
+└── host_vars/
+    └── web1.yml         <span class="c-gray"># variables spécifiques à web1</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Un dossier <code>group_vars/webservers/</code> est équivalent au fichier <code>group_vars/webservers.yml</code>. Les deux formats sont valides. Le dossier permet de séparer les vars normales des vars vault.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PLAYBOOK
+══════════════════════════════════════ -->
+<div class="cat-header cat-play">
+  <div class="cat-icon">📄</div>
+  <span class="cat-name">Playbook — Structure &amp; Contrôle</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f9">
+  <div class="fiche-header" onclick="toggle('f9')">
+    <span class="fiche-num">09</span>
+    <span class="fiche-title">Structure d'un play — les directives clés</span>
+    <span class="fiche-arrow" id="a-f9">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f9">
+    <pre><span class="c-gray">---</span>
+- <span class="c-amber">name:</span> <span class="c-green">Deploy web application</span>
+  <span class="c-amber">hosts:</span> webservers
+  <span class="c-amber">gather_facts:</span> <span class="c-blue">true</span>
+  <span class="c-amber">become:</span> <span class="c-blue">true</span>
+  <span class="c-amber">serial:</span> <span class="c-blue">2</span>              <span class="c-gray"># rolling update</span>
+  <span class="c-amber">any_errors_fatal:</span> <span class="c-blue">false</span>
+  <span class="c-amber">vars:</span>
+    app_port: <span class="c-blue">8080</span>
+  <span class="c-amber">vars_files:</span>
+    - vars/common.yml
+  <span class="c-amber">pre_tasks:</span>   <span class="c-gray"># avant les rôles</span>
+    - ...
+  <span class="c-amber">roles:</span>
+    - nginx
+  <span class="c-amber">tasks:</span>
+    - ...
+  <span class="c-amber">post_tasks:</span>  <span class="c-gray"># après les rôles</span>
+    - ...
+  <span class="c-amber">handlers:</span>
+    - ...</pre>
+    <div class="block block-memo">
+      <div class="block-label">Ordre d'exécution</div>
+      pre_tasks → roles → tasks → post_tasks → handlers (toujours à la fin)
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f10">
+  <div class="fiche-header" onclick="toggle('f10')">
+    <span class="fiche-num">10</span>
+    <span class="fiche-title">when — conditions sur les tâches</span>
+    <span class="fiche-arrow" id="a-f10">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f10">
+    <pre><span class="c-gray"># Condition sur OS :</span>
+- <span class="c-ans">ansible.builtin.apt:</span>
+    name: nginx
+  <span class="c-amber">when:</span> ansible_os_family == <span class="c-green">"Debian"</span>
+
+<span class="c-gray"># Conditions multiples (ET logique) :</span>
+  <span class="c-amber">when:</span>
+    - ansible_os_family == <span class="c-green">"RedHat"</span>
+    - ansible_distribution_major_version | int >= <span class="c-blue">8</span>
+
+<span class="c-gray"># OU logique :</span>
+  <span class="c-amber">when:</span> ansible_os_family == <span class="c-green">"Debian"</span> or
+        ansible_os_family == <span class="c-green">"Ubuntu"</span>
+
+<span class="c-gray"># Sur le résultat d'une tâche précédente :</span>
+  <span class="c-amber">when:</span> result.rc != <span class="c-blue">0</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Dans un <code>when</code>, les variables Jinja2 ne nécessitent <strong>pas</strong> les accolades <code>{{ }}</code>. Écrire directement <code>when: variable == "valeur"</code>, pas <code>when: "{{ variable }}" == "valeur"</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f11">
+  <div class="fiche-header" onclick="toggle('f11')">
+    <span class="fiche-num">11</span>
+    <span class="fiche-title">loop vs with_items — le bon choix</span>
+    <span class="fiche-arrow" id="a-f11">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f11">
+    <table>
+      <tr><th></th><th>loop</th><th>with_items (ancien)</th></tr>
+      <tr><td>Syntaxe</td><td>Moderne (Ansible 2.5+)</td><td>Déprécié</td></tr>
+      <tr><td>Variable d'itération</td><td>item</td><td>item</td></tr>
+      <tr><td>Aplatissement auto</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span> (listes dans listes)</td></tr>
+    </table>
+    <pre><span class="c-gray"># Avec loop (recommandé) :</span>
+- <span class="c-ans">ansible.builtin.user:</span>
+    name: <span class="c-green">"{{ item.name }}"</span>
+    groups: <span class="c-green">"{{ item.groups }}"</span>
+  <span class="c-amber">loop:</span>
+    - { name: alice, groups: sudo }
+    - { name: bob,   groups: docker }</pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Dans la tâche : <code>item</code> est la variable d'itération. Pour un dictionnaire : <code>item.clé</code>. <code>loop_var</code> permet de renommer <code>item</code> pour éviter les conflits dans les boucles imbriquées.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f12">
+  <div class="fiche-header" onclick="toggle('f12')">
+    <span class="fiche-num">12</span>
+    <span class="fiche-title">register et les attributs du résultat</span>
+    <span class="fiche-arrow" id="a-f12">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f12">
+    <pre><span class="c-gray"># Capturer le résultat d'une tâche :</span>
+- <span class="c-ans">ansible.builtin.command:</span>
+    cmd: nginx -v
+  <span class="c-amber">register:</span> nginx_result
+  <span class="c-amber">changed_when:</span> <span class="c-blue">false</span>
+
+- <span class="c-ans">ansible.builtin.debug:</span>
+    msg: <span class="c-green">"{{ nginx_result.stdout }}"</span>
+  <span class="c-amber">when:</span> nginx_result.rc == <span class="c-blue">0</span></pre>
+    <table>
+      <tr><th>Attribut</th><th>Contenu</th></tr>
+      <tr><td>.rc</td><td>Code de retour (0 = succès)</td></tr>
+      <tr><td>.stdout</td><td>Sortie standard</td></tr>
+      <tr><td>.stderr</td><td>Sortie d'erreur</td></tr>
+      <tr><td>.stdout_lines</td><td>stdout sous forme de liste</td></tr>
+      <tr><td>.changed</td><td>true si la tâche a modifié quelque chose</td></tr>
+      <tr><td>.failed</td><td>true si la tâche a échoué</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="fiche" id="f13">
+  <div class="fiche-header" onclick="toggle('f13')">
+    <span class="fiche-num">13</span>
+    <span class="fiche-title">block / rescue / always — gestion d'erreurs</span>
+    <span class="fiche-arrow" id="a-f13">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f13">
+    <pre><span class="c-amber">- block:</span>
+    - <span class="c-ans">ansible.builtin.command:</span>
+        cmd: /opt/deploy.sh
+  <span class="c-amber">rescue:</span>           <span class="c-gray"># exécuté si le block échoue</span>
+    - <span class="c-ans">ansible.builtin.debug:</span>
+        msg: <span class="c-green">"Déploiement échoué, rollback"</span>
+  <span class="c-amber">always:</span>           <span class="c-gray"># exécuté dans tous les cas</span>
+    - <span class="c-ans">ansible.builtin.debug:</span>
+        msg: <span class="c-green">"Nettoyage terminé"</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo — analogie Python</div>
+      block = try · rescue = except · always = finally
+    </div>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Si <code>rescue</code> s'exécute et réussit, le play <strong>continue</strong> normalement — l'hôte n'est pas marqué comme failed. C'est différent de <code>ignore_errors: true</code> qui ne gère pas l'erreur, il l'ignore juste.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f14">
+  <div class="fiche-header" onclick="toggle('f14')">
+    <span class="fiche-num">14</span>
+    <span class="fiche-title">Handlers — comportement et flush</span>
+    <span class="fiche-arrow" id="a-f14">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f14">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Les handlers s'exécutent <strong>une seule fois</strong> à la fin du play, même s'ils sont notifiés plusieurs fois. Ils ne s'exécutent que si la tâche qui les notifie a produit un <strong>changed</strong>.
+    </div>
+    <pre><span class="c-gray"># Tâche qui notifie :</span>
+- <span class="c-ans">ansible.builtin.template:</span>
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  <span class="c-amber">notify:</span> restart nginx
+
+<span class="c-gray"># Handler :</span>
+<span class="c-amber">handlers:</span>
+  - <span class="c-amber">name:</span> restart nginx
+    <span class="c-ans">ansible.builtin.service:</span>
+      name: nginx
+      state: restarted
+
+<span class="c-gray"># Forcer l'exécution immédiate des handlers :</span>
+- <span class="c-ans">ansible.builtin.meta:</span>
+    <span class="c-amber">flush_handlers</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Si le play s'arrête avec une erreur avant la fin, les handlers en attente <strong>ne s'exécutent pas</strong>. Utiliser <code>ansible.builtin.meta: flush_handlers</code> pour les forcer avant un point critique.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f15">
+  <div class="fiche-header" onclick="toggle('f15')">
+    <span class="fiche-num">15</span>
+    <span class="fiche-title">changed_when et failed_when — contrôler l'idempotence</span>
+    <span class="fiche-arrow" id="a-f15">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f15">
+    <pre><span class="c-gray"># changed_when : contrôler quand une tâche est "changed"</span>
+- <span class="c-ans">ansible.builtin.command:</span>
+    cmd: nginx -t
+  <span class="c-amber">changed_when:</span> <span class="c-blue">false</span>     <span class="c-gray"># jamais "changed" (commande de check)</span>
+
+<span class="c-gray"># failed_when : définir la condition d'échec</span>
+- <span class="c-ans">ansible.builtin.command:</span>
+    cmd: /opt/script.sh
+  <span class="c-amber">register:</span> result
+  <span class="c-amber">failed_when:</span> result.rc not in [<span class="c-blue">0</span>, <span class="c-blue">1</span>]  <span class="c-gray"># 0 et 1 = OK</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Les modules <code>command</code> et <code>shell</code> sont toujours <code>changed</code> car Ansible ne peut pas savoir si une commande shell a modifié quelque chose. Toujours utiliser <code>changed_when</code> avec eux pour maintenir l'idempotence.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f16">
+  <div class="fiche-header" onclick="toggle('f16')">
+    <span class="fiche-num">16</span>
+    <span class="fiche-title">import_tasks vs include_tasks — statique vs dynamique</span>
+    <span class="fiche-arrow" id="a-f16">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f16">
+    <table>
+      <tr><th></th><th>import_tasks (statique)</th><th>include_tasks (dynamique)</th></tr>
+      <tr><td>Résolution</td><td>Au chargement du playbook</td><td>À l'exécution</td></tr>
+      <tr><td>Tags hérités</td><td><span class="tag-ok">Oui</span></td><td><span class="tag-no">Non</span></td></tr>
+      <tr><td>Nom de fichier dynamique</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span> (variable)</td></tr>
+      <tr><td>Visible par --list-tasks</td><td><span class="tag-ok">Oui</span></td><td><span class="tag-no">Non</span></td></tr>
+    </table>
+    <pre><span class="c-gray"># Statique — le fichier est connu à l'avance :</span>
+- <span class="c-ans">ansible.builtin.import_tasks:</span>
+    file: install.yml
+
+<span class="c-gray"># Dynamique — le fichier dépend d'une variable :</span>
+- <span class="c-ans">ansible.builtin.include_tasks:</span>
+    file: <span class="c-green">"{{ ansible_os_family }}.yml"</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Règle simple</div>
+      Structure fixe → import. Fichier à déterminer à l'exécution → include.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f17">
+  <div class="fiche-header" onclick="toggle('f17')">
+    <span class="fiche-num">17</span>
+    <span class="fiche-title">serial — rolling update et contrôle du déploiement</span>
+    <span class="fiche-arrow" id="a-f17">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f17">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      <code>serial</code> contrôle combien d'hôtes sont traités à la fois dans un play. Utile pour les rolling updates sans downtime total.
+    </div>
+    <pre><span class="c-gray"># Traiter 2 hôtes à la fois :</span>
+<span class="c-amber">serial:</span> <span class="c-blue">2</span>
+
+<span class="c-gray"># Ou en pourcentage :</span>
+<span class="c-amber">serial:</span> <span class="c-green">"30%"</span>
+
+<span class="c-gray"># Progression par étapes :</span>
+<span class="c-amber">serial:</span> [<span class="c-blue">1</span>, <span class="c-blue">5</span>, <span class="c-green">"100%"</span>]  <span class="c-gray"># 1 puis 5 puis le reste</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>serial</code> s'applique au niveau du play, pas de la tâche. Avec <code>serial: 1</code>, le play complet s'exécute sur l'hôte 1 avant de passer à l'hôte 2.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODULES ESSENTIELS
+══════════════════════════════════════ -->
+<div class="cat-header cat-modules">
+  <div class="cat-icon">🧩</div>
+  <span class="cat-name">Modules essentiels</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f18">
+  <div class="fiche-header" onclick="toggle('f18')">
+    <span class="fiche-num">18</span>
+    <span class="fiche-title">command vs shell — quelle différence ?</span>
+    <span class="fiche-arrow" id="a-f18">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f18">
+    <table>
+      <tr><th></th><th>command</th><th>shell</th></tr>
+      <tr><td>Pipe | et &&</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>Redirections &gt; &lt;</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>Variables $HOME</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>Sécurité</td><td>Plus sûr</td><td>Risque d'injection</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Préférer <code>command</code> quand c'est possible (plus sûr, pas de sous-shell). Utiliser <code>shell</code> seulement quand les pipes ou redirections sont nécessaires. Dans les deux cas, toujours ajouter <code>changed_when</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f19">
+  <div class="fiche-header" onclick="toggle('f19')">
+    <span class="fiche-num">19</span>
+    <span class="fiche-title">copy vs template — quand utiliser lequel ?</span>
+    <span class="fiche-arrow" id="a-f19">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f19">
+    <table>
+      <tr><th></th><th>copy</th><th>template</th></tr>
+      <tr><td>Contenu</td><td>Fichier statique</td><td>Fichier Jinja2 (.j2)</td></tr>
+      <tr><td>Variables</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span> — {{ var }}</td></tr>
+      <tr><td>Source locale</td><td>files/</td><td>templates/</td></tr>
+    </table>
+    <pre><span class="c-gray"># copy — fichier statique :</span>
+- <span class="c-ans">ansible.builtin.copy:</span>
+    src: files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    mode: <span class="c-green">'0644'</span>
+    backup: <span class="c-blue">true</span>
+
+<span class="c-gray"># template — avec variables Jinja2 :</span>
+- <span class="c-ans">ansible.builtin.template:</span>
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf</pre>
+  </div>
+</div>
+
+<div class="fiche" id="f20">
+  <div class="fiche-header" onclick="toggle('f20')">
+    <span class="fiche-num">20</span>
+    <span class="fiche-title">lineinfile vs blockinfile — modifier un fichier existant</span>
+    <span class="fiche-arrow" id="a-f20">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f20">
+    <table>
+      <tr><th>Module</th><th>Usage</th></tr>
+      <tr><td>lineinfile</td><td>Assure qu'une <strong>ligne</strong> est présente/absente dans un fichier</td></tr>
+      <tr><td>blockinfile</td><td>Assure qu'un <strong>bloc de lignes</strong> est présent (avec marqueurs)</td></tr>
+      <tr><td>replace</td><td>Remplace toutes les occurrences d'un pattern regex</td></tr>
+    </table>
+    <pre><span class="c-gray"># lineinfile — désactiver auth password SSH :</span>
+- <span class="c-ans">ansible.builtin.lineinfile:</span>
+    path: /etc/ssh/sshd_config
+    regexp: <span class="c-green">'^PasswordAuthentication'</span>
+    line: <span class="c-green">'PasswordAuthentication no'</span>
+    state: present</pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>regexp</code> dans <code>lineinfile</code> sert à trouver la ligne à <strong>remplacer</strong>. Si aucune ligne ne correspond, la nouvelle ligne est ajoutée à la fin. Si plusieurs lignes correspondent, seule la dernière est remplacée.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f21">
+  <div class="fiche-header" onclick="toggle('f21')">
+    <span class="fiche-num">21</span>
+    <span class="fiche-title">file — créer, supprimer, liens symboliques</span>
+    <span class="fiche-arrow" id="a-f21">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f21">
+    <table>
+      <tr><th>state</th><th>Effet</th></tr>
+      <tr><td>directory</td><td>Crée le dossier (et parents si recurse: true)</td></tr>
+      <tr><td>touch</td><td>Crée le fichier s'il n'existe pas</td></tr>
+      <tr><td>absent</td><td>Supprime fichier ou dossier</td></tr>
+      <tr><td>link</td><td>Crée un lien symbolique</td></tr>
+      <tr><td>hard</td><td>Crée un lien physique (hard link)</td></tr>
+    </table>
+    <pre><span class="c-gray"># Créer un dossier avec les bons droits :</span>
+- <span class="c-ans">ansible.builtin.file:</span>
+    path: /opt/myapp
+    state: directory
+    owner: deploy
+    group: deploy
+    mode: <span class="c-green">'0755'</span>
+    recurse: <span class="c-blue">true</span></pre>
+  </div>
+</div>
+
+<div class="fiche" id="f22">
+  <div class="fiche-header" onclick="toggle('f22')">
+    <span class="fiche-num">22</span>
+    <span class="fiche-title">service vs systemd — quel module choisir ?</span>
+    <span class="fiche-arrow" id="a-f22">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f22">
+    <table>
+      <tr><th>Module</th><th>Quand l'utiliser</th></tr>
+      <tr><td>ansible.builtin.service</td><td>Multi-distro, générique (systemd, SysV, upstart)</td></tr>
+      <tr><td>ansible.builtin.systemd</td><td>Spécifique systemd — permet daemon_reload et scope</td></tr>
+    </table>
+    <pre><span class="c-gray"># Redémarrer nginx ET recharger systemd après install :</span>
+- <span class="c-ans">ansible.builtin.systemd:</span>
+    name: nginx
+    state: restarted
+    enabled: <span class="c-blue">true</span>
+    daemon_reload: <span class="c-blue">true</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo — states disponibles</div>
+      started · stopped · restarted · reloaded
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f23">
+  <div class="fiche-header" onclick="toggle('f23')">
+    <span class="fiche-num">23</span>
+    <span class="fiche-title">uri et wait_for — interactions réseau</span>
+    <span class="fiche-arrow" id="a-f23">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f23">
+    <pre><span class="c-gray"># Vérifier qu'une API répond :</span>
+- <span class="c-ans">ansible.builtin.uri:</span>
+    url: <span class="c-green">"http://localhost:8080/health"</span>
+    status_code: <span class="c-blue">200</span>
+  <span class="c-amber">register:</span> health_check
+
+<span class="c-gray"># Attendre qu'un port soit disponible :</span>
+- <span class="c-ans">ansible.builtin.wait_for:</span>
+    host: localhost
+    port: <span class="c-blue">8080</span>
+    timeout: <span class="c-blue">60</span>
+    state: started
+
+<span class="c-gray"># Attendre qu'un fichier existe :</span>
+- <span class="c-ans">ansible.builtin.wait_for:</span>
+    path: /tmp/app.lock
+    state: present
+    timeout: <span class="c-blue">30</span></pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     VARIABLES & PRÉCÉDENCE
+══════════════════════════════════════ -->
+<div class="cat-header cat-vars">
+  <div class="cat-icon">📊</div>
+  <span class="cat-name">Variables &amp; Précédence</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f24">
+  <div class="fiche-header" onclick="toggle('f24')">
+    <span class="fiche-num">24</span>
+    <span class="fiche-title">Priorité des variables — ordre exact (du plus bas au plus haut)</span>
+    <span class="fiche-arrow" id="a-f24">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f24">
+    <table>
+      <tr><th>Priorité</th><th>Source</th></tr>
+      <tr><td>1 (basse)</td><td>role defaults/ (main.yml)</td></tr>
+      <tr><td>2</td><td>group_vars/all</td></tr>
+      <tr><td>3</td><td>group_vars/nom_du_groupe</td></tr>
+      <tr><td>4</td><td>host_vars/nom_de_l_hôte</td></tr>
+      <tr><td>5</td><td>Facts (ansible_*)</td></tr>
+      <tr><td>6</td><td>vars (dans le play)</td></tr>
+      <tr><td>7</td><td>vars_files</td></tr>
+      <tr><td>8</td><td>role vars/ (main.yml)</td></tr>
+      <tr><td>9</td><td>set_fact / register</td></tr>
+      <tr><td>10 (haute)</td><td>-e / --extra-vars</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Pièges clés</div>
+      <code>role defaults/</code> = la plus basse (surchargeable facilement). <code>role vars/</code> = très haute (difficile à surcharger). <code>-e</code> = gagne toujours. <code>set_fact</code> persiste pour le reste du play sur l'hôte.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f25">
+  <div class="fiche-header" onclick="toggle('f25')">
+    <span class="fiche-num">25</span>
+    <span class="fiche-title">set_fact vs vars — différences pratiques</span>
+    <span class="fiche-arrow" id="a-f25">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f25">
+    <table>
+      <tr><th></th><th>vars (dans le play)</th><th>set_fact</th></tr>
+      <tr><td>Évaluation</td><td>Au chargement</td><td>À l'exécution (dans les tasks)</td></tr>
+      <tr><td>Valeur dynamique</td><td>Limitée</td><td>Complète (peut utiliser register)</td></tr>
+      <tr><td>Portée</td><td>Play</td><td>Hôte, jusqu'à la fin du play</td></tr>
+    </table>
+    <pre><span class="c-gray"># set_fact pour créer une variable calculée :</span>
+- <span class="c-ans">ansible.builtin.set_fact:</span>
+    app_url: <span class="c-green">"http://{{ ansible_default_ipv4.address }}:{{ app_port }}"</span>
+    cacheable: <span class="c-blue">true</span>   <span class="c-gray"># persistera entre les plays</span></pre>
+  </div>
+</div>
+
+<div class="fiche" id="f26">
+  <div class="fiche-header" onclick="toggle('f26')">
+    <span class="fiche-num">26</span>
+    <span class="fiche-title">Magic variables — hostvars, groups, inventory_hostname</span>
+    <span class="fiche-arrow" id="a-f26">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f26">
+    <table>
+      <tr><th>Variable</th><th>Contenu</th></tr>
+      <tr><td>inventory_hostname</td><td>Nom de l'hôte tel que dans l'inventory</td></tr>
+      <tr><td>ansible_hostname</td><td>Hostname système de la machine</td></tr>
+      <tr><td>hostvars['web1']</td><td>Variables et facts d'un autre hôte</td></tr>
+      <tr><td>groups['webservers']</td><td>Liste des hôtes d'un groupe</td></tr>
+      <tr><td>group_names</td><td>Liste des groupes de l'hôte courant</td></tr>
+      <tr><td>ansible_play_hosts</td><td>Liste des hôtes actifs dans le play en cours</td></tr>
+      <tr><td>playbook_dir</td><td>Répertoire du playbook</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>hostvars</code> ne contient les facts d'un hôte que si <code>gather_facts</code> a été exécuté sur cet hôte dans un play précédent. Sans gather_facts, seules les variables d'inventory sont disponibles.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     RÔLES
+══════════════════════════════════════ -->
+<div class="cat-header cat-roles">
+  <div class="cat-icon">🏗️</div>
+  <span class="cat-name">Rôles</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f27">
+  <div class="fiche-header" onclick="toggle('f27')">
+    <span class="fiche-num">27</span>
+    <span class="fiche-title">Structure d'un rôle — dossiers et rôles de chacun</span>
+    <span class="fiche-arrow" id="a-f27">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f27">
+    <pre>roles/nginx/
+├── tasks/main.yml       <span class="c-gray"># point d'entrée des tâches</span>
+├── handlers/main.yml    <span class="c-gray"># handlers du rôle</span>
+├── templates/           <span class="c-gray"># fichiers .j2 (Jinja2)</span>
+├── files/               <span class="c-gray"># fichiers statiques (copy)</span>
+├── vars/main.yml        <span class="c-gray"># vars haute priorité (non surchargeable facilement)</span>
+├── defaults/main.yml    <span class="c-gray"># vars basse priorité (surchargeable)</span>
+├── meta/main.yml        <span class="c-gray"># dépendances du rôle</span>
+└── README.md</pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège — defaults vs vars</div>
+      <code>defaults/main.yml</code> = valeurs par défaut facilement surchargées → mettre les valeurs configurables.<br>
+      <code>vars/main.yml</code> = variables internes au rôle difficiles à surcharger → mettre les constantes du rôle.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Créer un rôle vide</div>
+      <code>ansible-galaxy role init mon_role</code>
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f28">
+  <div class="fiche-header" onclick="toggle('f28')">
+    <span class="fiche-num">28</span>
+    <span class="fiche-title">ansible-galaxy — gérer les rôles et collections</span>
+    <span class="fiche-arrow" id="a-f28">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f28">
+    <pre><span class="c-gray"># Installer un rôle depuis Galaxy :</span>
+<span class="c-green">ansible-galaxy role install geerlingguy.nginx</span>
+
+<span class="c-gray"># Installer depuis requirements.yml :</span>
+<span class="c-green">ansible-galaxy install -r requirements.yml</span>
+
+<span class="c-gray"># Lister les rôles installés :</span>
+<span class="c-green">ansible-galaxy role list</span>
+
+<span class="c-gray"># Installer une collection :</span>
+<span class="c-green">ansible-galaxy collection install community.docker</span></pre>
+    <pre><span class="c-gray"># requirements.yml :</span>
+roles:
+  - name: <span class="c-green">geerlingguy.nginx</span>
+  - src: <span class="c-green">https://github.com/org/role</span>
+    version: <span class="c-green">v2.0.0</span>
+    name: <span class="c-green">my_nginx</span>
+collections:
+  - name: <span class="c-green">community.docker</span>
+    version: <span class="c-green">">=3.0"</span></pre>
+  </div>
+</div>
+
+<div class="fiche" id="f29">
+  <div class="fiche-header" onclick="toggle('f29')">
+    <span class="fiche-num">29</span>
+    <span class="fiche-title">include_role vs import_role</span>
+    <span class="fiche-arrow" id="a-f29">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f29">
+    <table>
+      <tr><th></th><th>import_role (statique)</th><th>include_role (dynamique)</th></tr>
+      <tr><td>Résolution</td><td>Au chargement</td><td>À l'exécution</td></tr>
+      <tr><td>Tags hérités du play</td><td><span class="tag-ok">Oui</span></td><td><span class="tag-no">Non</span></td></tr>
+      <tr><td>Nom dynamique</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>Utilisation dans loop</td><td><span class="tag-no">Non</span></td><td><span class="tag-ok">Oui</span></td></tr>
+    </table>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Même logique que import_tasks vs include_tasks : statique vs dynamique. Utiliser <code>include_role</code> dans une boucle ou quand le nom du rôle est dynamique.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     VAULT
+══════════════════════════════════════ -->
+<div class="cat-header cat-vault">
+  <div class="cat-icon">🔐</div>
+  <span class="cat-name">Ansible Vault</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f30">
+  <div class="fiche-header" onclick="toggle('f30')">
+    <span class="fiche-num">30</span>
+    <span class="fiche-title">Commandes Vault — chiffrer, déchiffrer, éditer</span>
+    <span class="fiche-arrow" id="a-f30">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f30">
+    <pre><span class="c-green">ansible-vault create secrets.yml</span>          <span class="c-gray"># créer un fichier chiffré</span>
+<span class="c-green">ansible-vault encrypt vars/db.yml</span>          <span class="c-gray"># chiffrer un fichier existant</span>
+<span class="c-green">ansible-vault decrypt vars/db.yml</span>          <span class="c-gray"># déchiffrer ⚠ permanent</span>
+<span class="c-green">ansible-vault edit secrets.yml</span>             <span class="c-gray"># éditer sans déchiffrer sur disque</span>
+<span class="c-green">ansible-vault view secrets.yml</span>             <span class="c-gray"># afficher le contenu</span>
+<span class="c-green">ansible-vault rekey secrets.yml</span>            <span class="c-gray"># changer le mot de passe</span>
+<span class="c-green">ansible-vault encrypt_string 'motdepasse' --name db_pass</span>
+                                            <span class="c-gray"># chiffrer une seule valeur inline</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>ansible-vault decrypt</code> déchiffre le fichier <strong>de façon permanente sur disque</strong>. Pour juste lire le contenu, utiliser <code>view</code>. Pour modifier, utiliser <code>edit</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f31">
+  <div class="fiche-header" onclick="toggle('f31')">
+    <span class="fiche-num">31</span>
+    <span class="fiche-title">Utiliser Vault avec ansible-playbook</span>
+    <span class="fiche-arrow" id="a-f31">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f31">
+    <pre><span class="c-gray"># Demander le mot de passe interactivement :</span>
+<span class="c-green">ansible-playbook site.yml --ask-vault-pass</span>
+
+<span class="c-gray"># Utiliser un fichier de mot de passe :</span>
+<span class="c-green">ansible-playbook site.yml --vault-password-file .vault_pass</span>
+
+<span class="c-gray"># Variable d'environnement pour le fichier de passe :</span>
+<span class="c-green">ANSIBLE_VAULT_PASSWORD_FILE=.vault_pass ansible-playbook site.yml</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Bonnes pratiques</div>
+      · Stocker <code>.vault_pass</code> hors du dépôt Git<br>
+      · Ajouter <code>.vault_pass</code> au <code>.gitignore</code><br>
+      · Nommer les fichiers vault <code>*_vault.yml</code> pour les reconnaître<br>
+      · En CI/CD : injecter le mot de passe via variable secrète du pipeline
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JINJA2
+══════════════════════════════════════ -->
+<div class="cat-header cat-jinja">
+  <div class="cat-icon">🔣</div>
+  <span class="cat-name">Jinja2 &amp; Filtres</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f32">
+  <div class="fiche-header" onclick="toggle('f32')">
+    <span class="fiche-num">32</span>
+    <span class="fiche-title">Filtres Jinja2 incontournables</span>
+    <span class="fiche-arrow" id="a-f32">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f32">
+    <table>
+      <tr><th>Filtre</th><th>Exemple &amp; résultat</th></tr>
+      <tr><td>default(val)</td><td>{{ var | default("backup") }} → "backup" si var non définie</td></tr>
+      <tr><td>default(omit)</td><td>Omet l'argument si la variable est non définie</td></tr>
+      <tr><td>upper / lower</td><td>{{ "hello" | upper }} → "HELLO"</td></tr>
+      <tr><td>join(sep)</td><td>{{ liste | join(", ") }} → "a, b, c"</td></tr>
+      <tr><td>length</td><td>{{ liste | length }} → nombre d'éléments</td></tr>
+      <tr><td>int / float / bool</td><td>{{ "3" | int }} → 3</td></tr>
+      <tr><td>to_json / from_json</td><td>Sérialiser/désérialiser JSON</td></tr>
+      <tr><td>select / reject</td><td>Filtrer une liste</td></tr>
+      <tr><td>dict2items</td><td>Convertir un dict en liste de {key, value}</td></tr>
+      <tr><td>items2dict</td><td>Convertir une liste {key, value} en dict</td></tr>
+      <tr><td>flatten</td><td>Aplatir une liste de listes</td></tr>
+      <tr><td>unique</td><td>Supprimer les doublons d'une liste</td></tr>
+      <tr><td>b64encode / b64decode</td><td>Encodage base64</td></tr>
+      <tr><td>password_hash('sha512')</td><td>Hacher un mot de passe</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="fiche" id="f33">
+  <div class="fiche-header" onclick="toggle('f33')">
+    <span class="fiche-num">33</span>
+    <span class="fiche-title">Lookups — accéder à des données externes</span>
+    <span class="fiche-arrow" id="a-f33">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f33">
+    <pre><span class="c-gray"># Lire un fichier local :</span>
+key: <span class="c-green">"{{ lookup('file', '~/.ssh/id_rsa.pub') }}"</span>
+
+<span class="c-gray"># Variable d'environnement :</span>
+path: <span class="c-green">"{{ lookup('env', 'HOME') }}"</span>
+
+<span class="c-gray"># Générer un mot de passe aléatoire :</span>
+pass: <span class="c-green">"{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits') }}"</span>
+
+<span class="c-gray"># Requête DNS :</span>
+ip: <span class="c-green">"{{ lookup('dig', 'example.com') }}"</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Les lookups s'exécutent sur le <strong>control node</strong> (pas sur l'hôte distant). Pour lire un fichier sur l'hôte distant, utiliser <code>slurp</code> ou <code>fetch</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f34">
+  <div class="fiche-header" onclick="toggle('f34')">
+    <span class="fiche-num">34</span>
+    <span class="fiche-title">ansible.cfg — paramètres essentiels</span>
+    <span class="fiche-arrow" id="a-f34">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f34">
+    <pre>[<span class="c-ans">defaults</span>]
+inventory            = ./inventory
+remote_user          = ubuntu
+private_key_file     = ~/.ssh/id_rsa
+host_key_checking    = <span class="c-blue">False</span>   <span class="c-gray"># désactiver en dev</span>
+forks                = <span class="c-blue">10</span>      <span class="c-gray"># parallélisme</span>
+gathering            = smart   <span class="c-gray"># smart/implicit/explicit</span>
+stdout_callback      = yaml    <span class="c-gray"># sortie lisible</span>
+roles_path           = ./roles:~/.ansible/roles
+
+[<span class="c-ans">privilege_escalation</span>]
+become               = <span class="c-blue">True</span>
+become_method        = sudo
+become_user          = root
+
+[<span class="c-ans">ssh_connection</span>]
+pipelining           = <span class="c-blue">True</span>   <span class="c-gray"># améliore les perfs</span>
+ssh_args             = -C -o ControlMaster=auto -o ControlPersist=60s</pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège — ordre de précédence ansible.cfg</div>
+      ANSIBLE_CONFIG (env var) > ./ansible.cfg (répertoire courant) > ~/.ansible.cfg > /etc/ansible/ansible.cfg
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PIÈGES & POINTS CRITIQUES
+══════════════════════════════════════ -->
+<div class="cat-header cat-pieges">
+  <div class="cat-icon">🎯</div>
+  <span class="cat-name">Pièges &amp; Points critiques</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f35">
+  <div class="fiche-header" onclick="toggle('f35')">
+    <span class="fiche-num">35</span>
+    <span class="fiche-title">Idempotence — ce qui n'est pas idempotent par défaut</span>
+    <span class="fiche-arrow" id="a-f35">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f35">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Les modules Ansible sont idempotents par conception — sauf <code>command</code>, <code>shell</code> et <code>raw</code> qui sont toujours marqués <code>changed</code>.
+    </div>
+    <table>
+      <tr><th>Module</th><th>Idempotent ?</th></tr>
+      <tr><td>apt, yum, dnf</td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>copy, template, file</td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>service, user, group</td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>command</td><td><span class="tag-no">Non par défaut</span> → changed_when</td></tr>
+      <tr><td>shell</td><td><span class="tag-no">Non par défaut</span> → changed_when</td></tr>
+      <tr><td>raw</td><td><span class="tag-no">Non</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="fiche" id="f36">
+  <div class="fiche-header" onclick="toggle('f36')">
+    <span class="fiche-num">36</span>
+    <span class="fiche-title">gather_facts — facts utiles à connaître</span>
+    <span class="fiche-arrow" id="a-f36">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f36">
+    <table>
+      <tr><th>Fact</th><th>Contenu</th></tr>
+      <tr><td>ansible_distribution</td><td>Ubuntu, CentOS, Debian…</td></tr>
+      <tr><td>ansible_distribution_major_version</td><td>22 (pour Ubuntu 22.04)</td></tr>
+      <tr><td>ansible_os_family</td><td>Debian, RedHat, Windows…</td></tr>
+      <tr><td>ansible_architecture</td><td>x86_64, arm64…</td></tr>
+      <tr><td>ansible_default_ipv4.address</td><td>IP principale de l'hôte</td></tr>
+      <tr><td>ansible_memtotal_mb</td><td>RAM totale en MB</td></tr>
+      <tr><td>ansible_processor_vcpus</td><td>Nombre de vCPUs</td></tr>
+      <tr><td>ansible_hostname</td><td>Hostname système</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>gather_facts: false</code> accélère les playbooks mais supprime l'accès à tous les <code>ansible_*</code> facts. Si une tâche utilise <code>ansible_os_family</code>, gather_facts doit être activé.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f37">
+  <div class="fiche-header" onclick="toggle('f37')">
+    <span class="fiche-num">37</span>
+    <span class="fiche-title">ignore_errors vs failed_when vs block/rescue</span>
+    <span class="fiche-arrow" id="a-f37">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f37">
+    <table>
+      <tr><th>Mécanisme</th><th>Comportement</th></tr>
+      <tr><td>ignore_errors: true</td><td>Ignore l'erreur, l'hôte n'est pas marqué failed, la tâche continue</td></tr>
+      <tr><td>failed_when: condition</td><td>Définit finement quand la tâche échoue</td></tr>
+      <tr><td>block / rescue</td><td>Gère l'erreur proprement, peut effectuer un rollback</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>ignore_errors: true</code> n'est pas une bonne pratique générale — il masque les vrais problèmes. Préférer <code>failed_when</code> ou <code>block/rescue</code> pour une gestion d'erreur explicite.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f38">
+  <div class="fiche-header" onclick="toggle('f38')">
+    <span class="fiche-num">38</span>
+    <span class="fiche-title">delegate_to et run_once</span>
+    <span class="fiche-arrow" id="a-f38">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f38">
+    <pre><span class="c-gray"># Exécuter une tâche sur un autre hôte :</span>
+- <span class="c-ans">ansible.builtin.command:</span>
+    cmd: haproxy -f /etc/haproxy.cfg -c
+  <span class="c-amber">delegate_to:</span> loadbalancer.example.com
+
+<span class="c-gray"># Exécuter sur le control node :</span>
+- <span class="c-ans">ansible.builtin.command:</span>
+    cmd: curl -s http://api/deploy
+  <span class="c-amber">delegate_to:</span> localhost
+
+<span class="c-gray"># N'exécuter qu'une seule fois (sur le 1er hôte du play) :</span>
+- <span class="c-ans">ansible.builtin.command:</span>
+    cmd: python manage.py migrate
+  <span class="c-amber">run_once:</span> <span class="c-blue">true</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      <code>delegate_to: localhost</code> est l'équivalent du provisioner <code>local-exec</code> de Terraform. Utile pour les appels d'API ou les vérifications depuis le control node.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f39">
+  <div class="fiche-header" onclick="toggle('f39')">
+    <span class="fiche-num">39</span>
+    <span class="fiche-title">Ansible vs Terraform — quand utiliser lequel ?</span>
+    <span class="fiche-arrow" id="a-f39">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f39">
+    <table>
+      <tr><th></th><th>Ansible</th><th>Terraform</th></tr>
+      <tr><td>Provisioning infra</td><td>Possible</td><td><span class="tag-ok">Idéal</span></td></tr>
+      <tr><td>Config management</td><td><span class="tag-ok">Idéal</span></td><td>Limité (provisioners)</td></tr>
+      <tr><td>Modèle</td><td>Impératif/déclaratif</td><td>Déclaratif</td></tr>
+      <tr><td>State</td><td>Pas de state</td><td>State file</td></tr>
+      <tr><td>Agent requis</td><td>Non (SSH)</td><td>Non (API provider)</td></tr>
+      <tr><td>Idempotence</td><td>Oui (modules)</td><td>Oui (natif)</td></tr>
+    </table>
+    <div class="block block-ansible">
+      <div class="block-label">En pratique</div>
+      Approche complémentaire courante : <strong>Terraform crée l'infra</strong> (VM, réseau, BDD) puis <strong>Ansible configure</strong> les serveurs (paquets, config, déploiement applicatif).
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f40">
+  <div class="fiche-header" onclick="toggle('f40')">
+    <span class="fiche-num">40</span>
+    <span class="fiche-title">Pièges YAML à éviter dans les playbooks</span>
+    <span class="fiche-arrow" id="a-f40">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f40">
+    <pre><span class="c-gray"># ❌ YAML interprète yes/no comme booléen :</span>
+state: <span class="c-red">yes</span>       <span class="c-gray"># → true (booléen)</span>
+state: <span class="c-green">"yes"</span>    <span class="c-gray"># ✅ string "yes"</span>
+
+<span class="c-gray"># ❌ Oublier les guillemets sur les nombres en string :</span>
+version: <span class="c-red">1.10</span>    <span class="c-gray"># → float 1.1 (perd le zéro final)</span>
+version: <span class="c-green">"1.10"</span>  <span class="c-gray"># ✅ string "1.10"</span>
+
+<span class="c-gray"># ❌ Double interpolation Jinja2 :</span>
+msg: <span class="c-red">"{{ "{{ var }}" }}"</span>   <span class="c-gray"># erreur</span>
+msg: <span class="c-green">"{{ var }}"</span>          <span class="c-gray"># ✅</span>
+
+<span class="c-gray"># ❌ when avec double accolades :</span>
+<span class="c-amber">when:</span> <span class="c-red">"{{ var == 'value' }}"</span>  <span class="c-gray"># peut marcher mais mauvaise pratique</span>
+<span class="c-amber">when:</span> <span class="c-green">var == 'value'</span>          <span class="c-gray"># ✅ sans accolades dans when</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège YAML classique</div>
+      En YAML, <code>yes</code>, <code>no</code>, <code>true</code>, <code>false</code>, <code>on</code>, <code>off</code> sont des booléens. Toujours mettre entre guillemets si on veut une chaîne de caractères.
+    </div>
+  </div>
+</div>
+
+<a class="back-top" href="#">↑ Retour en haut</a>
+
+</main>
+
+<script>
+const TOTAL = 40;
+function toggle(id) {
+  const body = document.getElementById('b-' + id);
+  const arrow = document.getElementById('a-' + id);
+  const isOpen = body.classList.toggle('open');
+  arrow.classList.toggle('open', isOpen);
+}
+function doSearch(val) {
+  const q = val.toLowerCase().trim();
+  const fiches = document.querySelectorAll('.fiche');
+  let count = 0;
+  fiches.forEach(f => {
+    const match = !q || f.textContent.toLowerCase().includes(q);
+    f.classList.toggle('hidden', !match);
+    if (match) count++;
+  });
+  document.getElementById('nav-count').textContent = q
+    ? count + ' résultat' + (count > 1 ? 's' : '')
+    : TOTAL + ' fiches';
+}
+</script>
+</body>
+</html>
