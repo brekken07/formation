@@ -21,7 +21,7 @@
       "title": "DevOps",
       "icon": "🚀",
       "description": "Du CI/CD à Kubernetes — construire, automatiser, déployer.",
-      "color": "teal",
+      "color": "rose",
       "modules": [
         {
           "file": "module1_cicd-github-guide.html",
