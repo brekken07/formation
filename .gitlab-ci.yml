@@ -38,9 +38,7 @@ lint-css:
 # ─── YAML ───────────────────────────────────────────────
 lint-yaml:
   stage: lint
-  image: python:3.12-alpine
   script:
-    - pip install yamllint
     - yamllint -c .yamllint.yml .
   rules:
     - changes:
