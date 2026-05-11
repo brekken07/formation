@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Terraform Associate 003 — Practice Exam #3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#080d0a;--card:#0e1510;--card2:#141f16;--border:#1e2e20;
+  --accent:#22c55e;--accent2:#4ade80;--green:#34d399;--red:#f87171;
+  --yellow:#fbbf24;--text:#e2e8f0;--muted:#6b7280;--code:#050a06;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.header{background:linear-gradient(160deg,#041208 0%,#080d0a 55%);border-bottom:1px solid var(--border);padding:2.5rem 1.5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(34,197,94,.15) 0%,transparent 70%);pointer-events:none}
+.badge-row{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;position:relative}
+.badge{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;padding:.28rem .7rem;border-radius:20px;letter-spacing:.05em;text-transform:uppercase}
+.b-gr{background:rgba(34,197,94,.2);border:1px solid var(--accent);color:var(--accent2)}
+.b-tl{background:rgba(52,211,153,.1);border:1px solid #34d399;color:#34d399}
+.b-yw{background:rgba(251,191,36,.1);border:1px solid #fbbf24;color:#fbbf24}
+.header h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;position:relative}
+.header h1 em{font-style:normal;color:var(--accent2)}
+.header p{color:var(--muted);margin-top:.35rem;font-size:.9rem;position:relative}
+#bar{background:var(--card);border-bottom:1px solid var(--border);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+#timer{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:600;color:var(--accent2);min-width:70px}
+#timer.warn{color:var(--yellow)}
+#timer.crit{color:var(--red);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.4}}
+.bar-label{font-size:.78rem;color:var(--muted)}
+.prog-wrap{flex:1;max-width:220px}
+.prog-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s}
+.btn{font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;padding:.5rem 1.1rem;border-radius:7px;border:none;cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:#16a34a;transform:translateY(-1px)}
+.btn-o{background:transparent;color:var(--accent2);border:1px solid var(--accent)}.btn-o:hover{background:rgba(34,197,94,.1)}
+.btn-row{display:flex;gap:.5rem;flex-wrap:wrap}
+main{max-width:860px;margin:0 auto;padding:1.8rem 1.2rem 5rem}
+.notice{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:1.1rem 1.4rem;margin-bottom:2rem}
+.notice h3{font-size:.88rem;font-weight:700;color:var(--accent2);margin-bottom:.5rem}
+.notice ul{padding-left:1.1rem;color:var(--muted);font-size:.84rem}
+.notice li{margin-bottom:.25rem}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem 1.6rem;margin-bottom:1.2rem;scroll-margin-top:110px;transition:border-color .2s}
+.qcard.done{border-color:rgba(34,197,94,.5)}
+.qhead{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:.9rem}
+.qnum{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:600;color:var(--accent2);background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:5px;padding:.2rem .55rem;flex-shrink:0;margin-top:2px}
+.dtag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.64rem;font-weight:600;padding:.15rem .55rem;border-radius:4px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--accent2);text-transform:uppercase;letter-spacing:.04em;margin-right:.4rem}
+.diff{font-size:.8rem;margin-left:auto;flex-shrink:0}
+.multi-tag{display:inline-block;font-size:.75rem;color:var(--yellow);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:5px;padding:.18rem .55rem;margin-bottom:.7rem}
+.qtext{font-size:.93rem;line-height:1.65;margin-bottom:1rem}
+pre{font-family:'JetBrains Mono',monospace;font-size:.78rem;background:var(--code);border:1px solid var(--border);border-radius:7px;padding:.85rem 1rem;overflow-x:auto;margin:.5rem 0 .9rem;line-height:1.5;color:#c9d1d9}
+code{font-family:'JetBrains Mono',monospace;font-size:.82em;background:var(--code);border:1px solid var(--border);border-radius:3px;padding:.05em .35em;color:var(--accent2)}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{display:flex;align-items:flex-start;gap:.75rem;padding:.65rem .9rem;border-radius:7px;border:1px solid var(--border);cursor:pointer;transition:all .14s;background:var(--card2);user-select:none}
+.opt:hover{border-color:var(--accent);background:rgba(34,197,94,.07)}
+.opt.sel{border-color:var(--accent);background:rgba(34,197,94,.12)}
+.opt.ok{border-color:var(--green);background:rgba(52,211,153,.07)}
+.opt.ko{border-color:var(--red);background:rgba(248,113,113,.07)}
+.oletter{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;width:22px;height:22px;border-radius:5px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .14s}
+.opt.sel .oletter{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt.ok .oletter{background:var(--green);border-color:var(--green);color:#080d0a}
+.opt.ko .oletter{background:var(--red);border-color:var(--red);color:#080d0a}
+.otext{font-size:.87rem;line-height:1.5}
+.expl{margin-top:.9rem;border-radius:7px;border:1px solid var(--border);overflow:hidden;display:none}
+.expl.show{display:block}
+.expl-h{padding:.5rem .9rem;font-size:.78rem;font-weight:700}
+.expl.expl-ok .expl-h{background:rgba(52,211,153,.1);color:var(--green);border-bottom:1px solid rgba(52,211,153,.2)}
+.expl.expl-ko .expl-h{background:rgba(248,113,113,.08);color:var(--red);border-bottom:1px solid rgba(248,113,113,.2)}
+.expl-b{padding:.8rem .9rem;font-size:.84rem;line-height:1.6;color:var(--muted)}
+.expl-b strong{color:var(--text)}
+.expl-b ul{padding-left:1.1rem;margin-top:.4rem}
+.expl-b li{margin-bottom:.3rem}
+.ref-box{margin-top:.6rem;padding:.4rem .7rem;background:rgba(34,197,94,.07);border-radius:5px;font-size:.8rem;color:var(--muted)}
+.ref-box b{color:var(--accent2)}
+#results{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:2.5rem;margin-top:1.5rem;text-align:center}
+#results.show{display:block}
+.score-ring{width:130px;height:130px;border-radius:50%;border:5px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1.2rem;background:rgba(34,197,94,.07)}
+.score-big{font-size:2.2rem;font-weight:800;color:var(--accent2);line-height:1}
+.score-sub{font-size:.8rem;color:var(--muted);margin-top:2px}
+.verdict{font-size:1.2rem;font-weight:700;margin-bottom:.4rem}
+.verdict-msg{color:var(--muted);font-size:.87rem;max-width:380px;margin:0 auto 1.5rem}
+.domain-grid{text-align:left;margin-top:1.4rem;border-top:1px solid var(--border);padding-top:1.2rem}
+.domain-grid h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.8rem}
+.drow{display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem;font-size:.82rem}
+.dname{width:210px;flex-shrink:0;color:var(--muted);font-size:.8rem}
+.dbar{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.dfill{height:100%;border-radius:4px}
+.dpct{width:34px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent2)}
+#floatbtn{position:fixed;bottom:1.5rem;right:1.5rem;z-index:200}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:580px){.header h1{font-size:1.4rem}.qcard{padding:1rem 1.1rem}#bar{flex-wrap:wrap}.prog-wrap{max-width:100%;width:100%}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge-row">
+    <span class="badge b-gr">HCTA-003</span>
+    <span class="badge b-tl">Practice Exam #3</span>
+    <span class="badge b-yw">60 Questions · 60 min</span>
+  </div>
+  <h1>Terraform Associate <em>003</em></h1>
+  <p>Full-length simulation #3 · All 8 domains · Advanced & edge-case questions</p>
+</div>
+
+<div id="bar">
+  <div><div class="bar-label">Time remaining</div><div id="timer">60:00</div></div>
+  <div class="prog-wrap">
+    <div class="bar-label" id="prog-label">0 / 60 answered</div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-o" onclick="nextBlank()">Next unanswered</button>
+    <button class="btn btn-p" onclick="submitExam()">Submit exam</button>
+  </div>
+</div>
+
+<main>
+  <div class="notice">
+    <h3>📋 Instructions</h3>
+    <ul>
+      <li>60 questions · 60 minutes · <strong>Passing score: 70 %</strong> (42 / 60 correct answers).</li>
+      <li>Questions tagged <span style="color:var(--yellow)">★ Select TWO</span> require exactly <strong>two</strong> answers.</li>
+      <li>Click <strong>Submit exam</strong> to reveal your score and full corrections.</li>
+      <li>After submission: correct answers turn <span style="color:var(--green)">green</span>, wrong selections turn <span style="color:var(--red)">red</span>.</li>
+    </ul>
+  </div>
+  <div id="qwrap"></div>
+  <div id="results"></div>
+</main>
+
+<div id="floatbtn">
+  <button class="btn btn-o" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲ Top</button>
+</div>
+
+<script>
+const QUESTIONS = [
+
+/* ── DOMAIN 1 : IaC Concepts ── */
+{id:1,dom:"IaC Concepts",dif:2,
+ q:"A company moves from manually managed servers to Terraform. Which term describes treating servers as disposable, short-lived resources rather than long-lived assets maintained with patches?",
+ o:["Pet vs cattle model","Blue/green deployment","Immutable infrastructure","Canary releases"],
+ a:[0],
+ r:"The 'pets vs cattle' model distinguishes between servers treated as unique, named, irreplaceable systems (pets) and servers treated as identical, disposable, numbered instances (cattle). IaC enables the cattle model: instances are replaced rather than repaired.",
+ w:["B — Blue/green is a deployment strategy for minimising downtime, not a server management philosophy.","C — Immutable infrastructure is related but describes the technical property (never modified in place); pets vs cattle is the broader organisational metaphor.","D — Canary releases are a progressive rollout strategy."],
+ ref:"HashiCorp: Infrastructure as Cattle",
+ tip:"Pets = named, patched, irreplaceable. Cattle = numbered, replaced, disposable. IaC enables the cattle model."
+},
+
+{id:2,dom:"IaC Concepts",dif:2,
+ q:"Which TWO practices does IaC enable that are impossible with purely manual infrastructure management? (Select TWO)",
+ multi:true,
+ o:["Peer review of infrastructure changes through pull requests",
+    "Zero-cost cloud infrastructure",
+    "Automatic rollback on provider API failures",
+    "Reproducible infrastructure across multiple environments from the same code"],
+ a:[0,3],
+ r:"IaC enables (A) peer review via pull requests — infrastructure changes become code reviewable by the team — and (D) reproducible environments — the same config creates identical dev, staging, and prod environments.",
+ w:["B — IaC has no effect on cloud resource pricing.","C — Automatic rollback on API failures is not a built-in IaC feature; Terraform has no transaction rollback."],
+ ref:"HashiCorp: Benefits of IaC",
+ tip:"IaC superpowers: peer review (PRs) + reproducibility (same code = same infra). Not magic — still costs money and can fail."
+},
+
+{id:3,dom:"IaC Concepts",dif:3,
+ q:"What is the key difference between 'push' and 'pull' configuration management models, and which model does Ansible use?",
+ o:["Push = agent pulls config from server; Ansible uses pull","Push = control node sends config to targets; Ansible uses push","Pull = control node sends config to targets; Ansible uses pull","There is no difference; both models work identically"],
+ a:[1],
+ r:"In the push model, the control node actively sends configurations to managed nodes. Ansible uses SSH to push playbooks and ad-hoc commands directly to targets — no agent required. Puppet and Chef use the pull model where agents regularly poll a server.",
+ w:["A — This reverses the definitions.","C — Pull means agents pull from a server; this also reverses the definition.","D — The models are architecturally distinct and have different trade-offs."],
+ ref:"HashiCorp: IaC Models — Push vs Pull",
+ tip:"Push (Ansible, Terraform) = control node initiates. Pull (Puppet, Chef) = agents poll server. Agentless = push."
+},
+
+{id:4,dom:"IaC Concepts",dif:2,
+ q:"A Terraform configuration is applied to create 5 EC2 instances. It is then applied again with no configuration changes. How many EC2 instances exist after the second apply?",
+ o:["10 — Terraform always creates new resources on each apply","5 — Terraform is idempotent and makes no changes","0 — Terraform destroys and recreates resources on every apply","It depends on the provider version"],
+ a:[1],
+ r:"Terraform is idempotent. On the second apply, it compares the desired state (5 instances) with the actual state (5 instances already exist), detects no difference, and makes zero changes. The result is still 5 instances.",
+ w:["A — Terraform only creates resources that don't already exist in state.","C — Terraform never destroys and recreates unless configuration or reality changed.","D — Idempotency is a fundamental property of Terraform, not provider-dependent."],
+ ref:"HashiCorp: Idempotent Configuration",
+ tip:"No config change + existing state = 0 changes on apply. This is idempotency in action."
+},
+
+/* ── DOMAIN 2 : Terraform Purpose & Workflow ── */
+{id:5,dom:"Terraform Purpose & Workflow",dif:2,
+ q:"What is the correct Terraform CLI flag to specify a variable file that is NOT automatically loaded?",
+ o:["-variables=prod.tfvars","--var-file prod.tfvars","-var-file=prod.tfvars","-vars prod.tfvars"],
+ a:[2],
+ r:"The correct flag is '-var-file=filename.tfvars' (single dash, with equals sign). Multiple -var-file flags can be used in a single command. Files named terraform.tfvars or *.auto.tfvars are loaded automatically without this flag.",
+ w:["A — '-variables' is not a valid Terraform flag.","B — Terraform uses single-dash flags, not double-dash for this option.","D — '-vars' is not a valid Terraform flag."],
+ ref:"HashiCorp CLI: -var-file flag",
+ tip:"Exact syntax: -var-file=file.tfvars (single dash, equals sign). Auto-loaded: terraform.tfvars and *.auto.tfvars."
+},
+
+{id:6,dom:"Terraform Purpose & Workflow",dif:2,
+ q:"What does 'terraform init -backend=false' do?",
+ o:["Initialises only the backend, skipping provider downloads","Initialises providers and modules but skips backend configuration","Destroys the existing backend configuration","Resets the backend to the local default"],
+ a:[1],
+ r:"'-backend=false' tells 'terraform init' to skip backend initialisation entirely. Providers and modules are still downloaded. Useful in CI pipelines where backend configuration is handled separately, or for testing without a backend.",
+ w:["A — This reverses the behaviour; providers and modules are initialised, not the backend.","C — This flag does not destroy backend configuration.","D — The backend is not reset; it is simply not initialised in this run."],
+ ref:"HashiCorp CLI: terraform init -backend=false",
+ tip:"init -backend=false = download providers/modules only, skip backend setup. Useful in offline or split-init workflows."
+},
+
+{id:7,dom:"Terraform Purpose & Workflow",dif:3,
+ q:"A team runs 'terraform plan' and sees '+/-' symbols next to a resource. What do these symbols indicate?",
+ o:["The resource will be created and then immediately destroyed","The resource must be destroyed and recreated (replaced) because an immutable attribute changed","The resource has both additions and removals within the same attribute","The resource is partially managed by Terraform"],
+ a:[1],
+ r:"The '+/-' symbol in a Terraform plan indicates a resource replacement: the existing resource will be destroyed and a new one created. This happens when an immutable attribute (one that cannot be updated in-place) is changed, such as an EC2 instance's AMI.",
+ w:["A — Create-then-destroy is controlled by create_before_destroy; +/- means replace, not a sequence.","C — Changes within an attribute use ~ (update in-place).","D — Partial management is not indicated by +/-."],
+ ref:"HashiCorp: Plan Output Symbols",
+ tip:"+ = create. - = destroy. ~ = update in-place. +/- = replace (destroy+create). Must know all four for the exam."
+},
+
+{id:8,dom:"Terraform Purpose & Workflow",dif:2,
+ q:"Which environment variable disables interactive input prompts in Terraform (useful for CI/CD)?",
+ o:["TF_NONINTERACTIVE=true","TF_INPUT=0","TF_AUTO_APPLY=true","TF_PROMPT_DISABLE=1"],
+ a:[1],
+ r:"Setting 'TF_INPUT=0' (or TF_INPUT=false) disables all interactive input prompts. If a required variable has no value, Terraform will error rather than prompt. This is the standard approach for non-interactive CI/CD environments.",
+ w:["A — TF_NONINTERACTIVE is not a valid Terraform environment variable.","C — TF_AUTO_APPLY does not exist; use -auto-approve flag instead.","D — TF_PROMPT_DISABLE does not exist."],
+ ref:"HashiCorp: TF_INPUT environment variable",
+ tip:"TF_INPUT=0 = no prompts, error if missing vars. Combine with TF_VAR_ or -var-file to supply all values."
+},
+
+/* ── DOMAIN 3 : Terraform Basics ── */
+{id:9,dom:"Terraform Basics",dif:2,
+ q:"What is the result of this HCL expression?\n<pre>length(compact([\"a\", \"\", \"b\", null, \"c\"]))</pre>",
+ o:["5","4","3","An error — compact() does not accept null values"],
+ a:[2],
+ r:"'compact()' removes empty strings and null values from a list. Applied to [\"a\", \"\", \"b\", null, \"c\"], it returns [\"a\", \"b\", \"c\"]. Then 'length()' returns 3.",
+ w:["A — 5 is the length of the original list before compact().","B — 4 would result if only the empty string OR only null were removed, not both.","D — compact() is designed to handle both empty strings and null values."],
+ ref:"HashiCorp: compact Function",
+ tip:"compact() removes empty strings AND nulls from a list. length(compact(list)) is a common pattern for counting non-empty values."
+},
+
+{id:10,dom:"Terraform Basics",dif:2,
+ q:"Which statement about Terraform's 'null' value is TRUE?",
+ o:["null causes an immediate error whenever it is used","null can be set as a variable default to make the variable optional while still having a declared type","null is equivalent to an empty string in Terraform","null cannot be used in conditional expressions"],
+ a:[1],
+ r:"Setting 'default = null' on a variable makes it optional — callers can omit it and the variable will be null. This is commonly used to make module arguments optional. When passed to a resource attribute, null typically omits the attribute.",
+ w:["A — null is a valid value; it does not immediately error.","C — null is distinct from an empty string; they behave differently.","D — null is commonly used in conditional expressions, e.g. var.x != null ? var.x : \"default\"."],
+ ref:"HashiCorp: null Value",
+ tip:"default = null makes a variable optional. Passing null to an optional resource argument typically omits that argument entirely."
+},
+
+{id:11,dom:"Terraform Basics",dif:3,
+ q:"You declare a variable with 'type = list(string)' but pass the value '[\"a\", 1, true]'. What happens?",
+ o:["Terraform accepts all values and converts them to strings automatically","Terraform throws a type error because 1 and true are not strings","Terraform converts the list to type = list(any)","The number and boolean are silently dropped"],
+ a:[0],
+ r:"Terraform performs automatic type coercion for compatible conversions. Numbers and booleans can be coerced to strings (1 → \"1\", true → \"true\"). So [\"a\", 1, true] becomes [\"a\", \"1\", \"true\"] — a valid list(string).",
+ w:["B — Coercion handles compatible type conversions; this is not an error.","C — The declared type remains list(string); coercion converts the elements, not the type declaration.","D — Values are coerced, not dropped."],
+ ref:"HashiCorp: Type Constraints — Coercion",
+ tip:"Terraform coerces numbers and booleans to strings when list(string) is declared. Useful to know — and a common exam trap."
+},
+
+{id:12,dom:"Terraform Basics",dif:2,
+ q:"What is the purpose of the 'description' argument in a variable or output block?",
+ o:["It adds a comment to the generated state file","It provides human-readable documentation shown in 'terraform plan' output and module documentation","It sets the default value if no other value is provided","It validates the variable value against a schema"],
+ a:[1],
+ r:"The 'description' argument documents the purpose of a variable or output. It appears in the Terraform Registry documentation for published modules and is shown by 'terraform-docs'. Good descriptions are essential for maintainable, reusable modules.",
+ w:["A — Descriptions are not written to the state file.","C — The default value is set with the 'default' argument.","D — Validation is done with the 'validation' block."],
+ ref:"HashiCorp: Variable Descriptions",
+ tip:"Always write descriptions for module variables and outputs — they become the module's API documentation."
+},
+
+{id:13,dom:"Terraform Basics",dif:3,
+ q:"What does the 'one()' function do in Terraform?",
+ o:["Returns the first element of any list","Converts a list of zero or one elements into a single value or null, erroring if the list has more than one element","Returns the number 1","Checks if a list contains exactly one element and returns a boolean"],
+ a:[1],
+ r:"'one(list)' is designed to work with lists that should contain zero or one element (typically produced by count=0/1 patterns). If the list is empty, it returns null. If it has exactly one element, it returns that element. If it has more than one element, it errors.",
+ w:["A — 'first()' doesn't exist in Terraform; element(list, 0) or list[0] gets the first element.","C — 'one()' operates on lists, not numbers.","D — 'one()' returns the value or null, not a boolean."],
+ ref:"HashiCorp: one Function",
+ tip:"one([]) = null. one([\"x\"]) = \"x\". one([\"x\",\"y\"]) = error. Perfect for count=0/1 resource references."
+},
+
+{id:14,dom:"Terraform Basics",dif:2,
+ q:"What is the function of 'terraform.required_version' in the terraform {} block?",
+ o:["It specifies which version of the AWS provider to use","It defines the minimum/maximum Terraform CLI version required to use this configuration","It sets the version of HCL syntax to use","It specifies the Terraform Enterprise version"],
+ a:[1],
+ r:"'required_version' declares a version constraint for the Terraform CLI itself. If the running Terraform version does not satisfy the constraint, Terraform exits with an error during 'terraform init'. This prevents older or newer CLI versions from accidentally applying incompatible configurations.",
+ w:["A — Provider versions are declared in 'required_providers', not 'required_version'.","C — HCL syntax versioning is not a Terraform feature.","D — 'required_version' applies to the CLI, not to Terraform Enterprise."],
+ ref:"HashiCorp: required_version",
+ tip:"required_version = \">= 1.5, < 2.0\" locks the CLI version. Checked at 'terraform init'."
+},
+
+{id:15,dom:"Terraform Basics",dif:3,
+ q:"What does the 'try()' function do when ALL of its arguments produce errors?",
+ o:["It returns null","It returns an empty string","It propagates the last error and causes the plan to fail","It returns false"],
+ a:[2],
+ r:"'try(e1, e2, ...)' evaluates each expression in order and returns the first one that succeeds without error. If ALL expressions produce errors, try() propagates the final error and the Terraform operation fails. It is not a silent catch-all.",
+ w:["A — null is not returned when all expressions fail; the error propagates.","B — An empty string is not returned; the error propagates.","D — false is not returned; the error propagates."],
+ ref:"HashiCorp: try Function",
+ tip:"try(a, b, c) = first successful value. If all fail → error. Use can() to check first if you need a safe fallback."
+},
+
+{id:16,dom:"Terraform Basics",dif:2,
+ q:"Which of the following correctly uses string template directives to generate a multi-line string?",
+ o:["\"Hello, ${name}! You have ${count} messages.\"",
+    "<<EOT\nHello, ${name}!\nYou have ${count} messages.\nEOT",
+    "'Hello, ${name}! You have ${count} messages.'",
+    "format(\"Hello, %s! You have %d messages.\", name, count)"],
+ a:[1],
+ r:"Heredoc syntax (<<EOT...EOT) creates multi-line strings in HCL. It supports ${} interpolation and %{} template directives. The format() function is an alternative for single-line formatted strings but is less readable for multi-line content.",
+ w:["A — This is a single-line string, not multi-line.","C — Single quotes are not valid for string interpolation in HCL.","D — format() works but is not the heredoc syntax; it produces a single string, not a multi-line template."],
+ ref:"HashiCorp: String Templates — Heredoc",
+ tip:"Heredoc: <<EOT ... EOT for multi-line strings. Use <<-EOT ... EOT to allow indentation stripping."
+},
+
+{id:17,dom:"Terraform Basics",dif:2,
+ q:"What does 'sensitive = true' on a variable block prevent?",
+ o:["The variable from being used in resource configurations","The variable's value from appearing in Terraform plan, apply, and log output","The variable from being stored in the state file","The variable from being overridden by -var flags"],
+ a:[1],
+ r:"'sensitive = true' on a variable marks its value as sensitive, causing Terraform to redact it from plan output, apply output, and log files. The value is still stored in the state file in plain text and can still be overridden by -var flags.",
+ w:["A — Sensitive variables can still be used in resource configurations normally.","C — The state file still stores sensitive values in plain text; use backend encryption to protect them.","D — sensitive=true does not prevent value overrides; -var flags still work."],
+ ref:"HashiCorp: Sensitive Input Variables",
+ tip:"sensitive=true = hidden from CLI output only. State still stores it in plain text. Encrypt your backend."
+},
+
+{id:18,dom:"Terraform Basics",dif:3,
+ q:"What is the output of this expression in 'terraform console'?\n<pre>{ for k, v in {a=1, b=2, c=3} : v => k if v > 1 }</pre>",
+ o:["{1=\"a\", 2=\"b\", 3=\"c\"}","{2=\"b\", 3=\"c\"}","{b=2, c=3}","{\"2\"=\"b\", \"3\"=\"c\"}"],
+ a:[1],
+ r:"This for expression iterates over the map, swaps keys and values (v => k), and filters to entries where v > 1. Only b=2 and c=3 pass the filter. After swapping, the result is {2=\"b\", 3=\"c\"} — numeric keys become numbers in HCL maps.",
+ w:["A — All three entries would appear without the 'if v > 1' filter.","C — This shows the original key=value pairs without swapping.","D — In HCL, map keys that look like integers remain as numbers, not quoted strings."],
+ ref:"HashiCorp: For Expressions — Map to Map with Filter",
+ tip:"For map: {for k, v in map : new_key => new_value if condition}. Key and value can be swapped freely."
+},
+
+/* ── DOMAIN 4 : Terraform State ── */
+{id:19,dom:"Terraform State",dif:2,
+ q:"What is the 'terraform_remote_state' data source used for?",
+ o:["Migrating state from one backend to another","Accessing output values from another Terraform configuration's state","Merging two state files into one","Listing all resources in a remote state"],
+ a:[1],
+ r:"The 'terraform_remote_state' data source reads the outputs of another Terraform configuration's state file. This enables cross-stack communication: Stack B can read output values (like VPC IDs) from Stack A's state without duplicating the resource.",
+ w:["A — State migration is done via 'terraform init -migrate-state'.","C — There is no state merge functionality in Terraform.","D — Listing resources in state uses 'terraform state list'."],
+ ref:"HashiCorp: terraform_remote_state Data Source",
+ tip:"terraform_remote_state = cross-stack output sharing. Only exposes 'outputs' block values — not all resource attributes."
+},
+
+{id:20,dom:"Terraform State",dif:3,
+ q:"What happens to the state lock if 'terraform apply' is interrupted by a signal (SIGTERM) rather than being forcefully killed (SIGKILL)?",
+ o:["The lock is always preserved regardless of signal type","Terraform gracefully releases the lock on SIGTERM before exiting","The state file is permanently corrupted on any signal","The apply is transparently resumed on the next run"],
+ a:[1],
+ r:"Terraform handles SIGTERM gracefully: it catches the signal, finishes any in-progress API call, saves the state, and releases the lock before exiting. SIGKILL (force kill) bypasses this cleanup, potentially leaving a stale lock.",
+ w:["A — SIGKILL bypasses cleanup; locks may remain after SIGKILL.","C — State corruption requires extremely unusual circumstances; SIGTERM causes graceful cleanup.","D — Terraform has no built-in resume mechanism; it needs to be re-run manually."],
+ ref:"HashiCorp: Interrupting Terraform",
+ tip:"SIGTERM = graceful: lock released. SIGKILL = forceful: lock may remain. Always prefer SIGTERM / Ctrl+C over force-kill."
+},
+
+{id:21,dom:"Terraform State",dif:2,
+ q:"What does the '-refresh=false' flag do when passed to 'terraform plan'?",
+ o:["Prevents Terraform from reading the state file","Skips querying real infrastructure and uses only the cached state data","Prevents the state from being updated after the plan","Disables fact collection from providers"],
+ a:[1],
+ r:"By default, 'terraform plan' refreshes the state by querying real infrastructure before computing the diff. '-refresh=false' skips this step and uses the state file as-is. This speeds up plan execution but may miss recent out-of-band changes.",
+ w:["A — The state file is always read during plan; -refresh=false only skips the infrastructure query.","C — Plan never updates state; that happens during apply. -refresh=false is about the infrastructure query.","D — Facts are a different concept; this flag is about state refresh, not fact collection."],
+ ref:"HashiCorp CLI: terraform plan -refresh=false",
+ tip:"plan -refresh=false = faster plan but may miss drift. Use for large configs where drift is unlikely."
+},
+
+{id:22,dom:"Terraform State",dif:3,
+ q:"You need to rename a module from 'module.old' to 'module.new' in your configuration without destroying any resources. Which is the MOST correct approach?",
+ o:["Delete and recreate all resources in the module manually",
+    "Use 'terraform state mv module.old module.new' or add a 'moved' block",
+    "Simply rename the module block and run terraform apply — Terraform handles it automatically",
+    "Use 'terraform import' for each resource in the module"],
+ a:[1],
+ r:"When renaming a module, Terraform would normally plan to destroy the old resources and create new ones (different addresses). To prevent this, use 'terraform state mv module.old module.new' (CLI) or add a 'moved' block (declarative). Both update the state addresses without touching real infrastructure.",
+ w:["A — Manual delete and recreate causes unnecessary downtime and is not the correct approach.","C — Simply renaming and applying would cause Terraform to plan destroy+create because the addresses changed.","D — terraform import is for importing externally existing resources, not for renaming."],
+ ref:"HashiCorp: Refactoring — state mv and moved block",
+ tip:"Rename module → always use 'state mv' or 'moved' block first. Never just rename and apply — you'll get destroy+create."
+},
+
+{id:23,dom:"Terraform State",dif:2,
+ q:"What is the Azure equivalent of the AWS S3+DynamoDB backend for Terraform state with locking?",
+ o:["Azure Files + Azure Table Storage","Azure Blob Storage with lease-based locking (azurerm backend)","Azure SQL Database + Azure Cache for Redis","Azure Cosmos DB + Azure Service Bus"],
+ a:[1],
+ r:"The 'azurerm' backend stores state in Azure Blob Storage. Azure Blob Storage uses lease-based locking natively, so no separate service (equivalent to DynamoDB) is needed. The blob lease mechanism provides state locking automatically.",
+ w:["A — Azure Files is not a supported Terraform backend.","C — Azure SQL is not used for Terraform state storage.","D — Cosmos DB and Service Bus are not used for Terraform state."],
+ ref:"HashiCorp: AzureRM Backend",
+ tip:"Azure: azurerm backend = Blob Storage (state) + blob lease (locking). No separate lock service needed unlike AWS."
+},
+
+{id:24,dom:"Terraform State",dif:3,
+ q:"What does 'terraform state push' do and when would you use it?",
+ o:["Pushes local configuration files to a remote repository","Uploads a local state file to the configured backend, overwriting the remote state","Syncs state between two workspaces","Pushes provider plugins to the Terraform Registry"],
+ a:[1],
+ r:"'terraform state push' uploads a local state file to the configured backend, replacing the remote state. This is a dangerous operation typically used to recover from state corruption or to manually migrate state when automation is not possible.",
+ w:["A — Terraform has no built-in integration for pushing to Git repositories.","C — Workspace state synchronisation is not a Terraform feature.","D — Provider plugins are published to the Registry by their authors, not by users."],
+ ref:"HashiCorp CLI: terraform state push",
+ tip:"state push = upload local state to backend. Dangerous — it overwrites remote state. Always back up first."
+},
+
+{id:25,dom:"Terraform State",dif:2,
+ q:"Which TWO of the following statements about workspaces are TRUE? (Select TWO)",
+ multi:true,
+ o:["Each workspace has its own independent state file",
+    "The 'default' workspace can be deleted with 'terraform workspace delete default'",
+    "The current workspace name is accessible via the 'terraform.workspace' expression",
+    "Workspaces allow completely different provider configurations per workspace"],
+ a:[0,2],
+ r:"Each workspace maintains its own separate state file (A), enabling environment isolation. The 'terraform.workspace' built-in expression (C) returns the current workspace name and can be used in resource naming.",
+ w:["B — The 'default' workspace cannot be deleted; it always exists and is the fallback.","D — Provider configurations are in the code, which is shared across workspaces; workspaces only isolate state."],
+ ref:"HashiCorp: Workspaces",
+ tip:"Workspaces = isolated state. Same config code. terraform.workspace gives the current name. 'default' is undeletable."
+},
+
+/* ── DOMAIN 5 : Terraform Modules ── */
+{id:26,dom:"Terraform Modules",dif:2,
+ q:"What is the difference between 'Official' and 'Verified' modules on the Terraform Registry?",
+ o:["Official modules are free; verified modules require a paid subscription",
+    "Official modules are published and maintained by HashiCorp; verified modules are published by trusted partners and reviewed by HashiCorp",
+    "Official modules are for enterprise use; verified modules are community modules",
+    "There is no difference — both terms mean the same thing"],
+ a:[1],
+ r:"Official modules (blue HashiCorp badge) are written and maintained by HashiCorp. Verified modules (blue checkmark badge) are written by HashiCorp Technology Partners and have been reviewed and approved by HashiCorp for quality. Community modules have no badge.",
+ w:["A — Both tiers are available to all users at no cost.","C — This distinction does not exist; both official and verified modules are high quality.","D — They are distinct tiers with different levels of HashiCorp involvement."],
+ ref:"HashiCorp Registry: Module Tiers",
+ tip:"Official = HashiCorp writes it. Verified = partner writes it, HashiCorp approves it. Community = anyone, no review."
+},
+
+{id:27,dom:"Terraform Modules",dif:3,
+ q:"A module declares an output with 'sensitive = true'. A calling module references this output. Which statement is correct?",
+ o:["The calling module can freely use the sensitive value in non-sensitive outputs without any restriction",
+    "If the calling module uses the sensitive value in its own output, that output must also be marked sensitive",
+    "Sensitive outputs from child modules are automatically decrypted in the calling module",
+    "The calling module cannot use sensitive outputs at all"],
+ a:[1],
+ r:"Terraform tracks sensitivity through the call chain. When a sensitive value is used in a parent module's output, Terraform requires that output to also be marked 'sensitive = true'. This ensures the sensitive marking is explicitly propagated and not accidentally exposed.",
+ w:["A — Terraform enforces explicit sensitivity propagation; you cannot freely put sensitive values in non-sensitive outputs.","C — 'Sensitive' is a display/logging concept, not encryption; there is nothing to decrypt.","D — Sensitive outputs can be used; they just require careful handling."],
+ ref:"HashiCorp: Sensitive Output Values — Propagation",
+ tip:"Sensitive output used in a parent output → parent output must also be sensitive. Sensitivity is contagious."
+},
+
+{id:28,dom:"Terraform Modules",dif:2,
+ q:"What does 'terraform init' do when a module source points to a local path (e.g., './modules/vpc')?",
+ o:["It downloads the module from the Terraform Registry","It copies the module files into the .terraform directory for use","It creates a symlink to the local module directory","It validates the module syntax but does not copy anything"],
+ a:[1],
+ r:"For local module sources, 'terraform init' copies the module files into the .terraform/modules directory. This ensures a consistent snapshot of the module code is used, even if the source directory is subsequently modified.",
+ w:["A — Local paths are not fetched from the Registry.","C — Terraform copies files, it does not create symlinks.","D — 'terraform init' does copy the module; 'terraform validate' handles syntax checking."],
+ ref:"HashiCorp: Module Installation — Local Paths",
+ tip:"Even local modules are copied to .terraform/modules/ during init. Changes to local module source require re-running init."
+},
+
+{id:29,dom:"Terraform Modules",dif:3,
+ q:"A module uses 'count' to create resources. How do you reference the second resource instance created by the module from the calling module?",
+ o:["module.my_module.resource_type.resource_name[1]",
+    "module.my_module[1].output_name",
+    "module.my_module.output_name[1]",
+    "module.my_module.1.output_name"],
+ a:[2],
+ r:"When a module's resource uses count, the module's output referencing that resource will be a list. The calling module accesses specific elements using index notation on the output: module.my_module.output_name[1]. The module itself controls the count; the caller accesses outputs as lists.",
+ w:["A — You cannot directly reference resource internals from outside a module; you must go through the module's outputs.","B — module.my_module[1] would be used if the module BLOCK itself used count or for_each.","D — Dot notation cannot be used for list indexing in HCL; use square brackets."],
+ ref:"HashiCorp: Module Outputs with count",
+ tip:"Module outputs from counted resources are lists. Access with module.name.output[index]. Never reference internal resources directly."
+},
+
+{id:30,dom:"Terraform Modules",dif:2,
+ q:"What is the purpose of the 'meta' directory (meta/main.yml concept) in Ansible roles, and what is its Terraform module equivalent?",
+ o:["There is no Terraform equivalent; only Ansible has metadata",
+    "In Terraform modules, dependencies between modules are expressed through module output references and 'depends_on' rather than a separate metadata file",
+    "The Terraform equivalent is the .terraform.lock.hcl file",
+    "The Terraform equivalent is the terraform.tfstate file"],
+ a:[1],
+ r:"Ansible roles use meta/main.yml to declare role dependencies. In Terraform, module dependencies are expressed implicitly through output references (when module B uses module A's output) or explicitly through 'depends_on'. There is no separate metadata dependency file in Terraform modules.",
+ w:["A — Terraform has its own dependency system; the analogy is valid.","C — .terraform.lock.hcl tracks provider versions, not module dependencies.","D — tfstate tracks resource state, not module dependencies."],
+ ref:"HashiCorp: Module Dependencies",
+ tip:"Terraform module deps = implicit via output references + explicit depends_on. No separate meta file needed."
+},
+
+/* ── DOMAIN 6 : Terraform Workflow ── */
+{id:31,dom:"Terraform Workflow",dif:2,
+ q:"What is the purpose of 'terraform apply -destroy'?",
+ o:["It is an alias for 'terraform destroy'",
+    "It destroys only the resources that were created in the last apply",
+    "It destroys resources and then immediately recreates them",
+    "It is used to preview a destruction without executing it"],
+ a:[0],
+ r:"'terraform apply -destroy' is functionally equivalent to 'terraform destroy'. Both generate a plan to destroy all resources in the current state and execute it. The -destroy flag was introduced as a more consistent alternative to the standalone 'destroy' subcommand.",
+ w:["B — Both commands destroy ALL tracked resources, not just the ones from the last apply.","C — Neither 'terraform destroy' nor 'apply -destroy' recreates resources afterward.","D — To preview a destruction, use 'terraform plan -destroy'."],
+ ref:"HashiCorp CLI: terraform apply -destroy",
+ tip:"terraform destroy = terraform apply -destroy. They are equivalent. Use 'terraform plan -destroy' to preview."
+},
+
+{id:32,dom:"Terraform Workflow",dif:3,
+ q:"What does 'terraform plan -generate-config-out=generated.tf' do (Terraform 1.5+)?",
+ o:["Generates a plan file named generated.tf","Generates HCL configuration code for resources being imported, writing it to generated.tf","Exports the current state as HCL configuration","Creates a template file for new resources"],
+ a:[1],
+ r:"Introduced in Terraform 1.5, '-generate-config-out' works alongside 'terraform import' blocks to automatically generate HCL resource configuration for resources being imported. This was a major improvement over the old import workflow that required manually writing configuration first.",
+ w:["A — Plan files are binary; they use the -out flag, not -generate-config-out.","C — Exporting existing state as config is done by 'terraform show' or third-party tools.","D — This flag is specifically for import config generation, not general templates."],
+ ref:"HashiCorp: Generating Configuration for Import (Terraform 1.5+)",
+ tip:"Terraform 1.5+ import workflow: add import {} block → terraform plan -generate-config-out=res.tf → review → apply."
+},
+
+{id:33,dom:"Terraform Workflow",dif:2,
+ q:"A Terraform plan shows a resource with the symbol '~'. What does this mean?",
+ o:["The resource will be destroyed","The resource will be created","The resource will be updated in-place without being replaced","The resource is marked as tainted and will be recreated"],
+ a:[2],
+ r:"The '~' symbol in a Terraform plan indicates an in-place update: one or more attributes of the resource will be changed, but the resource itself will not be destroyed and recreated. This is different from '+/-' (replacement).",
+ w:["A — Destruction is shown with '-'.","B — Creation is shown with '+'.","D — Tainted/replaced resources show '+/-'."],
+ ref:"HashiCorp: Plan Output Symbols",
+ tip:"Plan symbols: + create, - destroy, ~ update in-place, +/- replace, <= data read. Know all of them."
+},
+
+{id:34,dom:"Terraform Workflow",dif:2,
+ q:"What happens when 'terraform apply' is run with a saved plan file that was generated against a different infrastructure state than the current one?",
+ o:["Terraform automatically recalculates the plan before applying","Terraform applies the saved plan exactly as generated, even if infrastructure changed in the meantime","Terraform errors immediately and refuses to apply the stale plan","Terraform merges the saved plan with the current state"],
+ a:[1],
+ r:"When applying a saved plan file, Terraform executes exactly the operations recorded in the plan — it does NOT re-evaluate the current state. If infrastructure changed between 'plan' and 'apply', the apply may fail or produce unexpected results. This is a trade-off: plan files guarantee determinism at the cost of staleness.",
+ w:["A — Terraform does not recalculate when using a plan file; that would defeat the purpose of saving the plan.","C — Terraform does not error on stale plans; it applies them as-is.","D — Terraform does not merge plan files with current state."],
+ ref:"HashiCorp CLI: terraform apply with plan file",
+ tip:"Saved plan = deterministic but potentially stale. In production, keep the time between plan and apply short."
+},
+
+{id:35,dom:"Terraform Workflow",dif:3,
+ q:"Which command would you use to verify the integrity of providers in .terraform.lock.hcl against the actual downloaded binaries?",
+ o:["terraform validate","terraform providers lock","terraform init -verify","terraform providers mirror"],
+ a:[1],
+ r:"'terraform providers lock' verifies that the checksums in .terraform.lock.hcl match the downloaded provider binaries and updates the lock file with checksums for additional platforms. It is used to pre-populate checksums for CI/CD environments that need to run on multiple OS/architectures.",
+ w:["A — 'terraform validate' checks configuration syntax, not provider binary integrity.","C — 'terraform init -verify' is not a valid flag.","D — 'terraform providers mirror' creates a local mirror of provider plugins for air-gapped environments."],
+ ref:"HashiCorp CLI: terraform providers lock",
+ tip:"providers lock = pre-populate checksums for multiple platforms. Essential for cross-platform teams (macOS dev + Linux CI)."
+},
+
+{id:36,dom:"Terraform Workflow",dif:2,
+ q:"What is the correct use of 'terraform import' in Terraform versions before 1.5?",
+ o:["terraform import automatically generates the HCL configuration for the imported resource",
+    "terraform import only updates the state file; you must manually write the matching HCL configuration",
+    "terraform import works without any existing configuration being present",
+    "terraform import can import multiple resources in a single command"],
+ a:[1],
+ r:"Before Terraform 1.5, 'terraform import' ONLY updated the state file to include the resource. You had to manually write the HCL resource block first. If the configuration didn't match the imported resource, the next 'terraform plan' would show changes. Config generation was added in 1.5.",
+ w:["A — Config generation was added in Terraform 1.5+; it is not available in earlier versions.","C — An HCL resource block must exist before running import in pre-1.5 versions.","D — Each import command handles exactly one resource."],
+ ref:"HashiCorp: terraform import (pre-1.5)",
+ tip:"Pre-1.5: write config → import state. 1.5+: add import{} block → plan -generate-config-out → apply."
+},
+
+/* ── DOMAIN 7 : Implement & Maintain State ── */
+{id:37,dom:"Implement & Maintain State",dif:2,
+ q:"What is the effect of setting 'encrypt = true' in the S3 backend configuration?",
+ o:["It encrypts the Terraform plan files before storing them","It enables server-side encryption (SSE-S3) for the state file stored in S3","It encrypts variables marked as sensitive before writing them to state","It enables TLS for the connection to the S3 API"],
+ a:[1],
+ r:"'encrypt = true' in the S3 backend configuration enables server-side encryption (SSE-S3) for the state file stored in S3. AWS uses AES-256 to encrypt the file at rest. For stronger control, add 'kms_key_id' to use SSE-KMS with a customer-managed key.",
+ w:["A — Plan files are stored locally or not at all; the S3 backend stores state, not plan files.","C — Variable sensitivity is a display concern; 'encrypt' is about S3-side at-rest encryption.","D — HTTPS is always used for S3 API calls; this flag is about at-rest encryption."],
+ ref:"HashiCorp: S3 Backend — encrypt",
+ tip:"encrypt=true → SSE-S3 (AWS-managed keys). Add kms_key_id → SSE-KMS (customer-managed keys, audit trail)."
+},
+
+{id:38,dom:"Implement & Maintain State",dif:3,
+ q:"Your team's Terraform state is stored in S3. A junior engineer accidentally runs 'terraform state rm' on 20 resources. How do you recover?",
+ o:["There is no recovery — the resources are permanently deleted from state","Restore a previous version of the state file from S3 versioning, then use 'terraform state push' to restore it","Re-import all 20 resources manually with 'terraform import'","Run 'terraform apply -refresh-only' to automatically re-add the resources to state"],
+ a:[1],
+ r:"With S3 versioning enabled, every state file version is preserved. You can restore the previous version from S3, then use 'terraform state push' to upload it back as the current state — recovering all 20 resources with their full attributes instantly.",
+ w:["A — S3 versioning exists precisely for this recovery scenario.","C — Re-importing all 20 resources is possible but tedious and error-prone; state restore is faster and more accurate.","D — 'apply -refresh-only' updates state to match reality; it doesn't re-add resources that were removed from state."],
+ ref:"HashiCorp: S3 Backend — Versioning Recovery",
+ tip:"S3 versioning = your safety net. state rm accident → restore S3 version → state push. This is why you always enable versioning."
+},
+
+{id:39,dom:"Implement & Maintain State",dif:2,
+ q:"What is the 'cloud' backend block used for in Terraform?",
+ o:["Connecting to any cloud provider API","Connecting to HCP Terraform (Terraform Cloud) for remote state and remote execution","Replacing all provider configurations with a single cloud block","Enabling multi-cloud deployments in a single configuration"],
+ a:[1],
+ r:"The 'cloud' block (inside the terraform {} block) connects the local CLI to HCP Terraform (formerly Terraform Cloud). It enables remote state storage, remote plan/apply execution, team collaboration features, and policy enforcement in HCP Terraform.",
+ w:["A — Provider API connections are configured in 'provider' blocks, not the cloud backend.","C — The cloud block only connects to HCP Terraform; it does not replace provider configurations.","D — Multi-cloud is achieved through multiple provider blocks, not the cloud backend."],
+ ref:"HashiCorp: Cloud Backend (HCP Terraform)",
+ tip:"terraform { cloud { organization = \"org\" workspaces { name = \"ws\" } } } — connects to HCP Terraform."
+},
+
+{id:40,dom:"Implement & Maintain State",dif:3,
+ q:"A team wants to split a large monolithic Terraform configuration into two separate configurations (A and B). Config B needs the VPC ID from Config A. What is the recommended approach?",
+ o:["Copy the VPC ID value manually between configurations as a hardcoded variable",
+    "Use 'terraform_remote_state' data source in Config B to read Config A's output",
+    "Merge both configurations back into one — splitting is not supported",
+    "Use a shared .tfvars file that both configurations read"],
+ a:[1],
+ r:"The 'terraform_remote_state' data source is specifically designed for this use case: it reads the output values from another configuration's remote state. Config A outputs the VPC ID; Config B uses terraform_remote_state to read it.",
+ w:["A — Hardcoding values defeats the purpose of IaC and creates a maintenance burden.","C — Splitting configurations is a common and well-supported pattern.","D — A shared .tfvars file would require manual updates whenever Config A changes, and wouldn't be automatically in sync."],
+ ref:"HashiCorp: terraform_remote_state",
+ tip:"Cross-stack data sharing: Config A outputs → Config B reads via terraform_remote_state. Only outputs are accessible."
+},
+
+{id:41,dom:"Implement & Maintain State",dif:2,
+ q:"What is the recommended .gitignore pattern for a Terraform project?",
+ o:["Ignore everything: **/*.tf, .terraform/, *.tfstate, .terraform.lock.hcl",
+    "Ignore: .terraform/, *.tfstate, *.tfstate.backup, *.tfvars (if containing secrets). Commit: *.tf, .terraform.lock.hcl",
+    "Ignore: .terraform.lock.hcl, *.tfstate. Commit: *.tf, .terraform/",
+    "Ignore: *.tf (compiled output). Commit: .terraform/, *.tfstate"],
+ a:[1],
+ r:"Standard Terraform .gitignore: ignore .terraform/ (provider binaries), *.tfstate and *.tfstate.backup (state files — contain secrets), and sensitive .tfvars files. Commit *.tf (configuration) and .terraform.lock.hcl (provider version pins).",
+ w:["A — Ignoring all .tf files would mean no configuration is tracked in Git — defeating the purpose of IaC.","C — .terraform.lock.hcl SHOULD be committed; .terraform/ should NOT.","D — .tf files are source code to commit; .terraform/ contains binaries to ignore."],
+ ref:"HashiCorp: .gitignore for Terraform",
+ tip:"Commit: *.tf + .terraform.lock.hcl. Ignore: .terraform/ + *.tfstate + *.tfstate.backup + sensitive .tfvars."
+},
+
+{id:42,dom:"Implement & Maintain State",dif:3,
+ q:"What is the 'terraform providers mirror' command used for?",
+ o:["Replicates the Terraform Registry to a private server","Downloads provider plugins to a local directory for use in air-gapped or offline environments","Creates a backup copy of all installed providers","Mirrors provider configurations across multiple workspaces"],
+ a:[1],
+ r:"'terraform providers mirror <directory>' downloads all provider plugins required by the current configuration to a local directory. This directory can then be used as a provider source in air-gapped environments using 'terraform init -plugin-dir=<directory>'.",
+ w:["A — Full Registry replication is done with tools like Artifactory or Nexus; providers mirror is for specific configs.","C — It downloads plugins for offline use, not as a backup mechanism.","D — Workspace configuration is unrelated to provider mirroring."],
+ ref:"HashiCorp CLI: terraform providers mirror",
+ tip:"Air-gapped workflow: providers mirror ./offline/ → copy to network → init -plugin-dir=./offline/"
+},
+
+/* ── DOMAIN 8 : Read, Generate & Modify Config ── */
+{id:43,dom:"Read, Generate & Modify Config",dif:2,
+ q:"What is the difference between 'coalesce()' and 'coalescelist()' functions?",
+ o:["They are identical — coalesce is just an alias for coalescelist",
+    "coalesce() returns the first non-null/non-empty argument (scalars); coalescelist() returns the first non-empty list",
+    "coalesce() works on maps; coalescelist() works on lists",
+    "coalesce() is deprecated; coalescelist() is the modern replacement"],
+ a:[1],
+ r:"'coalesce(a, b, c)' returns the first non-null, non-empty-string argument from a list of scalar values. 'coalescelist([a], [b], [c])' returns the first non-empty list from a list of lists. They serve the same conceptual purpose for different types.",
+ w:["A — They are distinct functions for different types.","C — coalesce() works on scalar values (strings, numbers); neither works specifically on maps.","D — Both functions are current and non-deprecated."],
+ ref:"HashiCorp: coalesce and coalescelist Functions",
+ tip:"coalesce(a,b) = first non-empty scalar. coalescelist([a],[b]) = first non-empty list."
+},
+
+{id:44,dom:"Read, Generate & Modify Config",dif:3,
+ q:"What does the 'nonsensitive()' function do?",
+ o:["Marks a value as not sensitive, allowing it to appear in output even if originally marked sensitive",
+    "Removes encryption from a sensitive variable",
+    "Converts a sensitive value to an empty string for safe logging",
+    "Checks if a value contains sensitive data and returns a boolean"],
+ a:[0],
+ r:"'nonsensitive(value)' explicitly removes the sensitive marking from a value, allowing it to appear in plan output and logs. This should be used with extreme caution and only when you are certain the value is safe to display (e.g., a hash or truncated version).",
+ w:["B — 'Sensitive' is a display concept, not encryption; nonsensitive() changes the display flag, not encryption.","C — nonsensitive() returns the original value without the sensitive marking; it doesn't replace it with empty string.","D — There is no built-in function to detect if a value contains sensitive data."],
+ ref:"HashiCorp: nonsensitive Function",
+ tip:"nonsensitive() removes the sensitive flag. Use sparingly and carefully — it can expose secrets in logs."
+},
+
+{id:45,dom:"Read, Generate & Modify Config",dif:2,
+ q:"Which function would you use to get the absolute filesystem path to a file relative to the current module?",
+ o:["file(\"./config.json\")","path.module","${path.root}/config.json","abspath(\"./config.json\")"],
+ a:[1],
+ r:"'path.module' is a special expression that returns the absolute filesystem path to the directory containing the current module's configuration files. It is commonly used to construct paths to files within a module: '${path.module}/files/config.json'.",
+ w:["A — file() reads the file content, it doesn't return the path.","C — path.root refers to the root module directory, not the current module directory.","D — abspath() converts a relative path to absolute, but path.module is the idiomatic way to reference module-relative paths."],
+ ref:"HashiCorp: Filesystem and Workspace Expressions — path.module",
+ tip:"path.module = current module directory. path.root = root module directory. path.cwd = working directory."
+},
+
+{id:46,dom:"Read, Generate & Modify Config",dif:2,
+ q:"What does the 'jsonencode()' function return?",
+ o:["A file path to a JSON file on disk","A JSON-formatted string representation of the input value","A Terraform object parsed from a JSON string","A base64-encoded JSON string"],
+ a:[1],
+ r:"'jsonencode(value)' converts any Terraform value (object, list, map, string, etc.) into a JSON-formatted string. This is commonly used to embed JSON content in resource attributes, such as IAM policies in AWS.",
+ w:["A — jsonencode() returns a string, not a file path.","C — That is 'jsondecode()' — it parses a JSON string into a Terraform value.","D — jsonencode() produces plain JSON, not base64. Use base64encode(jsonencode(val)) for base64 JSON."],
+ ref:"HashiCorp: jsonencode Function",
+ tip:"jsonencode(object) = JSON string. jsondecode(string) = Terraform value. Often used for IAM policy documents."
+},
+
+{id:47,dom:"Read, Generate & Modify Config",dif:3,
+ q:"What is the result of running this configuration where 'var.env' is \"prod\"?\n<pre>locals {\n  config = var.env == \"prod\" ? {\n    size    = \"large\"\n    replicas = 3\n  } : {\n    size    = \"small\"\n    replicas = 1\n  }\n}</pre>",
+ o:["An error — ternary operators cannot return object values",
+    "local.config = { size = \"large\", replicas = 3 }",
+    "local.config = { size = \"small\", replicas = 1 }",
+    "An error — object values in ternary must have identical types"],
+ a:[1],
+ r:"The ternary operator in HCL can return any type, including objects. Since var.env == \"prod\" is true, the true branch is selected, returning { size = \"large\", replicas = 3 }. Both branches must have compatible types (they do — both are objects with the same attribute structure).",
+ w:["A — Ternary operators can return any HCL type, including objects.","C — The false branch would be selected if var.env were not \"prod\".","D — Both objects have the same structure (size=string, replicas=number), so they are compatible types."],
+ ref:"HashiCorp: Conditional Expressions with Objects",
+ tip:"Ternary can return objects, lists, maps — any HCL type. Both branches must be type-compatible."
+},
+
+{id:48,dom:"Read, Generate & Modify Config",dif:2,
+ q:"What is the purpose of the 'precondition' block inside a resource or data source lifecycle?",
+ o:["It runs a script before the resource is created",
+    "It validates assumptions about input values and fails with a clear message if they are violated before applying changes",
+    "It checks post-apply conditions and triggers a rollback if they fail",
+    "It is an alias for the 'validation' block in variable declarations"],
+ a:[1],
+ r:"'precondition' blocks (Terraform 1.2+) check conditions before a resource is created or modified. If the condition is false, Terraform fails with the provided error message before making any changes. They validate assumptions about values that may not be input variables (e.g., data source results).",
+ w:["A — precondition is a Terraform-native assertion; it does not run shell scripts.","C — Post-apply checks use 'postcondition' blocks, not precondition.","D — precondition and postcondition are lifecycle-level checks; validation blocks are for input variables only."],
+ ref:"HashiCorp: Custom Conditions — precondition",
+ tip:"precondition = check before apply (fail fast). postcondition = check after apply (validate result). Both in lifecycle {}."
+},
+
+{id:49,dom:"Read, Generate & Modify Config",dif:3,
+ q:"What does 'setintersection(set1, set2)' return?",
+ o:["The combined set of all elements from both sets",
+    "A set containing only the elements that appear in BOTH sets",
+    "The elements present in set1 but not in set2",
+    "The total count of unique elements across both sets"],
+ a:[1],
+ r:"'setintersection(set1, set2, ...)' returns a new set containing only elements present in ALL of the input sets — the mathematical intersection. For example, setintersection([\"a\",\"b\",\"c\"], [\"b\",\"c\",\"d\"]) returns {\"b\",\"c\"}.",
+ w:["A — The union of all elements is returned by 'setunion()'.","C — Elements in set1 but not set2 is returned by 'setsubtract(set1, set2)'.","D — 'length(setunion(set1, set2))' would give total unique count; setintersection returns elements, not a count."],
+ ref:"HashiCorp: setintersection Function",
+ tip:"setintersection = AND (common to all). setunion = OR (any set). setsubtract = NOT IN (present in first, absent in rest)."
+},
+
+{id:50,dom:"Read, Generate & Modify Config",dif:2,
+ q:"What does the 'replace_triggered_by' lifecycle argument do?",
+ o:["Replaces the resource when any of the listed resources or attributes change",
+    "Marks the resource to be replaced only during terraform destroy",
+    "Triggers a handler notification when the resource changes",
+    "Replaces the resource on every apply regardless of changes"],
+ a:[0],
+ r:"'replace_triggered_by' (Terraform 1.2+) forces a resource to be replaced when any of the listed resources or resource attributes change — even if the current resource's own configuration hasn't changed. Useful when downstream resources need fresh replacements when upstream resources change.",
+ w:["B — replace_triggered_by works during apply, not destroy.","C — Handlers are an Ansible concept; Terraform uses notify patterns differently.","D — Replacement only triggers when the listed resources/attributes actually change, not on every apply."],
+ ref:"HashiCorp: lifecycle — replace_triggered_by",
+ tip:"replace_triggered_by = cascade replacement. \"If this upstream resource changes, force-replace me too.\""
+},
+
+/* ── ADDITIONAL MIXED ── */
+{id:51,dom:"Terraform Basics",dif:2,
+ q:"What does the 'floor()' function return for the value 4.9?",
+ o:["5","4","4.9","An error — floor() only accepts integers"],
+ a:[1],
+ r:"'floor(4.9)' returns 4 — the largest integer less than or equal to the input. floor() always rounds down. Its counterpart, 'ceil()', always rounds up.",
+ w:["A — That would be the result of ceil(4.9) or round(4.9).","C — floor() returns an integer, not a float.","D — floor() accepts floats and returns an integer result."],
+ ref:"HashiCorp: floor Function",
+ tip:"floor() rounds down. ceil() rounds up. Both useful for calculating resource counts or subnet sizes."
+},
+
+{id:52,dom:"Terraform State",dif:3,
+ q:"What is a 'state snapshot' in the context of HCP Terraform?",
+ o:["A read-only copy of the state shared with external teams",
+    "An automatic backup of each state version stored by HCP Terraform, viewable in the UI",
+    "A manually triggered export of the state to an S3 bucket",
+    "A snapshot of all provider binaries at a point in time"],
+ a:[1],
+ r:"HCP Terraform automatically stores a snapshot (version) of the state after every successful apply. These snapshots are viewable in the HCP Terraform UI, can be downloaded, and can be used to roll back to a previous state. This is HCP Terraform's built-in equivalent of S3 versioning.",
+ w:["A — Snapshots are not specifically for external sharing; they are version history.","C — Manual S3 exports require separate tooling; HCP Terraform stores snapshots automatically.","D — Provider binaries are not part of state snapshots."],
+ ref:"HashiCorp: HCP Terraform — State Snapshots",
+ tip:"HCP Terraform = automatic state snapshots after every apply. No need for S3 versioning when using HCP Terraform."
+},
+
+{id:53,dom:"Terraform Modules",dif:2,
+ q:"What is the difference between 'import_tasks' and 'include_tasks' in Ansible, and what is the Terraform equivalent distinction?",
+ o:["They are identical in Ansible; Terraform makes no such distinction",
+    "import_tasks is static (resolved at playbook load); include_tasks is dynamic (resolved at runtime). In Terraform, import {} blocks are static; include_role is dynamic",
+    "In Terraform, this corresponds to the difference between 'module' blocks (static) and 'data' blocks (dynamic)",
+    "Terraform has no equivalent concept as all modules are loaded statically"],
+ a:[3],
+ r:"In Terraform, all module calls are resolved statically during initialisation — there is no dynamic module loading equivalent to Ansible's include_tasks. Module sources must be known at init time. The closest Terraform concepts are simply 'module' blocks, which are always static.",
+ w:["A — They are different in Ansible (static vs dynamic loading).","B — The Terraform import block is for importing existing resources, not for static task loading.","C — 'module' blocks and 'data' blocks serve different purposes; the static/dynamic distinction doesn't apply in the same way."],
+ ref:"HashiCorp: Module Sources — Static Resolution",
+ tip:"All Terraform module sources are resolved at init time (static). No dynamic module loading like Ansible's include_tasks."
+},
+
+{id:54,dom:"Implement & Maintain State",dif:2,
+ q:"What is 'drift detection' and how does Terraform detect it?",
+ o:["Drift detection monitors network latency between the control node and providers",
+    "Drift detection compares the recorded state with real infrastructure during 'terraform plan', highlighting differences caused by out-of-band changes",
+    "Drift detection is only available in Terraform Enterprise",
+    "Drift detection requires installing the terraform-drift plugin"],
+ a:[1],
+ r:"Configuration drift occurs when real infrastructure diverges from the desired state recorded in Terraform's state file (due to manual changes). 'terraform plan' performs drift detection by refreshing the state against real infrastructure and highlighting the delta.",
+ w:["A — Drift detection is about infrastructure state divergence, not network latency.","C — Drift detection via 'terraform plan' is available in all Terraform editions.","D — No plugin is required; drift detection is built into 'terraform plan'."],
+ ref:"HashiCorp: Detecting and Managing Drift",
+ tip:"terraform plan = automatic drift detection. Out-of-band changes show up as unexpected diffs in the plan output."
+},
+
+{id:55,dom:"Read, Generate & Modify Config",dif:3,
+ q:"What does 'yamldecode()' do in Terraform?",
+ o:["Converts a Terraform object to YAML format",
+    "Parses a YAML string and converts it to a Terraform value (map, list, or scalar)",
+    "Reads a YAML file from disk",
+    "Validates that a string is valid YAML syntax"],
+ a:[1],
+ r:"'yamldecode(string)' parses a YAML-formatted string and returns the equivalent Terraform value. Commonly used with 'file()' to load YAML configuration files: yamldecode(file(\"${path.module}/config.yaml\")). Its counterpart 'yamlencode()' converts Terraform values to YAML strings.",
+ w:["A — That is 'yamlencode()' — converts Terraform values to YAML strings.","C — 'file()' reads a file from disk; yamldecode() parses the string content.","D — yamldecode() converts the YAML; it errors if the YAML is invalid, but its purpose is conversion, not validation."],
+ ref:"HashiCorp: yamldecode Function",
+ tip:"yamldecode(file(\"config.yaml\")) = common pattern for loading YAML configs. yamlencode() = opposite direction."
+},
+
+{id:56,dom:"Terraform Workflow",dif:2,
+ q:"What is a 'run trigger' in HCP Terraform?",
+ o:["A scheduled cron job that runs terraform apply automatically",
+    "A configuration that automatically queues a run in one workspace when a run in another workspace completes successfully",
+    "A webhook that triggers a Terraform plan when code is pushed to Git",
+    "A CI/CD pipeline step that runs terraform validate"],
+ a:[1],
+ r:"Run triggers in HCP Terraform create automatic dependencies between workspaces. When Workspace A (upstream) completes a successful apply, Workspace B (downstream) is automatically queued for a plan/apply. This is how multi-workspace pipelines are orchestrated.",
+ w:["A — Scheduled runs are a separate HCP Terraform feature (scheduling).","C — Git-triggered runs are VCS integration, not run triggers.","D — Run triggers are workspace-to-workspace dependencies, not CI/CD steps."],
+ ref:"HashiCorp: HCP Terraform — Run Triggers",
+ tip:"Run trigger = workspace dependency. Upstream apply succeeds → downstream workspace auto-queues. Like Terraform pipeline chaining."
+},
+
+{id:57,dom:"IaC Concepts",dif:2,
+ q:"Which of the following is the best description of 'policy as code' in the context of Terraform?",
+ o:["Writing Terraform configurations inside CI/CD pipeline scripts",
+    "Using tools like Sentinel or OPA to define and enforce governance rules on infrastructure configurations as code",
+    "Storing all IAM policies as Terraform resource configurations",
+    "Using terraform validate to enforce code quality standards"],
+ a:[1],
+ r:"Policy as code means writing compliance and governance rules in code (using Sentinel, OPA/Conftest, Checkov, etc.) and enforcing them automatically as part of the Terraform workflow. Rules like 'all S3 buckets must be private' or 'no instance type larger than t3.large in dev' are expressed and enforced as code.",
+ w:["A — Writing Terraform in CI/CD pipelines is not policy as code; it's CI/CD integration.","C — Storing IAM policies as Terraform resources is infrastructure as code, not policy as code.","D — 'terraform validate' checks syntax; policy as code checks compliance rules."],
+ ref:"HashiCorp: Sentinel — Policy as Code",
+ tip:"Policy as code = compliance rules as code (Sentinel, OPA, Checkov). Enforced automatically in the pipeline."
+},
+
+{id:58,dom:"Terraform Purpose & Workflow",dif:3,
+ q:"What is the difference between a 'plan' file and a 'state' file in Terraform?",
+ o:["They are the same file with different names",
+    "A plan file is a binary snapshot of intended changes; a state file is a JSON record of currently managed resources",
+    "A state file is created by 'terraform plan'; a plan file is created by 'terraform apply'",
+    "Plan files are stored remotely; state files are always local"],
+ a:[1],
+ r:"A plan file (created by 'terraform plan -out=file') is a binary file recording exactly what changes Terraform intends to make. A state file (terraform.tfstate) is a JSON file recording what infrastructure Terraform currently manages. They serve completely different purposes.",
+ w:["A — They are distinct files with different formats and purposes.","C — 'terraform plan -out' creates the plan file; state is updated by 'terraform apply'.","D — Both can be stored locally or remotely depending on backend configuration."],
+ ref:"HashiCorp: Plan Files vs State Files",
+ tip:"Plan file = binary, what WILL change. State file = JSON, what IS managed. Different formats, different purposes."
+},
+
+{id:59,dom:"Terraform Basics",dif:3,
+ q:"What is the result of 'cidrsubnet(\"10.0.0.0/16\", 8, 2)'?",
+ o:["10.0.0.0/24","10.0.2.0/24","10.2.0.0/24","10.0.0.2/16"],
+ a:[1],
+ r:"'cidrsubnet(prefix, newbits, netnum)' calculates a subnet: starting from 10.0.0.0/16, add 8 bits to the prefix (16+8=24), subnet number 2. The result is the 3rd subnet (0-indexed) in the /24 division: 10.0.2.0/24.",
+ w:["A — That would be netnum=0 (the first /24 subnet).","C — That would require the 8 new bits to be in the second octet, which is not how cidrsubnet works.","D — cidrsubnet always extends the prefix; it doesn't assign a host address."],
+ ref:"HashiCorp: cidrsubnet Function",
+ tip:"cidrsubnet(\"10.0.0.0/16\", 8, N) = 10.0.N.0/24. The third argument is the subnet index (0-based)."
+},
+
+{id:60,dom:"Implement & Maintain State",dif:2,
+ q:"What TWO actions should you take before running 'terraform state push' to restore a state file? (Select TWO)",
+ multi:true,
+ o:["Back up the current remote state with 'terraform state pull > current.tfstate'",
+    "Run 'terraform apply' to synchronise infrastructure first",
+    "Verify the state file to push is not corrupted or from a significantly older state",
+    "Delete the existing remote state before pushing"],
+ a:[0,2],
+ r:"Before pushing a state file: (A) always back up the current state first ('terraform state pull > backup.tfstate') in case the push has unintended consequences, and (C) verify the state file to push is valid and recent enough to not cause unintended resource deletions.",
+ w:["B — Running apply before a state push could make the situation worse if state is already inconsistent.","D — Deleting the remote state before pushing is unnecessary and creates a dangerous window where no state exists."],
+ ref:"HashiCorp CLI: terraform state push — Safety",
+ tip:"Before state push: 1) backup current state, 2) verify the file to push. state push is a last-resort recovery tool."
+}
+
+]; /* END QUESTIONS */
+
+/* ═════════════ ENGINE ═════════════ */
+const L=['A','B','C','D'];
+const DIFF=['','⭐ Easy','⭐⭐ Intermediate','⭐⭐⭐ Hard'];
+let answers={},submitted=false,timeLeft=3600,timerID;
+
+function build(){
+  const wrap=document.getElementById('qwrap');
+  QUESTIONS.forEach(q=>{
+    const card=document.createElement('div');
+    card.className='qcard';card.id='q'+q.id;
+    const opts=q.o.map((o,i)=>`
+      <div class="opt" id="opt_${q.id}_${i}" onclick="pick(${q.id},${i},${!!q.multi})">
+        <div class="oletter">${L[i]}</div><div class="otext">${o}</div>
+      </div>`).join('');
+    card.innerHTML=`
+      <div class="qhead">
+        <span class="qnum">Q${String(q.id).padStart(2,'0')}</span>
+        <div style="flex:1"><span class="dtag">${q.dom}</span></div>
+        <span class="diff">${DIFF[q.dif]}</span>
+      </div>
+      ${q.multi?'<div class="multi-tag">★ Select TWO answers</div>':''}
+      <div class="qtext">${q.q}</div>
+      <div class="opts">${opts}</div>
+      <div class="expl" id="expl_${q.id}"></div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function pick(qid,oi,isMulti){
+  if(submitted)return;
+  const q=QUESTIONS.find(x=>x.id===qid);
+  if(!answers[qid])answers[qid]=[];
+  if(isMulti){
+    const idx=answers[qid].indexOf(oi);
+    if(idx>=0){answers[qid].splice(idx,1);document.getElementById(`opt_${qid}_${oi}`).classList.remove('sel');}
+    else if(answers[qid].length<q.a.length){answers[qid].push(oi);document.getElementById(`opt_${qid}_${oi}`).classList.add('sel');}
+  }else{
+    const prev=answers[qid][0];
+    if(prev===oi){answers[qid]=[];document.getElementById(`opt_${qid}_${oi}`).classList.remove('sel');}
+    else{
+      if(prev!==undefined)document.getElementById(`opt_${qid}_${prev}`).classList.remove('sel');
+      answers[qid]=[oi];document.getElementById(`opt_${qid}_${oi}`).classList.add('sel');
+    }
+  }
+  document.getElementById('q'+qid).classList.toggle('done',answers[qid].length>0);
+  updateProg();
+}
+
+function updateProg(){
+  const n=Object.values(answers).filter(a=>a.length>0).length;
+  document.getElementById('prog-label').textContent=`${n} / ${QUESTIONS.length} answered`;
+  document.getElementById('prog-fill').style.width=`${(n/QUESTIONS.length)*100}%`;
+}
+
+function nextBlank(){
+  const u=QUESTIONS.find(q=>!answers[q.id]||answers[q.id].length===0);
+  if(u)document.getElementById('q'+u.id).scrollIntoView({behavior:'smooth',block:'start'});
+  else alert('All questions answered! You can now submit.');
+}
+
+function startTimer(){
+  timerID=setInterval(()=>{
+    timeLeft--;
+    const m=Math.floor(timeLeft/60),s=timeLeft%60;
+    const el=document.getElementById('timer');
+    el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(timeLeft<=300)el.className='warn';
+    if(timeLeft<=60)el.className='crit';
+    if(timeLeft<=0){clearInterval(timerID);submitExam();}
+  },1000);
+}
+
+function submitExam(){
+  if(submitted)return;
+  submitted=true;clearInterval(timerID);
+  let correct=0;const ds={};
+  QUESTIONS.forEach(q=>{
+    const sel=answers[q.id]||[];
+    const ok=q.a.length===sel.length&&q.a.every(c=>sel.includes(c));
+    if(ok)correct++;
+    if(!ds[q.dom])ds[q.dom]={c:0,t:0};
+    ds[q.dom].t++;if(ok)ds[q.dom].c++;
+    q.o.forEach((_,i)=>{
+      const el=document.getElementById(`opt_${q.id}_${i}`);
+      el.classList.remove('sel');
+      if(q.a.includes(i))el.classList.add('ok');
+      else if(sel.includes(i))el.classList.add('ko');
+    });
+    const expl=document.getElementById(`expl_${q.id}`);
+    const wi=q.w.map(x=>`<li>${x}</li>`).join('');
+    const cl=q.a.map(c=>L[c]).join(' + ');
+    expl.className=`expl show ${ok?'expl-ok':'expl-ko'}`;
+    expl.innerHTML=`
+      <div class="expl-h">${ok?'✅ Correct!':'❌ Incorrect — correct answer: '+cl}</div>
+      <div class="expl-b">
+        <p><strong>Why ${cl} is correct:</strong><br>${q.r}</p>
+        <ul style="margin-top:.5rem"><strong>Why other options are wrong:</strong>${wi}</ul>
+        <div class="ref-box">📎 <b>Ref:</b> ${q.ref} &nbsp;|&nbsp; 💡 <em>${q.tip}</em></div>
+      </div>`;
+  });
+  const pct=Math.round((correct/QUESTIONS.length)*100);
+  const pass=pct>=70;
+  const drows=Object.entries(ds).map(([name,{c,t}])=>{
+    const p=Math.round((c/t)*100);
+    return`<div class="drow"><div class="dname">${name}</div><div class="dbar"><div class="dfill" style="width:${p}%;background:${p>=70?'#34d399':'#f87171'}"></div></div><div class="dpct">${p}%</div></div>`;
+  }).join('');
+  const panel=document.getElementById('results');
+  panel.className='show';
+  panel.innerHTML=`
+    <div class="score-ring"><div class="score-big">${correct}/${QUESTIONS.length}</div><div class="score-sub">${pct}%</div></div>
+    <div class="verdict" style="color:${pass?'#34d399':'#f87171'}">${pass?'🎉 PASS — Excellent work, Titi!':'❌ NOT PASSED — Keep pushing!'}</div>
+    <div class="verdict-msg">Passing score: <strong>70 %</strong> (42/60). You scored <strong>${pct}%</strong> (${correct} correct).</div>
+    <div class="domain-grid"><h4>Score by Domain</h4>${drows}</div>
+    <div style="margin-top:1.5rem"><button class="btn btn-p" onclick="location.reload()">🔄 Retake exam</button></div>`;
+  panel.scrollIntoView({behavior:'smooth'});
+}
+
+build();startTimer();updateProg();
+</script>
+</body>
+</html>
