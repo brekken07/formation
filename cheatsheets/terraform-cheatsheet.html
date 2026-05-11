@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Terraform Cheatsheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Outfit:wght@300;400;600;700;800;900&display=swap');
+
+:root {
+  --bg:        #080b10;
+  --bg2:       #0d1117;
+  --card:      #111827;
+  --card2:     #161f2e;
+  --border:    #1e2d40;
+  --border2:   #263548;
+  --tf:        #7b42f6;
+  --tf2:       #a78bfa;
+  --tf3:       #c4b5fd;
+  --cyan:      #06b6d4;
+  --cyan2:     #67e8f9;
+  --green:     #10b981;
+  --green2:    #6ee7b7;
+  --yellow:    #f59e0b;
+  --yellow2:   #fcd34d;
+  --red:       #ef4444;
+  --red2:      #fca5a5;
+  --orange:    #f97316;
+  --orange2:   #fdba74;
+  --pink:      #ec4899;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --muted2:    #94a3b8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.55;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  opacity: .018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(160deg, #0f0524 0%, #080b10 50%);
+  border-bottom: 1px solid var(--border);
+  padding: 3rem 2rem 2.5rem;
+  position: relative; overflow: hidden; z-index: 1;
+}
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 15% 50%, rgba(123,66,246,.18) 0%, transparent 65%),
+              radial-gradient(ellipse 50% 40% at 85% 20%, rgba(6,182,212,.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+.hero-left {}
+.tf-logo {
+  display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem;
+}
+.tf-diamond {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--tf) 0%, var(--cyan) 100%);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  flex-shrink: 0;
+  box-shadow: 0 0 24px rgba(123,66,246,.5);
+}
+.hero h1 {
+  font-size: 2.6rem; font-weight: 900;
+  letter-spacing: -.03em; line-height: 1;
+  background: linear-gradient(120deg, #fff 0%, var(--tf3) 50%, var(--cyan2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub {
+  font-size: .95rem; color: var(--muted2); margin-top: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.hero-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.2rem; }
+.hbadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem; font-weight: 500;
+  padding: .25rem .65rem; border-radius: 20px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.hb-tf  { background: rgba(123,66,246,.15); border: 1px solid rgba(123,66,246,.4); color: var(--tf2); }
+.hb-cy  { background: rgba(6,182,212,.12);  border: 1px solid rgba(6,182,212,.35);  color: var(--cyan2); }
+.hb-gr  { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.35); color: var(--green2); }
+.hero-right { text-align: right; }
+.version-box {
+  background: rgba(123,66,246,.1); border: 1px solid rgba(123,66,246,.3);
+  border-radius: 10px; padding: .75rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--tf3);
+  text-align: left;
+}
+.version-box .vl { color: var(--muted); font-size: .72rem; margin-bottom: .2rem; }
+
+/* ── SEARCH ── */
+.search-wrap {
+  max-width: 1400px; margin: 0 auto;
+  padding: 1.5rem 2rem 0;
+  position: relative; z-index: 1;
+}
+.search-box {
+  display: flex; align-items: center; gap: .75rem;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 10px; padding: .65rem 1rem;
+  transition: border-color .2s;
+}
+.search-box:focus-within { border-color: var(--tf); }
+.search-icon { color: var(--muted); font-size: 1rem; flex-shrink: 0; }
+.search-box input {
+  background: transparent; border: none; outline: none;
+  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  width: 100%;
+}
+.search-box input::placeholder { color: var(--muted); }
+
+/* ── LAYOUT ── */
+.page { max-width: 1400px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  display: flex; align-items: center; gap: .75rem;
+  font-size: 1.1rem; font-weight: 800; letter-spacing: -.01em;
+  margin-bottom: 1rem; margin-top: 2.5rem;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-title:first-child { margin-top: 0; }
+.section-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .95rem; flex-shrink: 0;
+}
+.si-purple { background: rgba(123,66,246,.2); border: 1px solid rgba(123,66,246,.4); }
+.si-cyan   { background: rgba(6,182,212,.15); border: 1px solid rgba(6,182,212,.35); }
+.si-green  { background: rgba(16,185,129,.15);border: 1px solid rgba(16,185,129,.35);}
+.si-yellow { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.35);}
+.si-red    { background: rgba(239,68,68,.15);  border: 1px solid rgba(239,68,68,.35); }
+.si-orange { background: rgba(249,115,22,.15); border: 1px solid rgba(249,115,22,.35);}
+.si-pink   { background: rgba(236,72,153,.15); border: 1px solid rgba(236,72,153,.35);}
+
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+@media(max-width:1100px){ .grid-4 { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:900px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+@media(max-width:640px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; } }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.1rem 1.2rem;
+  transition: border-color .2s, transform .15s;
+}
+.card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.card-title {
+  font-size: .78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; margin-bottom: .8rem;
+  display: flex; align-items: center; gap: .4rem;
+}
+.ct-purple { color: var(--tf2); }
+.ct-cyan   { color: var(--cyan2); }
+.ct-green  { color: var(--green2); }
+.ct-yellow { color: var(--yellow2); }
+.ct-red    { color: var(--red2); }
+.ct-orange { color: var(--orange2); }
+.ct-pink   { color: var(--pink); }
+
+/* ── CODE BLOCKS ── */
+.cmd-list { display: flex; flex-direction: column; gap: .45rem; }
+.cmd-row {
+  display: flex; align-items: flex-start; gap: .6rem;
+  padding: .45rem .65rem; border-radius: 7px;
+  background: var(--card2); border: 1px solid var(--border);
+  transition: background .15s;
+}
+.cmd-row:hover { background: #1e2d40; }
+.cmd-row code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .78rem; color: var(--cyan2); flex-shrink: 0;
+  white-space: nowrap;
+}
+.cmd-row .desc {
+  font-size: .78rem; color: var(--muted2); line-height: 1.4;
+  padding-top: .05rem;
+}
+.cmd-row .flag { color: var(--yellow2); }
+.cmd-row .arg  { color: var(--orange2); }
+
+/* ── INLINE CODE ── */
+code { font-family: 'JetBrains Mono', monospace; font-size: .82em; }
+.ic  { background: rgba(123,66,246,.15); border: 1px solid rgba(123,66,246,.3); border-radius: 4px; padding: .05em .35em; color: var(--tf3); }
+.ic-c{ background: rgba(6,182,212,.12);  border: 1px solid rgba(6,182,212,.3);  border-radius: 4px; padding: .05em .35em; color: var(--cyan2); }
+.ic-g{ background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.3); border-radius: 4px; padding: .05em .35em; color: var(--green2);}
+.ic-y{ background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3); border-radius: 4px; padding: .05em .35em; color: var(--yellow2);}
+.ic-r{ background: rgba(239,68,68,.12);  border: 1px solid rgba(239,68,68,.3);  border-radius: 4px; padding: .05em .35em; color: var(--red2); }
+
+/* ── SYNTAX BLOCKS ── */
+.syntax-block {
+  background: #060a0f; border: 1px solid var(--border);
+  border-radius: 9px; padding: .85rem 1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .76rem;
+  line-height: 1.65; overflow-x: auto; position: relative;
+}
+.syntax-block .label {
+  position: absolute; top: .5rem; right: .75rem;
+  font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em;
+}
+.t-kw  { color: #c792ea; } /* keyword purple */
+.t-ty  { color: #82aaff; } /* type blue */
+.t-st  { color: #c3e88d; } /* string green */
+.t-cm  { color: #546e7a; font-style: italic; } /* comment */
+.t-fn  { color: #82aaff; } /* function */
+.t-nb  { color: #f78c6c; } /* number/bool */
+.t-at  { color: var(--cyan2); } /* attribute */
+.t-bl  { color: var(--tf3); } /* block label */
+.t-op  { color: #89ddff; } /* operator */
+
+/* ── TABLE ── */
+.ref-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.ref-table th {
+  text-align: left; padding: .5rem .7rem;
+  font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--muted); border-bottom: 1px solid var(--border2);
+}
+.ref-table td { padding: .45rem .7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table tr:hover td { background: rgba(255,255,255,.025); }
+.ref-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: .76rem; color: var(--cyan2); white-space: nowrap; }
+.ref-table td:last-child { color: var(--muted2); }
+
+/* ── PILL TAGS ── */
+.tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem; font-weight: 600; padding: .15rem .5rem;
+  border-radius: 4px; letter-spacing: .03em; text-transform: uppercase;
+  margin-right: .25rem;
+}
+.tag-g { background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3); color: var(--green2); }
+.tag-r { background: rgba(239,68,68,.12);  border: 1px solid rgba(239,68,68,.3);  color: var(--red2); }
+.tag-y { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3); color: var(--yellow2);}
+.tag-b { background: rgba(123,66,246,.12); border: 1px solid rgba(123,66,246,.3); color: var(--tf3); }
+.tag-c { background: rgba(6,182,212,.1);   border: 1px solid rgba(6,182,212,.3);  color: var(--cyan2); }
+
+/* ── WARN / NOTE ── */
+.note {
+  display: flex; gap: .65rem; align-items: flex-start;
+  padding: .65rem .9rem; border-radius: 8px; font-size: .8rem; margin-top: .5rem;
+}
+.note-w { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.25); color: var(--yellow2); }
+.note-r { background: rgba(239,68,68,.08);  border: 1px solid rgba(239,68,68,.25);  color: var(--red2); }
+.note-g { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.25); color: var(--green2);}
+.note-b { background: rgba(123,66,246,.08); border: 1px solid rgba(123,66,246,.25); color: var(--tf3); }
+.note-icon { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+
+/* ── WORKFLOW STEPS ── */
+.wf { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; margin-top: .2rem; }
+.wf-step {
+  flex: 1; min-width: 120px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 0; padding: .65rem .8rem;
+  position: relative; text-align: center;
+}
+.wf-step:first-child { border-radius: 8px 0 0 8px; }
+.wf-step:last-child  { border-radius: 0 8px 8px 0; }
+.wf-step::after {
+  content: '▶';
+  position: absolute; right: -11px; top: 50%; transform: translateY(-50%);
+  color: var(--border2); font-size: .7rem; z-index: 2;
+}
+.wf-step:last-child::after { display: none; }
+.wf-num { font-size: .62rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.wf-cmd { font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--cyan2); font-weight: 600; }
+.wf-label { font-size: .7rem; color: var(--muted2); margin-top: .15rem; }
+
+/* ── PRECEDENCE ── */
+.prec-list { display: flex; flex-direction: column; gap: .3rem; }
+.prec-row {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .35rem .7rem; border-radius: 6px;
+  background: var(--card2); border-left: 3px solid transparent;
+}
+.prec-row .num { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: var(--muted); width: 18px; flex-shrink: 0; }
+.prec-row .src { font-family: 'JetBrains Mono', monospace; font-size: .78rem; flex: 1; }
+.prec-row .lbl { font-size: .7rem; color: var(--muted2); }
+.prec-1 { border-color: var(--red);    } .prec-1 .src { color: var(--red2); }
+.prec-2 { border-color: var(--orange); } .prec-2 .src { color: var(--orange2); }
+.prec-3 { border-color: var(--yellow); } .prec-3 .src { color: var(--yellow2); }
+.prec-4 { border-color: var(--green);  } .prec-4 .src { color: var(--green2); }
+.prec-5 { border-color: var(--muted);  } .prec-5 .src { color: var(--muted2); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── SEARCH FILTER (hidden class) ── */
+.cs-hidden { display: none !important; }
+
+/* ── FOOTER ── */
+.footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; text-align: center; color: var(--muted); font-size: .78rem; position: relative; z-index: 1; }
+.footer span { color: var(--tf2); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="hero-left">
+        <div class="tf-logo">
+          <div class="tf-diamond"></div>
+          <div>
+            <div style="font-size:.7rem;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">HashiCorp</div>
+            <h1>Terraform</h1>
+          </div>
+        </div>
+        <div class="hero-sub">$ terraform --version &nbsp;·&nbsp; Terraform v1.x &nbsp;·&nbsp; HCTA-003</div>
+        <div class="hero-badges">
+          <span class="hbadge hb-tf">IaC Declarative</span>
+          <span class="hbadge hb-cy">Multi-Cloud</span>
+          <span class="hbadge hb-gr">HCL Language</span>
+          <span class="hbadge hb-tf">Provider Plugins</span>
+          <span class="hbadge hb-cy">State Management</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="version-box">
+          <div class="vl">Workflow</div>
+          <div style="color:var(--cyan2);font-weight:600">Write → Plan → Apply</div>
+          <div style="margin-top:.5rem;color:var(--muted)">Passing score HCTA-003</div>
+          <div style="color:var(--green2);font-weight:600">70 % (42/57 questions)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SEARCH ═══════════════ -->
+<div class="search-wrap">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Rechercher une commande, un bloc, une fonction…" oninput="filterCards()"/>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="page" id="mainContent">
+
+  <!-- ══ 1. WORKFLOW CLI ══ -->
+  <div class="section-title">
+    <div class="section-icon si-cyan">⚡</div>
+    <span style="color:var(--cyan2)">CLI — Commandes principales</span>
+  </div>
+
+  <!-- WORKFLOW VISUEL -->
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-title ct-cyan">🔄 Core workflow</div>
+    <div class="wf">
+      <div class="wf-step"><div class="wf-num">1</div><div class="wf-cmd">init</div><div class="wf-label">Initialiser</div></div>
+      <div class="wf-step"><div class="wf-num">2</div><div class="wf-cmd">fmt</div><div class="wf-label">Formater</div></div>
+      <div class="wf-step"><div class="wf-num">3</div><div class="wf-cmd">validate</div><div class="wf-label">Valider</div></div>
+      <div class="wf-step"><div class="wf-num">4</div><div class="wf-cmd">plan</div><div class="wf-label">Prévisualiser</div></div>
+      <div class="wf-step"><div class="wf-num">5</div><div class="wf-cmd">apply</div><div class="wf-label">Appliquer</div></div>
+      <div class="wf-step" style="border-color:var(--red);"><div class="wf-num">6</div><div class="wf-cmd" style="color:var(--red2)">destroy</div><div class="wf-label">Détruire</div></div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title ct-cyan">📦 Init &amp; Format</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>terraform init</code><div class="desc">Initialise le répertoire, télécharge providers &amp; modules</div></div>
+        <div class="cmd-row"><code>terraform init <span class="flag">-upgrade</span></code><div class="desc">Met à jour les providers selon les contraintes</div></div>
+        <div class="cmd-row"><code>terraform init <span class="flag">-migrate-state</span></code><div class="desc">Migre le state vers un nouveau backend</div></div>
+        <div class="cmd-row"><code>terraform init <span class="flag">-reconfigure</span></code><div class="desc">Reconfigure le backend sans migrer le state</div></div>
+        <div class="cmd-row"><code>terraform fmt</code><div class="desc">Formate les fichiers .tf selon le style canonique</div></div>
+        <div class="cmd-row"><code>terraform fmt <span class="flag">-recursive</span></code><div class="desc">Formate aussi les sous-répertoires</div></div>
+        <div class="cmd-row"><code>terraform fmt <span class="flag">-check</span></code><div class="desc">Vérifie le format (exit 1 si non formaté)</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-purple">🔍 Validate &amp; Plan</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>terraform validate</code><div class="desc">Valide la syntaxe sans accès réseau</div></div>
+        <div class="cmd-row"><code>terraform plan</code><div class="desc">Prévisualise les changements (dry-run)</div></div>
+        <div class="cmd-row"><code>terraform plan <span class="flag">-out=</span><span class="arg">tfplan</span></code><div class="desc">Sauvegarde le plan dans un fichier binaire</div></div>
+        <div class="cmd-row"><code>terraform plan <span class="flag">-destroy</span></code><div class="desc">Prévisualise une destruction complète</div></div>
+        <div class="cmd-row"><code>terraform plan <span class="flag">-var-file=</span><span class="arg">prod.tfvars</span></code><div class="desc">Utilise un fichier de variables spécifique</div></div>
+        <div class="cmd-row"><code>terraform plan <span class="flag">-var</span> <span class="arg">"key=val"</span></code><div class="desc">Passe une variable en ligne de commande</div></div>
+        <div class="cmd-row"><code>terraform plan <span class="flag">-target=</span><span class="arg">res.name</span></code><div class="desc">Limite le plan à une ressource cible</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-green">✅ Apply &amp; Destroy</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>terraform apply</code><div class="desc">Applique le plan (demande confirmation)</div></div>
+        <div class="cmd-row"><code>terraform apply <span class="arg">tfplan</span></code><div class="desc">Applique exactement le plan sauvegardé</div></div>
+        <div class="cmd-row"><code>terraform apply <span class="flag">-auto-approve</span></code><div class="desc">Applique sans confirmation (CI/CD)</div></div>
+        <div class="cmd-row"><code>terraform apply <span class="flag">-replace=</span><span class="arg">res.name</span></code><div class="desc">Force la recréation d'une ressource</div></div>
+        <div class="cmd-row"><code>terraform apply <span class="flag">-refresh-only</span></code><div class="desc">Met à jour le state sans modifier l'infra</div></div>
+        <div class="cmd-row"><code>terraform destroy</code><div class="desc">Détruit toutes les ressources du state</div></div>
+        <div class="cmd-row"><code>terraform destroy <span class="flag">-target=</span><span class="arg">res.name</span></code><div class="desc">Détruit uniquement la ressource ciblée</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-4" style="margin-top:1rem">
+    <div class="card">
+      <div class="card-title ct-yellow">🔎 Inspect &amp; Debug</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>terraform show</code><div class="desc">Affiche le state courant lisible</div></div>
+        <div class="cmd-row"><code>terraform show <span class="arg">tfplan</span></code><div class="desc">Affiche un plan sauvegardé</div></div>
+        <div class="cmd-row"><code>terraform output</code><div class="desc">Affiche toutes les outputs</div></div>
+        <div class="cmd-row"><code>terraform output <span class="flag">-json</span></code><div class="desc">Outputs au format JSON (CI/CD)</div></div>
+        <div class="cmd-row"><code>terraform console</code><div class="desc">REPL pour tester des expressions HCL</div></div>
+        <div class="cmd-row"><code>terraform graph</code><div class="desc">Graphe DOT des dépendances</div></div>
+        <div class="cmd-row"><code>terraform version</code><div class="desc">Affiche la version Terraform</div></div>
+        <div class="cmd-row"><code>terraform providers</code><div class="desc">Liste les providers requis</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-orange">📂 State Commands</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>terraform state list</code><div class="desc">Liste toutes les adresses du state</div></div>
+        <div class="cmd-row"><code>terraform state show <span class="arg">addr</span></code><div class="desc">Détails d'une ressource dans le state</div></div>
+        <div class="cmd-row"><code>terraform state mv <span class="arg">src dst</span></code><div class="desc">Renomme/déplace dans le state</div></div>
+        <div class="cmd-row"><code>terraform state rm <span class="arg">addr</span></code><div class="desc">Supprime du state (garde l'infra)</div></div>
+        <div class="cmd-row"><code>terraform state pull</code><div class="desc">Exporte le state brut (JSON)</div></div>
+        <div class="cmd-row"><code>terraform state push</code><div class="desc">Pousse un state local vers le backend</div></div>
+        <div class="cmd-row"><code>terraform force-unlock <span class="arg">ID</span></code><div class="desc">Libère un verrou bloqué</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-pink">🗂️ Workspaces</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>terraform workspace list</code><div class="desc">Liste tous les workspaces</div></div>
+        <div class="cmd-row"><code>terraform workspace show</code><div class="desc">Affiche le workspace courant</div></div>
+        <div class="cmd-row"><code>terraform workspace new <span class="arg">name</span></code><div class="desc">Crée et bascule vers un nouveau workspace</div></div>
+        <div class="cmd-row"><code>terraform workspace select <span class="arg">name</span></code><div class="desc">Change de workspace</div></div>
+        <div class="cmd-row"><code>terraform workspace delete <span class="arg">name</span></code><div class="desc">Supprime un workspace (doit être vide)</div></div>
+        <div class="cmd-row"><code>terraform.workspace</code><div class="desc">Expression HCL → nom du workspace actif</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-red">📥 Import &amp; Misc</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>terraform import <span class="arg">addr id</span></code><div class="desc">Importe une ressource existante dans le state</div></div>
+        <div class="cmd-row"><code>terraform get</code><div class="desc">Télécharge les modules (subset de init)</div></div>
+        <div class="cmd-row"><code>terraform login</code><div class="desc">Authentifie avec HCP Terraform</div></div>
+        <div class="cmd-row"><code>terraform logout</code><div class="desc">Révoque le token HCP Terraform</div></div>
+        <div class="cmd-row"><code>TF_LOG=DEBUG</code><div class="desc">Active les logs détaillés (TRACE/DEBUG/INFO/WARN/ERROR)</div></div>
+        <div class="cmd-row"><code>TF_LOG_PATH=<span class="arg">file</span></code><div class="desc">Redirige les logs vers un fichier</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 2. BLOCS HCL ══ -->
+  <div class="section-title" style="margin-top:2.5rem">
+    <div class="section-icon si-purple">🧱</div>
+    <span style="color:var(--tf2)">Blocs HCL — Structure de configuration</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-purple">terraform {} &amp; provider {}</div>
+      <div class="syntax-block">
+        <span class="label">HCL</span>
+<span class="t-kw">terraform</span> {
+  <span class="t-at">required_version</span> = <span class="t-st">"&gt;= 1.5"</span>
+
+  <span class="t-kw">required_providers</span> {
+    <span class="t-at">aws</span> = {
+      <span class="t-at">source</span>  = <span class="t-st">"hashicorp/aws"</span>
+      <span class="t-at">version</span> = <span class="t-st">"~&gt; 5.0"</span>
+    }
+  }
+
+  <span class="t-kw">backend</span> <span class="t-bl">"s3"</span> {
+    <span class="t-at">bucket</span>         = <span class="t-st">"my-tf-state"</span>
+    <span class="t-at">key</span>            = <span class="t-st">"prod/terraform.tfstate"</span>
+    <span class="t-at">region</span>         = <span class="t-st">"eu-west-1"</span>
+    <span class="t-at">dynamodb_table</span> = <span class="t-st">"tf-locks"</span>
+    <span class="t-at">encrypt</span>        = <span class="t-nb">true</span>
+  }
+}
+
+<span class="t-kw">provider</span> <span class="t-bl">"aws"</span> {
+  <span class="t-at">region</span> = <span class="t-st">"eu-west-1"</span>
+}
+
+<span class="t-cm"># Provider avec alias (multi-région)</span>
+<span class="t-kw">provider</span> <span class="t-bl">"aws"</span> {
+  <span class="t-at">alias</span>  = <span class="t-st">"us"</span>
+  <span class="t-at">region</span> = <span class="t-st">"us-east-1"</span>
+}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-cyan">resource {} &amp; data {}</div>
+      <div class="syntax-block">
+        <span class="label">HCL</span>
+<span class="t-cm"># resource = créer/gérer l'infra</span>
+<span class="t-kw">resource</span> <span class="t-bl">"aws_instance"</span> <span class="t-bl">"web"</span> {
+  <span class="t-at">ami</span>           = <span class="t-fn">data</span>.aws_ami.ubuntu.id
+  <span class="t-at">instance_type</span> = <span class="t-fn">var</span>.instance_type
+  <span class="t-at">tags</span>          = <span class="t-fn">local</span>.common_tags
+
+  <span class="t-cm"># Référence alias provider</span>
+  <span class="t-at">provider</span> = <span class="t-fn">aws</span>.us
+
+  <span class="t-kw">lifecycle</span> {
+    <span class="t-at">create_before_destroy</span> = <span class="t-nb">true</span>
+    <span class="t-at">prevent_destroy</span>       = <span class="t-nb">false</span>
+    <span class="t-at">ignore_changes</span>        = [<span class="t-fn">tags</span>]
+  }
+}
+
+<span class="t-cm"># data = lire une ressource existante</span>
+<span class="t-kw">data</span> <span class="t-bl">"aws_ami"</span> <span class="t-bl">"ubuntu"</span> {
+  <span class="t-at">most_recent</span> = <span class="t-nb">true</span>
+  <span class="t-at">owners</span>      = [<span class="t-st">"099720109477"</span>]
+  <span class="t-kw">filter</span> {
+    <span class="t-at">name</span>   = <span class="t-st">"name"</span>
+    <span class="t-at">values</span> = [<span class="t-st">"ubuntu/images/*22.04*"</span>]
+  }
+}
+<span class="t-cm"># Référence : data.aws_ami.ubuntu.id</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-green">variable {} &amp; locals {} &amp; output {}</div>
+      <div class="syntax-block">
+        <span class="label">HCL</span>
+<span class="t-kw">variable</span> <span class="t-bl">"instance_type"</span> {
+  <span class="t-at">type</span>        = <span class="t-ty">string</span>
+  <span class="t-at">default</span>     = <span class="t-st">"t3.micro"</span>
+  <span class="t-at">description</span> = <span class="t-st">"Type d'instance EC2"</span>
+  <span class="t-at">sensitive</span>   = <span class="t-nb">false</span>
+
+  <span class="t-kw">validation</span> {
+    <span class="t-at">condition</span> = <span class="t-fn">contains</span>(
+      [<span class="t-st">"t3.micro"</span>,<span class="t-st">"t3.small"</span>], <span class="t-fn">var</span>.instance_type)
+    <span class="t-at">error_message</span> = <span class="t-st">"Type non autorisé."</span>
+  }
+}
+
+<span class="t-kw">locals</span> {
+  <span class="t-at">env</span>         = <span class="t-fn">terraform</span>.workspace
+  <span class="t-at">common_tags</span> = {
+    <span class="t-at">Env</span>     = <span class="t-fn">local</span>.env
+    <span class="t-at">ManagedBy</span> = <span class="t-st">"Terraform"</span>
+  }
+}
+
+<span class="t-kw">output</span> <span class="t-bl">"instance_ip"</span> {
+  <span class="t-at">value</span>       = <span class="t-fn">aws_instance</span>.web.public_ip
+  <span class="t-at">description</span> = <span class="t-st">"IP publique de l'instance"</span>
+  <span class="t-at">sensitive</span>   = <span class="t-nb">false</span>
+}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-yellow">module {} &amp; moved {}</div>
+      <div class="syntax-block">
+        <span class="label">HCL</span>
+<span class="t-cm"># Appel d'un module Registry</span>
+<span class="t-kw">module</span> <span class="t-bl">"vpc"</span> {
+  <span class="t-at">source</span>  = <span class="t-st">"terraform-aws-modules/vpc/aws"</span>
+  <span class="t-at">version</span> = <span class="t-st">"~&gt; 5.0"</span>
+
+  <span class="t-at">name</span> = <span class="t-st">"my-vpc"</span>
+  <span class="t-at">cidr</span> = <span class="t-fn">var</span>.vpc_cidr
+}
+<span class="t-cm"># Accès : module.vpc.vpc_id</span>
+
+<span class="t-cm"># Module local</span>
+<span class="t-kw">module</span> <span class="t-bl">"sg"</span> {
+  <span class="t-at">source</span>  = <span class="t-st">"./modules/security_group"</span>
+  <span class="t-at">vpc_id</span>  = <span class="t-fn">module</span>.vpc.vpc_id
+}
+
+<span class="t-cm"># Refactoring sans destroy/recreate</span>
+<span class="t-kw">moved</span> {
+  <span class="t-at">from</span> = <span class="t-fn">aws_instance</span>.old_name
+  <span class="t-at">to</span>   = <span class="t-fn">aws_instance</span>.new_name
+}
+
+<span class="t-cm"># depends_on explicite</span>
+<span class="t-kw">resource</span> <span class="t-bl">"aws_instance"</span> <span class="t-bl">"app"</span> {
+  <span class="t-at">depends_on</span> = [<span class="t-fn">aws_iam_role_policy</span>.attach]
+}
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 3. META-ARGUMENTS & LIFECYCLE ══ -->
+  <div class="section-title">
+    <div class="section-icon si-orange">⚙️</div>
+    <span style="color:var(--orange2)">Meta-arguments &amp; Lifecycle</span>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title ct-orange">count &amp; for_each</div>
+      <div class="syntax-block" style="font-size:.74rem">
+<span class="t-cm"># count — basé sur un entier</span>
+<span class="t-kw">resource</span> <span class="t-bl">"aws_instance"</span> <span class="t-bl">"web"</span> {
+  <span class="t-at">count</span> = <span class="t-fn">var</span>.create ? <span class="t-nb">1</span> : <span class="t-nb">0</span>
+  <span class="t-at">ami</span>   = <span class="t-fn">var</span>.ami
+}
+<span class="t-cm"># Référence : aws_instance.web[0]</span>
+
+<span class="t-cm"># for_each — basé sur map/set</span>
+<span class="t-kw">resource</span> <span class="t-bl">"aws_instance"</span> <span class="t-bl">"nodes"</span> {
+  <span class="t-at">for_each</span>      = <span class="t-fn">var</span>.instances
+  <span class="t-at">ami</span>           = <span class="t-fn">each</span>.value.ami
+  <span class="t-at">instance_type</span> = <span class="t-fn">each</span>.value.type
+  <span class="t-at">tags</span> = { Name = <span class="t-fn">each</span>.key }
+}
+<span class="t-cm"># Référence : aws_instance.nodes["prod"]</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-red">lifecycle</div>
+      <div class="syntax-block" style="font-size:.74rem">
+<span class="t-kw">lifecycle</span> {
+  <span class="t-cm"># Créer avant détruire (zero-downtime)</span>
+  <span class="t-at">create_before_destroy</span> = <span class="t-nb">true</span>
+
+  <span class="t-cm"># Bloque toute destruction</span>
+  <span class="t-at">prevent_destroy</span> = <span class="t-nb">true</span>
+
+  <span class="t-cm"># Ignore les changements sur ces attrs</span>
+  <span class="t-at">ignore_changes</span> = [
+    <span class="t-fn">tags</span>,
+    <span class="t-fn">instance_type</span>,
+  ]
+
+  <span class="t-cm"># Condition de remplacement</span>
+  <span class="t-at">replace_triggered_by</span> = [
+    <span class="t-fn">aws_launch_template</span>.this.id,
+  ]
+}
+
+<span class="t-cm"># Remplacer une ressource (anciennement taint)</span>
+<span class="t-cm"># terraform apply -replace=aws_instance.web</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-pink">dynamic {}</div>
+      <div class="syntax-block" style="font-size:.74rem">
+<span class="t-cm"># Générer des blocs répétitifs</span>
+<span class="t-kw">resource</span> <span class="t-bl">"aws_security_group"</span> <span class="t-bl">"web"</span> {
+  <span class="t-at">name</span>   = <span class="t-st">"web-sg"</span>
+  <span class="t-at">vpc_id</span> = <span class="t-fn">var</span>.vpc_id
+
+  <span class="t-kw">dynamic</span> <span class="t-bl">"ingress"</span> {
+    <span class="t-at">for_each</span> = <span class="t-fn">var</span>.ingress_rules
+    <span class="t-at">content</span> {
+      <span class="t-at">from_port</span>   = <span class="t-fn">ingress</span>.value.from
+      <span class="t-at">to_port</span>     = <span class="t-fn">ingress</span>.value.to
+      <span class="t-at">protocol</span>    = <span class="t-fn">ingress</span>.value.proto
+      <span class="t-at">cidr_blocks</span> = <span class="t-fn">ingress</span>.value.cidrs
+    }
+  }
+}
+<span class="t-cm"># ingress.key / ingress.value disponibles</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 4. VARIABLES ══ -->
+  <div class="section-title">
+    <div class="section-icon si-green">📥</div>
+    <span style="color:var(--green2)">Variables — Types, priorité &amp; sources</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-green">Types HCL</div>
+      <table class="ref-table">
+        <tr><th>Type</th><th>Exemple</th><th>Notes</th></tr>
+        <tr><td>string</td><td><code class="ic-y">"us-east-1"</code></td><td>Guillemets doubles</td></tr>
+        <tr><td>number</td><td><code class="ic-y">42 / 3.14</code></td><td>Int ou float</td></tr>
+        <tr><td>bool</td><td><code class="ic-y">true / false</code></td><td>Minuscules uniquement</td></tr>
+        <tr><td>list(T)</td><td><code class="ic-y">["a","b","c"]</code></td><td>Ordonné, indexé</td></tr>
+        <tr><td>set(T)</td><td><code class="ic-y">toset(["a","b"])</code></td><td>Non ordonné, sans doublon</td></tr>
+        <tr><td>map(T)</td><td><code class="ic-y">{a="x", b="y"}</code></td><td>Clé string → valeur T</td></tr>
+        <tr><td>object({…})</td><td><code class="ic-y">{name=string, port=number}</code></td><td>Schéma structuré</td></tr>
+        <tr><td>tuple([…])</td><td><code class="ic-y">[string, number, bool]</code></td><td>Types mixtes</td></tr>
+        <tr><td>any</td><td><code class="ic-y">any</code></td><td>Pas de contrainte</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-yellow">⬆️ Priorité des variables (+ haute en haut)</div>
+      <div class="prec-list">
+        <div class="prec-row prec-1"><span class="num">1</span><span class="src">-var "key=val"</span><span class="lbl">CLI flag — priorité maximale</span></div>
+        <div class="prec-row prec-2"><span class="num">2</span><span class="src">-var-file=file.tfvars</span><span class="lbl">Fichier explicite</span></div>
+        <div class="prec-row prec-3"><span class="num">3</span><span class="src">*.auto.tfvars</span><span class="lbl">Chargé automatiquement (ordre alpha)</span></div>
+        <div class="prec-row prec-3"><span class="num">4</span><span class="src">terraform.tfvars</span><span class="lbl">Chargé automatiquement</span></div>
+        <div class="prec-row prec-4"><span class="num">5</span><span class="src">TF_VAR_name</span><span class="lbl">Variable d'environnement</span></div>
+        <div class="prec-row prec-5"><span class="num">6</span><span class="src">default = "..."</span><span class="lbl">Valeur par défaut — priorité minimale</span></div>
+      </div>
+      <div class="note note-w" style="margin-top:.8rem">
+        <span class="note-icon">⚠️</span>
+        <div>Les <strong>variables d'env</strong> ont la forme <code class="ic-y">TF_VAR_nom</code> (sensible à la casse). Elles ne se propagent PAS aux modules enfants.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 5. EXPRESSIONS & FONCTIONS ══ -->
+  <div class="section-title">
+    <div class="section-icon si-cyan">🔣</div>
+    <span style="color:var(--cyan2)">Expressions &amp; Fonctions HCL essentielles</span>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title ct-cyan">Expressions</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>condition <span class="t-op">?</span> true_val <span class="t-op">:</span> false_val</code><div class="desc">Ternaire — seule syntaxe conditionnelle en HCL</div></div>
+        <div class="cmd-row"><code>[for x in list : f(x)]</code><div class="desc">For-expression → liste</div></div>
+        <div class="cmd-row"><code>{for k,v in map : k => f(v)}</code><div class="desc">For-expression → map</div></div>
+        <div class="cmd-row"><code>[for x in list : x if cond]</code><div class="desc">For-expression avec filtre</div></div>
+        <div class="cmd-row"><code>"Hello <span class="t-op">${</span>var.name<span class="t-op">}</span>"</code><div class="desc">Interpolation de chaîne</div></div>
+        <div class="cmd-row"><code>resource_type.name.attr</code><div class="desc">Référence attribut de ressource</div></div>
+        <div class="cmd-row"><code>module.name.output</code><div class="desc">Référence output d'un module</div></div>
+        <div class="cmd-row"><code>var.name</code><div class="desc">Référence une variable d'entrée</div></div>
+        <div class="cmd-row"><code>local.name</code><div class="desc">Référence une valeur locale</div></div>
+        <div class="cmd-row"><code>data.type.name.attr</code><div class="desc">Référence attribut d'une data source</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-purple">Fonctions — Strings &amp; Collections</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>length(list/map/string)</code><div class="desc">Nombre d'éléments / caractères</div></div>
+        <div class="cmd-row"><code>upper(str) / lower(str)</code><div class="desc">Conversion de casse</div></div>
+        <div class="cmd-row"><code>join(sep, list)</code><div class="desc"><code class="ic">join(",",["a","b"])</code> → "a,b"</div></div>
+        <div class="cmd-row"><code>split(sep, str)</code><div class="desc"><code class="ic">split(",","a,b")</code> → ["a","b"]</div></div>
+        <div class="cmd-row"><code>contains(list, val)</code><div class="desc">true si val est dans la liste</div></div>
+        <div class="cmd-row"><code>merge(map1, map2)</code><div class="desc">Fusionne des maps (last wins)</div></div>
+        <div class="cmd-row"><code>concat(list1, list2)</code><div class="desc">Concatène des listes</div></div>
+        <div class="cmd-row"><code>flatten(list_of_lists)</code><div class="desc">Aplatit une liste de listes</div></div>
+        <div class="cmd-row"><code>toset(list)</code><div class="desc">Convertit liste → set (dédoublonne)</div></div>
+        <div class="cmd-row"><code>tolist(set)</code><div class="desc">Convertit set → list</div></div>
+        <div class="cmd-row"><code>lookup(map, key, default)</code><div class="desc">Valeur d'une map par clé + fallback</div></div>
+        <div class="cmd-row"><code>keys(map) / values(map)</code><div class="desc">Clés ou valeurs d'une map</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-green">Fonctions — Réseau, Fichiers, Encodage</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>cidrsubnet(cidr, bits, num)</code><div class="desc">Calcule un sous-réseau</div></div>
+        <div class="cmd-row"><code>cidrhost(cidr, num)</code><div class="desc">Calcule une adresse IP hôte</div></div>
+        <div class="cmd-row"><code>file(path)</code><div class="desc">Lit un fichier → string</div></div>
+        <div class="cmd-row"><code>templatefile(path, vars)</code><div class="desc">Rend un template avec variables</div></div>
+        <div class="cmd-row"><code>fileexists(path)</code><div class="desc">true si le fichier existe</div></div>
+        <div class="cmd-row"><code>jsonencode(obj)</code><div class="desc">Encode un objet HCL en JSON string</div></div>
+        <div class="cmd-row"><code>jsondecode(str)</code><div class="desc">Décode une JSON string → objet HCL</div></div>
+        <div class="cmd-row"><code>base64encode(str)</code><div class="desc">Encode en base64</div></div>
+        <div class="cmd-row"><code>base64decode(str)</code><div class="desc">Décode du base64</div></div>
+        <div class="cmd-row"><code>can(expr)</code><div class="desc">true si l'expr ne produit pas d'erreur</div></div>
+        <div class="cmd-row"><code>try(e1, e2, ...)</code><div class="desc">Retourne la 1ère expr sans erreur</div></div>
+        <div class="cmd-row"><code>coalesce(a, b, c)</code><div class="desc">Retourne le 1er élément non-null/vide</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 6. STATE & BACKENDS ══ -->
+  <div class="section-title">
+    <div class="section-icon si-yellow">🗄️</div>
+    <span style="color:var(--yellow2)">State &amp; Backends</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-yellow">Backend S3 + DynamoDB (AWS — recommandé)</div>
+      <div class="syntax-block" style="font-size:.74rem">
+<span class="t-kw">terraform</span> {
+  <span class="t-kw">backend</span> <span class="t-bl">"s3"</span> {
+    <span class="t-at">bucket</span>         = <span class="t-st">"my-tf-state-bucket"</span>
+    <span class="t-at">key</span>            = <span class="t-st">"env/prod/terraform.tfstate"</span>
+    <span class="t-at">region</span>         = <span class="t-st">"eu-west-1"</span>
+    <span class="t-at">dynamodb_table</span> = <span class="t-st">"terraform-state-lock"</span>
+    <span class="t-at">encrypt</span>        = <span class="t-nb">true</span>
+    <span class="t-at">kms_key_id</span>     = <span class="t-st">"alias/terraform-state"</span>
+  }
+}
+<span class="t-cm">
+# Table DynamoDB requise :
+# - Primary key : LockID (type String)
+# - S3 bucket   : versionning activé
+# - Partial config via :
+#   terraform init -backend-config=secret.hcl</span>
+      </div>
+      <div class="note note-b" style="margin-top:.7rem">
+        <span class="note-icon">💡</span>
+        <div>S3 = stockage &amp; versioning · DynamoDB = verrou · KMS = chiffrement</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-orange">Commandes State critiques</div>
+      <table class="ref-table">
+        <tr><th>Commande</th><th>Effet</th></tr>
+        <tr><td>state list</td><td>Liste toutes les adresses du state</td></tr>
+        <tr><td>state show &lt;addr&gt;</td><td>Détails attributs d'une ressource</td></tr>
+        <tr><td>state mv src dst</td><td>Renomme/déplace (sans détruire)</td></tr>
+        <tr><td>state rm &lt;addr&gt;</td><td>Supprime du state, garde l'infra</td></tr>
+        <tr><td>state pull</td><td>Exporte le state JSON vers stdout</td></tr>
+        <tr><td>state push</td><td>Pousse un state local vers backend</td></tr>
+        <tr><td>force-unlock &lt;id&gt;</td><td>Libère un verrou bloqué</td></tr>
+        <tr><td>apply -refresh-only</td><td>Sync state ↔ réalité sans changement</td></tr>
+        <tr><td>import addr id</td><td>Importe ressource existante dans state</td></tr>
+      </table>
+      <div class="note note-r" style="margin-top:.7rem">
+        <span class="note-icon">🚨</span>
+        <div><strong>Ne jamais éditer terraform.tfstate à la main.</strong> Toujours utiliser les commandes <code class="ic-r">terraform state</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 7. MODULES ══ -->
+  <div class="section-title">
+    <div class="section-icon si-pink">📦</div>
+    <span style="color:var(--pink)">Modules — Sources &amp; Structure</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-pink">Sources de modules</div>
+      <table class="ref-table">
+        <tr><th>Type</th><th>Source</th><th>Notes</th></tr>
+        <tr><td>Registry public</td><td><code class="ic-c">hashicorp/consul/aws</code></td><td>namespace/module/provider</td></tr>
+        <tr><td>Registry privé</td><td><code class="ic-c">app.terraform.io/org/mod/aws</code></td><td>hostname/namespace/module/provider</td></tr>
+        <tr><td>Chemin local</td><td><code class="ic-c">./modules/vpc</code></td><td>Pas de version argument</td></tr>
+        <tr><td>GitHub</td><td><code class="ic-c">git::https://github.com/org/repo.git</code></td><td>Préfixe git::</td></tr>
+        <tr><td>Git + sous-dossier</td><td><code class="ic-c">git::…repo.git//subdir?ref=v1.0</code></td><td>Double-slash pour sous-dossier</td></tr>
+        <tr><td>Archive HTTP</td><td><code class="ic-c">https://example.com/vpc.zip</code></td><td>URL vers .zip ou .tar.gz</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-yellow">Contraintes de versions</div>
+      <table class="ref-table">
+        <tr><th>Opérateur</th><th>Signification</th><th>Exemple</th></tr>
+        <tr><td>= 1.5.0</td><td>Exactement cette version</td><td><code class="ic-y">= 1.5.0</code></td></tr>
+        <tr><td>!= 1.5.0</td><td>Toutes sauf cette version</td><td><code class="ic-y">!= 1.4.0</code></td></tr>
+        <tr><td>&gt;= 1.5</td><td>1.5 ou plus (sans plafond)</td><td><code class="ic-y">&gt;= 1.5</code></td></tr>
+        <tr><td>~&gt; 1.5</td><td>&gt;=1.5.0, &lt;2.0.0</td><td><code class="ic-y">~&gt; 1.5</code></td></tr>
+        <tr><td>~&gt; 1.5.0</td><td>&gt;=1.5.0, &lt;1.6.0</td><td><code class="ic-y">~&gt; 1.5.0</code></td></tr>
+        <tr><td>&gt;= 1.5, &lt; 2.0</td><td>Plage explicite</td><td><code class="ic-y">&gt;= 1.5, &lt; 2.0</code></td></tr>
+      </table>
+      <div class="note note-g" style="margin-top:.7rem">
+        <span class="note-icon">✅</span>
+        <div><code class="ic-g">~&gt;</code> est l'opérateur idiomatique Terraform (pessimistic constraint). Toujours épingler les versions en production.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 8. VARIABLES D'ENV ══ -->
+  <div class="section-title">
+    <div class="section-icon si-red">🌍</div>
+    <span style="color:var(--red2)">Variables d'environnement Terraform</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-red">Variables d'environnement clés</div>
+      <table class="ref-table">
+        <tr><th>Variable</th><th>Effet</th></tr>
+        <tr><td>TF_VAR_name</td><td>Définit la variable Terraform "name"</td></tr>
+        <tr><td>TF_LOG</td><td>Niveau de log : TRACE / DEBUG / INFO / WARN / ERROR</td></tr>
+        <tr><td>TF_LOG_PATH</td><td>Redirige les logs vers un fichier</td></tr>
+        <tr><td>TF_INPUT</td><td>0 = désactive les prompts interactifs</td></tr>
+        <tr><td>TF_IN_AUTOMATION</td><td>true = ajuste l'output pour CI/CD</td></tr>
+        <tr><td>TF_CLI_ARGS</td><td>Arguments CLI supplémentaires (tous)</td></tr>
+        <tr><td>TF_CLI_ARGS_plan</td><td>Arguments supplémentaires pour 'plan'</td></tr>
+        <tr><td>TF_CLI_ARGS_apply</td><td>Arguments supplémentaires pour 'apply'</td></tr>
+        <tr><td>TF_DATA_DIR</td><td>Répertoire alternatif à .terraform/</td></tr>
+        <tr><td>TF_WORKSPACE</td><td>Sélectionne le workspace actif</td></tr>
+        <tr><td>TF_REGISTRY_DISCOVERY_RETRY</td><td>Nb de tentatives Registry</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-cyan">Fichiers importants du projet</div>
+      <table class="ref-table">
+        <tr><th>Fichier</th><th>Rôle</th><th>Git ?</th></tr>
+        <tr><td>*.tf</td><td>Configuration HCL principale</td><td><span class="tag tag-g">✓ commit</span></td></tr>
+        <tr><td>terraform.tfvars</td><td>Valeurs de variables (auto-chargé)</td><td><span class="tag tag-y">⚠ dépend</span></td></tr>
+        <tr><td>*.auto.tfvars</td><td>Valeurs auto-chargées</td><td><span class="tag tag-y">⚠ dépend</span></td></tr>
+        <tr><td>.terraform.lock.hcl</td><td>Versions providers épinglées</td><td><span class="tag tag-g">✓ commit</span></td></tr>
+        <tr><td>terraform.tfstate</td><td>State local (défaut)</td><td><span class="tag tag-r">✗ jamais</span></td></tr>
+        <tr><td>*.tfstate.backup</td><td>Backup auto du state</td><td><span class="tag tag-r">✗ jamais</span></td></tr>
+        <tr><td>.terraform/</td><td>Binaires providers + modules</td><td><span class="tag tag-r">✗ jamais</span></td></tr>
+      </table>
+      <div class="note note-r" style="margin-top:.7rem">
+        <span class="note-icon">🚨</span>
+        <div>Ne jamais commiter <code class="ic-r">.tfstate</code> dans Git — il peut contenir des secrets en clair.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 9. PIÈGES CERTIF ══ -->
+  <div class="section-title">
+    <div class="section-icon si-red">🎯</div>
+    <span style="color:var(--red2)">Pièges HCTA-003 &amp; Points critiques</span>
+  </div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title ct-red">🔄 Init &amp; Lock</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code class="ic-r">terraform get</code><div class="desc">≠ <code class="ic-c">terraform init</code> : get télécharge uniquement les modules, pas les providers ni le backend</div></div>
+        <div class="cmd-row"><code class="ic-r">-upgrade</code><div class="desc">Nécessaire pour mettre à jour les providers au-delà du lock file</div></div>
+        <div class="cmd-row"><code class="ic-y">.terraform.lock.hcl</code><div class="desc">À commiter dans Git. Ne jamais ignorer ce fichier</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title ct-orange">📊 State</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code class="ic-r">state rm</code><div class="desc">Supprime du state SANS détruire l'infra réelle</div></div>
+        <div class="cmd-row"><code class="ic-r">sensitive=true</code><div class="desc">Cache de l'output CLI, mais le state reste en clair</div></div>
+        <div class="cmd-row"><code class="ic-y">apply partiel</code><div class="desc">Si apply échoue à mi-chemin, le state reflète ce qui a réussi (pas de rollback)</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title ct-yellow">🧩 Modules</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code class="ic-r">TF_VAR_</code><div class="desc">Ne se propagent PAS aux modules enfants</div></div>
+        <div class="cmd-row"><code class="ic-r">terraform.tfvars</code><div class="desc">Lu seulement par le module racine</div></div>
+        <div class="cmd-row"><code class="ic-y">backend dans module enfant</code><div class="desc">INTERDIT — le backend est uniquement dans le module racine</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title ct-pink">⚡ Expressions</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code class="ic-r">for_each + list</code><div class="desc">for_each nécessite un map ou set, pas une liste directement</div></div>
+        <div class="cmd-row"><code class="ic-r">count vs for_each</code><div class="desc">count[0] peut décaler les index ; for_each est stable par clé</div></div>
+        <div class="cmd-row"><code class="ic-y">if/else</code><div class="desc">N'existe pas en HCL — utiliser l'opérateur ternaire <code class="ic">? :</code></div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<div class="footer">
+  Terraform Cheatsheet · HCTA-003 · Formateur DevOps <span>Capgemini CIS</span> · Généré par Claude
+</div>
+
+<script>
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.classList.toggle('cs-hidden', q.length > 1 && !text.includes(q));
+  });
+  // Show sections even if some cards hidden
+  document.querySelectorAll('.section-title').forEach(s => s.classList.remove('cs-hidden'));
+}
+</script>
+</body>
+</html>
