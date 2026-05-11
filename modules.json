@@ -190,7 +190,7 @@
         "title": "Pense-bêtes",
         "icon": "📋",
         "description": "Références rapides à garder sous la main — commandes, syntaxes, bonnes pratiques.",
-        "color": "red",
+        "color": "indigo",
         "modules": [
         {
             "file": "git-cheatsheet.html",
