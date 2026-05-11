@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiches Terraform – Points à réviser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:       #0d1117;
+    --bg2:      #161b22;
+    --bg3:      #1c2128;
+    --border:   #30363d;
+    --text:     #e6edf3;
+    --text2:    #8b949e;
+    --text3:    #6e7681;
+    --red:      #ff7b72;
+    --red-bg:   rgba(255,123,114,0.08);
+    --red-bd:   rgba(255,123,114,0.25);
+    --green:    #3fb950;
+    --green-bg: rgba(63,185,80,0.08);
+    --green-bd: rgba(63,185,80,0.25);
+    --blue:     #79c0ff;
+    --blue-bg:  rgba(121,192,255,0.08);
+    --blue-bd:  rgba(121,192,255,0.25);
+    --amber:    #e3b341;
+    --amber-bg: rgba(227,179,65,0.08);
+    --amber-bd: rgba(227,179,65,0.25);
+    --purple:   #bc8cff;
+    --tf:       #9f7aea;
+    --tf-bg:    rgba(159,122,234,0.08);
+    --tf-bd:    rgba(159,122,234,0.25);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  }
+  .nav-title { font-family: var(--mono); font-size: 12px; color: var(--tf); white-space: nowrap; }
+  .nav-count { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+  .search-input {
+    flex: 1; max-width: 220px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 10px;
+    color: var(--text); font-family: var(--sans); font-size: 13px; outline: none;
+  }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus { border-color: var(--tf); }
+
+  main { max-width: 720px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+
+  .cat-header {
+    display: flex; align-items: center; gap: 10px;
+    margin: 2rem 0 0.75rem;
+  }
+  .cat-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .cat-name { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); }
+  .cat-line { flex: 1; height: 1px; background: var(--border); }
+
+  .fiche { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+  .fiche-header {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 13px 14px; cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fiche-header:active { background: var(--bg3); }
+  .fiche-num { font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0; padding-top: 2px; }
+  .fiche-title { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; line-height: 1.45; }
+  .fiche-arrow { color: var(--text3); font-size: 11px; flex-shrink: 0; padding-top: 3px; transition: transform 0.2s; }
+  .fiche-arrow.open { transform: rotate(180deg); }
+
+  .fiche-body { display: none; padding: 0 14px 16px; border-top: 1px solid var(--border); }
+  .fiche-body.open { display: block; }
+
+  .block { border-radius: 8px; padding: 11px 13px; margin-top: 10px; font-size: 13.5px; line-height: 1.65; }
+  .block-label { font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+
+  .block-retenir { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); }
+  .block-retenir .block-label { color: var(--text3); }
+  .block-piege { background: var(--amber-bg); border: 1px solid var(--amber-bd); color: #f0cc7a; }
+  .block-piege .block-label { color: var(--amber); }
+  .block-memo { background: var(--blue-bg); border: 1px solid var(--blue-bd); color: #aad4ff; }
+  .block-memo .block-label { color: var(--blue); }
+  .block-certif { background: var(--tf-bg); border: 1px solid var(--tf-bd); color: #c8b8f8; }
+  .block-certif .block-label { color: var(--tf); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  th { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border); font-weight: 400; }
+  td { padding: 6px 8px; border-bottom: 1px solid rgba(48,54,61,0.5); color: var(--text2); vertical-align: top; }
+  td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-top: 10px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; color: #c9d1d9; }
+  .c-green  { color: var(--green); }
+  .c-red    { color: var(--red); }
+  .c-amber  { color: var(--amber); }
+  .c-blue   { color: var(--blue); }
+  .c-gray   { color: var(--text3); }
+  .c-purple { color: var(--purple); }
+  .c-tf     { color: var(--tf); }
+
+  code { font-family: var(--mono); background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--blue); }
+
+  .cat-workflow .cat-icon { background: rgba(121,192,255,0.12); }
+  .cat-hcl     .cat-icon { background: rgba(159,122,234,0.12); }
+  .cat-state   .cat-icon { background: rgba(63,185,80,0.12); }
+  .cat-modules .cat-icon { background: rgba(227,179,65,0.12); }
+  .cat-vars    .cat-icon { background: rgba(255,123,114,0.12); }
+  .cat-funcs   .cat-icon { background: rgba(188,140,255,0.12); }
+  .cat-backend .cat-icon { background: rgba(63,185,80,0.12); }
+  .cat-certif  .cat-icon { background: rgba(159,122,234,0.12); }
+
+  .fiche.hidden { display: none; }
+
+  .back-top { display: block; text-align: center; padding: 0.5rem; color: var(--text3); font-family: var(--mono); font-size: 11px; text-decoration: none; margin-top: 1rem; }
+  .back-top:hover { color: var(--tf); }
+
+  .tag-ok  { color: var(--green); font-weight: 600; }
+  .tag-no  { color: var(--red);   font-weight: 600; }
+  .tag-warn{ color: var(--amber); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-title">Terraform · Révision HCTA-003</span>
+  <input class="search-input" type="search" placeholder="Rechercher..." id="search" oninput="doSearch(this.value)">
+  <span class="nav-count" id="nav-count">40 fiches</span>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════
+     WORKFLOW CLI
+══════════════════════════════════════ -->
+<div class="cat-header cat-workflow">
+  <div class="cat-icon">⚡</div>
+  <span class="cat-name">Workflow CLI</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f1">
+  <div class="fiche-header" onclick="toggle('f1')">
+    <span class="fiche-num">01</span>
+    <span class="fiche-title">Le workflow fondamental Terraform</span>
+    <span class="fiche-arrow" id="a-f1">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f1">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Le workflow officiel HashiCorp est en trois étapes : <strong>Write → Plan → Apply</strong>. En CLI, cela se traduit par init → plan → apply.
+    </div>
+    <pre><span class="c-green">terraform init</span>     <span class="c-gray"># télécharge providers + modules + init backend</span>
+<span class="c-green">terraform plan</span>     <span class="c-gray"># dry-run : montre ce qui va changer</span>
+<span class="c-green">terraform apply</span>    <span class="c-gray"># applique les changements</span>
+<span class="c-green">terraform destroy</span>  <span class="c-gray"># détruit toutes les ressources du state</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>terraform get</code> télécharge uniquement les modules. <code>terraform init</code> fait tout (providers + modules + backend). À l'exam, la bonne réponse est presque toujours <strong>init</strong>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f2">
+  <div class="fiche-header" onclick="toggle('f2')">
+    <span class="fiche-num">02</span>
+    <span class="fiche-title">terraform plan — que fait-il exactement ?</span>
+    <span class="fiche-arrow" id="a-f2">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f2">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      <code>terraform plan</code> est un <strong>dry-run</strong>. Il compare la configuration souhaitée avec l'état actuel (state file + infra réelle) et affiche le diff. Il ne modifie <strong>rien</strong>.
+    </div>
+    <pre><span class="c-green">terraform plan</span>              <span class="c-gray"># aperçu</span>
+<span class="c-green">terraform plan -out=tfplan</span>  <span class="c-gray"># sauvegarder le plan</span>
+<span class="c-green">terraform apply tfplan</span>      <span class="c-gray"># appliquer exactement ce plan</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Symboles du plan</div>
+      <span class="c-green">+</span> créer &nbsp;·&nbsp; <span class="c-red">-</span> détruire &nbsp;·&nbsp; <span class="c-amber">~</span> modifier &nbsp;·&nbsp; <span class="c-red">+/-</span> remplacer &nbsp;·&nbsp; <span class="c-blue">&lt;=</span> data source lue
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f3">
+  <div class="fiche-header" onclick="toggle('f3')">
+    <span class="fiche-num">03</span>
+    <span class="fiche-title">terraform fmt et terraform validate</span>
+    <span class="fiche-arrow" id="a-f3">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f3">
+    <table>
+      <tr><th>Commande</th><th>Rôle</th><th>Accès réseau ?</th></tr>
+      <tr><td>terraform fmt</td><td>Formate les fichiers .tf selon le style canonique HashiCorp</td><td>Non</td></tr>
+      <tr><td>terraform validate</td><td>Vérifie la syntaxe et la cohérence interne des fichiers .tf</td><td>Non</td></tr>
+      <tr><td>terraform plan</td><td>Calcule le diff avec l'infra réelle</td><td>Oui</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>terraform validate</code> n'accède pas au provider ni au state. Il vérifie uniquement la syntaxe HCL. Pour détecter les erreurs d'API (ex. type d'instance invalide), il faut un <code>plan</code>.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Ordre recommandé</div>
+      fmt → validate → plan → apply
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f4">
+  <div class="fiche-header" onclick="toggle('f4')">
+    <span class="fiche-num">04</span>
+    <span class="fiche-title">-auto-approve et -refresh=false</span>
+    <span class="fiche-arrow" id="a-f4">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f4">
+    <pre><span class="c-green">terraform apply -auto-approve</span>      <span class="c-gray"># skip la confirmation interactive</span>
+<span class="c-green">terraform plan  -refresh=false</span>     <span class="c-gray"># n'interroge pas l'infra réelle</span>
+<span class="c-green">terraform apply -replace=aws_instance.web</span>  <span class="c-gray"># force recréation (ex-taint)</span>
+<span class="c-green">terraform apply -refresh-only</span>      <span class="c-gray"># met à jour le state sans toucher l'infra</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>TF_AUTO_APPROVE</code> n'existe <strong>pas</strong>. Le flag est <code>-auto-approve</code> sur la commande. Pour désactiver les prompts en CI/CD, utiliser ce flag ou <code>TF_INPUT=0</code>.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Variables d'env clés</div>
+      TF_VAR_name · TF_INPUT · TF_LOG · TF_LOG_PATH · TF_IN_AUTOMATION
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f5">
+  <div class="fiche-header" onclick="toggle('f5')">
+    <span class="fiche-num">05</span>
+    <span class="fiche-title">terraform taint est déprécié → -replace</span>
+    <span class="fiche-arrow" id="a-f5">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f5">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Depuis Terraform 0.15.2, <code>terraform taint</code> est déprécié. Le remplacement moderne est le flag <code>-replace</code> sur <code>apply</code>.
+    </div>
+    <pre><span class="c-red">terraform taint aws_instance.web</span>           <span class="c-gray"># déprécié</span>
+<span class="c-green">terraform apply -replace=aws_instance.web</span>  <span class="c-gray"># moderne</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège certif</div>
+      Les questions de certif peuvent encore mentionner <code>taint</code>. Savoir que les deux existent, mais que <code>-replace</code> est la réponse moderne attendue.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HCL - BLOCS & SYNTAXE
+══════════════════════════════════════ -->
+<div class="cat-header cat-hcl">
+  <div class="cat-icon">🧱</div>
+  <span class="cat-name">HCL — Blocs &amp; syntaxe</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f6">
+  <div class="fiche-header" onclick="toggle('f6')">
+    <span class="fiche-num">06</span>
+    <span class="fiche-title">Les 5 blocs fondamentaux HCL</span>
+    <span class="fiche-arrow" id="a-f6">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f6">
+    <table>
+      <tr><th>Bloc</th><th>Rôle</th></tr>
+      <tr><td>terraform {}</td><td>Meta-config : version, required_providers, backend</td></tr>
+      <tr><td>provider {}</td><td>Configure le plugin cloud (credentials, région…)</td></tr>
+      <tr><td>resource {}</td><td>Crée et gère une ressource</td></tr>
+      <tr><td>data {}</td><td>Lit une ressource existante (read-only)</td></tr>
+      <tr><td>variable {}</td><td>Déclare une variable d'entrée</td></tr>
+      <tr><td>output {}</td><td>Expose une valeur après apply</td></tr>
+      <tr><td>locals {}</td><td>Définit des valeurs locales calculées</td></tr>
+      <tr><td>module {}</td><td>Appelle un module enfant</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>data</code> ne crée rien. <code>resource</code> gère le cycle de vie complet. Ne pas les confondre à l'exam.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f7">
+  <div class="fiche-header" onclick="toggle('f7')">
+    <span class="fiche-num">07</span>
+    <span class="fiche-title">Référencer un attribut de ressource</span>
+    <span class="fiche-arrow" id="a-f7">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f7">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      La syntaxe est : <strong>TYPE.NOM.ATTRIBUT</strong>. Le mot-clé <code>resource</code> n'est jamais inclus dans la référence.
+    </div>
+    <pre><span class="c-gray"># Déclaration :</span>
+<span class="c-tf">resource</span> <span class="c-green">"aws_instance"</span> <span class="c-blue">"web"</span> { ... }
+
+<span class="c-gray"># Référence :</span>
+<span class="c-green">aws_instance.web.id</span>          <span class="c-gray"># ✅ correct</span>
+<span class="c-red">resource.aws_instance.web.id</span> <span class="c-gray"># ❌ incorrect</span></pre>
+    <div class="block block-memo">
+      <div class="block-label">Autres références</div>
+      var.nom · local.nom · data.type.nom.attr · module.nom.output
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f8">
+  <div class="fiche-header" onclick="toggle('f8')">
+    <span class="fiche-num">08</span>
+    <span class="fiche-title">count vs for_each — quelle différence ?</span>
+    <span class="fiche-arrow" id="a-f8">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f8">
+    <table>
+      <tr><th></th><th>count</th><th>for_each</th></tr>
+      <tr><td>Type d'entrée</td><td>Integer</td><td>Map ou Set of strings</td></tr>
+      <tr><td>Identifiant</td><td>Index numérique [0], [1]…</td><td>Clé nommée ["prod"]…</td></tr>
+      <tr><td>Référence interne</td><td>count.index</td><td>each.key / each.value</td></tr>
+      <tr><td>Risque suppression</td><td>Décale les index !</td><td>Stable par clé</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Avec <code>count</code>, supprimer un élément au milieu d'une liste décale tous les index suivants → Terraform peut vouloir détruire et recréer des ressources. <code>for_each</code> est plus sûr pour les collections nommées.
+    </div>
+    <pre><span class="c-gray"># count :</span>
+<span class="c-amber">count</span> = <span class="c-blue">3</span>  <span class="c-gray"># référence : aws_instance.web[0]</span>
+
+<span class="c-gray"># for_each avec map :</span>
+<span class="c-amber">for_each</span> = var.instances  <span class="c-gray"># référence : aws_instance.web["prod"]</span></pre>
+  </div>
+</div>
+
+<div class="fiche" id="f9">
+  <div class="fiche-header" onclick="toggle('f9')">
+    <span class="fiche-num">09</span>
+    <span class="fiche-title">L'opérateur ternaire — seule syntaxe conditionnelle HCL</span>
+    <span class="fiche-arrow" id="a-f9">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f9">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      HCL n'a pas de <code>if/else</code>. La seule expression conditionnelle est le ternaire : <strong>condition ? val_si_vrai : val_si_faux</strong>.
+    </div>
+    <pre><span class="c-gray"># Ternaire :</span>
+instance_type = var.env == <span class="c-green">"prod"</span> ? <span class="c-green">"t3.large"</span> : <span class="c-green">"t3.micro"</span>
+
+<span class="c-gray"># Ressource optionnelle :</span>
+count = var.create_instance ? <span class="c-blue">1</span> : <span class="c-blue">0</span>
+
+<span class="c-gray"># For expression avec filtre :</span>
+[<span class="c-amber">for</span> s <span class="c-amber">in</span> var.list : upper(s) <span class="c-amber">if</span> length(s) > <span class="c-blue">3</span>]</pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>if/else</code>, <code>switch</code>, <code>when</code> n'existent pas en HCL. Seul le ternaire <code>? :</code> est valide.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f10">
+  <div class="fiche-header" onclick="toggle('f10')">
+    <span class="fiche-num">10</span>
+    <span class="fiche-title">locals vs variable — quelle différence ?</span>
+    <span class="fiche-arrow" id="a-f10">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f10">
+    <table>
+      <tr><th></th><th>variable {}</th><th>locals {}</th></tr>
+      <tr><td>Surcharge externe</td><td><span class="tag-ok">Oui</span> (CLI, env, tfvars)</td><td><span class="tag-no">Non</span></td></tr>
+      <tr><td>Visible hors module</td><td>Via output seulement</td><td>Non</td></tr>
+      <tr><td>Calcul dynamique</td><td>Non (valeur fixe)</td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>Référence</td><td>var.nom</td><td>local.nom</td></tr>
+    </table>
+    <div class="block block-memo">
+      <div class="block-label">Règle simple</div>
+      <code>variable</code> = entrée externe configurable. <code>locals</code> = calcul interne non surchargeable.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f11">
+  <div class="fiche-header" onclick="toggle('f11')">
+    <span class="fiche-num">11</span>
+    <span class="fiche-title">lifecycle — les 4 arguments</span>
+    <span class="fiche-arrow" id="a-f11">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f11">
+    <table>
+      <tr><th>Argument</th><th>Effet</th></tr>
+      <tr><td>create_before_destroy</td><td>Crée la nouvelle ressource AVANT de détruire l'ancienne</td></tr>
+      <tr><td>prevent_destroy</td><td>Terraform échoue si le plan détruit cette ressource</td></tr>
+      <tr><td>ignore_changes</td><td>Ignore les diffs sur les attributs listés</td></tr>
+      <tr><td>replace_triggered_by</td><td>Force le remplacement si les ressources listées changent</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>prevent_destroy = true</code> ne bloque pas la commande <code>terraform destroy</code> en silence — il fait <strong>échouer</strong> le plan avec une erreur. Pour détruire la ressource, il faut d'abord retirer le bloc lifecycle.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f12">
+  <div class="fiche-header" onclick="toggle('f12')">
+    <span class="fiche-num">12</span>
+    <span class="fiche-title">depends_on — quand l'utiliser ?</span>
+    <span class="fiche-arrow" id="a-f12">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f12">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Terraform infère automatiquement les dépendances depuis les références. <code>depends_on</code> sert uniquement quand la dépendance est <strong>implicite</strong> (non visible dans la config).
+    </div>
+    <pre><span class="c-gray"># Exemple : ressource qui dépend d'une policy attachée</span>
+<span class="c-gray"># mais dont l'ARN n'est pas dans sa config</span>
+resource <span class="c-green">"aws_instance"</span> <span class="c-blue">"app"</span> {
+  <span class="c-amber">depends_on</span> = [aws_iam_role_policy_attachment.app]
+}</pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Préférer les références implicites (plus claires). <code>depends_on</code> = dernier recours pour dépendances invisibles.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     VARIABLES & PRÉCÉDENCE
+══════════════════════════════════════ -->
+<div class="cat-header cat-vars">
+  <div class="cat-icon">📥</div>
+  <span class="cat-name">Variables &amp; Précédence</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f13">
+  <div class="fiche-header" onclick="toggle('f13')">
+    <span class="fiche-num">13</span>
+    <span class="fiche-title">Priorité des variables — ordre exact</span>
+    <span class="fiche-arrow" id="a-f13">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f13">
+    <div class="block block-retenir">
+      <div class="block-label">Priorité croissante (1 = la plus basse)</div>
+    </div>
+    <table>
+      <tr><th>Priorité</th><th>Source</th></tr>
+      <tr><td>1 (basse)</td><td>default = dans le bloc variable {}</td></tr>
+      <tr><td>2</td><td>Variables d'environnement TF_VAR_name</td></tr>
+      <tr><td>3</td><td>terraform.tfvars (auto-chargé)</td></tr>
+      <tr><td>4</td><td>*.auto.tfvars (auto-chargé, ordre alphabétique)</td></tr>
+      <tr><td>5</td><td>-var-file=fichier.tfvars (explicite)</td></tr>
+      <tr><td>6 (haute)</td><td>-var "nom=valeur" (flag CLI)</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Les variables d'environnement <code>TF_VAR_</code> ont une priorité <strong>inférieure</strong> aux fichiers .tfvars. Le flag <code>-var</code> gagne toujours.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f14">
+  <div class="fiche-header" onclick="toggle('f14')">
+    <span class="fiche-num">14</span>
+    <span class="fiche-title">terraform.tfvars vs *.auto.tfvars — chargement automatique</span>
+    <span class="fiche-arrow" id="a-f14">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f14">
+    <table>
+      <tr><th>Fichier</th><th>Chargé automatiquement ?</th></tr>
+      <tr><td>terraform.tfvars</td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>terraform.tfvars.json</td><td><span class="tag-ok">Oui</span></td></tr>
+      <tr><td>*.auto.tfvars</td><td><span class="tag-ok">Oui</span> (ordre alphabétique)</td></tr>
+      <tr><td>prod.tfvars</td><td><span class="tag-no">Non</span> → -var-file=prod.tfvars</td></tr>
+      <tr><td>config.tfvars</td><td><span class="tag-no">Non</span> → -var-file=config.tfvars</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Un fichier nommé <code>prod.tfvars</code> n'est PAS chargé automatiquement. Il faut le spécifier avec <code>-var-file</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f15">
+  <div class="fiche-header" onclick="toggle('f15')">
+    <span class="fiche-num">15</span>
+    <span class="fiche-title">sensitive = true — ce que ça fait et ce que ça ne fait pas</span>
+    <span class="fiche-arrow" id="a-f15">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f15">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      <code>sensitive = true</code> cache la valeur dans les <strong>outputs CLI</strong> (plan, apply). La valeur est toujours présente en clair dans le state file.
+    </div>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>sensitive = true</code> <strong>ne chiffre pas</strong> la valeur dans le state. Pour protéger les secrets dans le state, il faut chiffrer le backend (ex: S3 + SSE-KMS).
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      sensitive = masqué en CLI ≠ chiffré. Le state file reste la source de vérité, et peut contenir des mots de passe en clair.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f16">
+  <div class="fiche-header" onclick="toggle('f16')">
+    <span class="fiche-num">16</span>
+    <span class="fiche-title">Types de variables HCL</span>
+    <span class="fiche-arrow" id="a-f16">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f16">
+    <table>
+      <tr><th>Type</th><th>Exemple</th></tr>
+      <tr><td>string</td><td>"us-east-1"</td></tr>
+      <tr><td>number</td><td>42 / 3.14</td></tr>
+      <tr><td>bool</td><td>true / false</td></tr>
+      <tr><td>list(T)</td><td>["a", "b"]</td></tr>
+      <tr><td>set(T)</td><td>toset(["a", "b"])</td></tr>
+      <tr><td>map(T)</td><td>{a = "x", b = "y"}</td></tr>
+      <tr><td>object({…})</td><td>{name = string, port = number}</td></tr>
+      <tr><td>any</td><td>Accepte tout type</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>list</code> est ordonné et accepte les doublons. <code>set</code> est non ordonné et sans doublon. <code>toset()</code> supprime les doublons silencieusement.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     STATE
+══════════════════════════════════════ -->
+<div class="cat-header cat-state">
+  <div class="cat-icon">🗄️</div>
+  <span class="cat-name">State &amp; Backends</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f17">
+  <div class="fiche-header" onclick="toggle('f17')">
+    <span class="fiche-num">17</span>
+    <span class="fiche-title">Rôle du state file</span>
+    <span class="fiche-arrow" id="a-f17">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f17">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Le state file (terraform.tfstate) est le <strong>mappage</strong> entre les ressources déclarées en HCL et leur identifiant réel dans le cloud. Sans lui, Terraform ne sait pas ce qu'il gère.
+    </div>
+    <table>
+      <tr><th>Localisation défaut</th><td>./terraform.tfstate (backend local)</td></tr>
+      <tr><th>Format</th><td>JSON (ne jamais éditer à la main)</td></tr>
+      <tr><th>Contenu sensible ?</th><td>Oui — peut contenir des mots de passe en clair</td></tr>
+      <tr><th>À commiter dans Git ?</th><td><span class="tag-no">Non</span> — utiliser un remote backend</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="fiche" id="f18">
+  <div class="fiche-header" onclick="toggle('f18')">
+    <span class="fiche-num">18</span>
+    <span class="fiche-title">Commandes terraform state — lesquelles font quoi ?</span>
+    <span class="fiche-arrow" id="a-f18">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f18">
+    <table>
+      <tr><th>Commande</th><th>Effet</th></tr>
+      <tr><td>state list</td><td>Liste toutes les adresses dans le state</td></tr>
+      <tr><td>state show addr</td><td>Détails d'une ressource dans le state</td></tr>
+      <tr><td>state mv src dst</td><td>Renomme une adresse dans le state</td></tr>
+      <tr><td>state rm addr</td><td>Supprime du state (sans détruire l'infra !)</td></tr>
+      <tr><td>state pull</td><td>Exporte le state brut (JSON)</td></tr>
+      <tr><td>state push</td><td>Pousse un state local vers le backend</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>terraform state rm</code> retire la ressource du state <strong>sans toucher à l'infra réelle</strong>. La ressource continue d'exister dans le cloud — Terraform ne la gère plus.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f19">
+  <div class="fiche-header" onclick="toggle('f19')">
+    <span class="fiche-num">19</span>
+    <span class="fiche-title">State locking — pourquoi et comment</span>
+    <span class="fiche-arrow" id="a-f19">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f19">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Le state locking empêche deux opérations Terraform concurrentes d'écrire dans le state simultanément (risque de corruption).
+    </div>
+    <table>
+      <tr><th>Backend AWS</th><td>S3 (stockage) + DynamoDB (verrou)</td></tr>
+      <tr><th>Backend Azure</th><td>Azure Blob Storage (verrou natif via lease)</td></tr>
+      <tr><th>HCP Terraform</th><td>Verrou intégré</td></tr>
+    </table>
+    <pre><span class="c-gray"># Libérer un verrou bloqué :</span>
+<span class="c-green">terraform force-unlock LOCK_ID</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      La table DynamoDB AWS doit avoir une clé primaire nommée exactement <code>LockID</code> (type String). Un nom différent empêche le locking de fonctionner.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f20">
+  <div class="fiche-header" onclick="toggle('f20')">
+    <span class="fiche-num">20</span>
+    <span class="fiche-title">Backend S3 + DynamoDB — configuration type</span>
+    <span class="fiche-arrow" id="a-f20">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f20">
+    <pre><span class="c-tf">terraform</span> {
+  <span class="c-amber">backend</span> <span class="c-green">"s3"</span> {
+    bucket         = <span class="c-green">"my-tf-state"</span>
+    key            = <span class="c-green">"prod/terraform.tfstate"</span>
+    region         = <span class="c-green">"eu-west-1"</span>
+    dynamodb_table = <span class="c-green">"terraform-locks"</span>  <span class="c-gray"># LockID</span>
+    encrypt        = <span class="c-blue">true</span>               <span class="c-gray"># SSE-S3</span>
+  }
+}</pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      S3 = stockage du state. DynamoDB = verrou. encrypt = true active SSE-S3. Pour SSE-KMS, ajouter <code>kms_key_id</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f21">
+  <div class="fiche-header" onclick="toggle('f21')">
+    <span class="fiche-num">21</span>
+    <span class="fiche-title">terraform import — avant et après Terraform 1.5</span>
+    <span class="fiche-arrow" id="a-f21">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f21">
+    <table>
+      <tr><th></th><th>Avant 1.5</th><th>1.5+</th></tr>
+      <tr><td>Écrire la config</td><td>Manuel (obligatoire avant import)</td><td>Auto-généré avec -generate-config-out</td></tr>
+      <tr><td>Commande</td><td>terraform import addr id</td><td>Bloc import {} + terraform plan</td></tr>
+    </table>
+    <pre><span class="c-gray"># Avant 1.5 :</span>
+<span class="c-green">terraform import aws_instance.web i-1234567890abcdef0</span>
+
+<span class="c-gray"># 1.5+ avec génération auto :</span>
+<span class="c-green">terraform plan -generate-config-out=generated.tf</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>terraform import</code> ne génère pas la configuration HCL (avant 1.5). Il ajoute uniquement la ressource au state. La config doit être écrite manuellement, sinon le plan suivant montrera des diffs.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f22">
+  <div class="fiche-header" onclick="toggle('f22')">
+    <span class="fiche-num">22</span>
+    <span class="fiche-title">Le bloc moved {} — refactoriser sans détruire</span>
+    <span class="fiche-arrow" id="a-f22">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f22">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Le bloc <code>moved {}</code> (Terraform 1.1+) permet de renommer ou déplacer une ressource dans le state sans la détruire. C'est l'alternative déclarative à <code>terraform state mv</code>.
+    </div>
+    <pre><span class="c-amber">moved</span> {
+  from = aws_instance.old_name
+  to   = aws_instance.new_name
+}</pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Après avoir appliqué le bloc moved, retirer le bloc de la config. Il n'est utile que le temps de la migration.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f23">
+  <div class="fiche-header" onclick="toggle('f23')">
+    <span class="fiche-num">23</span>
+    <span class="fiche-title">Workspaces — isoler les états</span>
+    <span class="fiche-arrow" id="a-f23">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f23">
+    <table>
+      <tr><th>Commande</th><th>Effet</th></tr>
+      <tr><td>workspace list</td><td>Lister les workspaces</td></tr>
+      <tr><td>workspace new staging</td><td>Créer + basculer sur "staging"</td></tr>
+      <tr><td>workspace select prod</td><td>Basculer sur "prod"</td></tr>
+      <tr><td>workspace show</td><td>Afficher le workspace actif</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Le workspace <code>default</code> existe toujours et <strong>ne peut pas être supprimé</strong>. Les workspaces partagent la même config mais ont chacun leur state indépendant. <code>terraform.workspace</code> retourne le nom du workspace courant dans le code HCL.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODULES
+══════════════════════════════════════ -->
+<div class="cat-header cat-modules">
+  <div class="cat-icon">📦</div>
+  <span class="cat-name">Modules</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f24">
+  <div class="fiche-header" onclick="toggle('f24')">
+    <span class="fiche-num">24</span>
+    <span class="fiche-title">Sources de modules — les formats</span>
+    <span class="fiche-arrow" id="a-f24">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f24">
+    <table>
+      <tr><th>Type</th><th>Source</th></tr>
+      <tr><td>Registry public</td><td>hashicorp/consul/aws</td></tr>
+      <tr><td>Registry privé</td><td>app.terraform.io/org/mod/aws</td></tr>
+      <tr><td>Chemin local</td><td>./modules/vpc</td></tr>
+      <tr><td>Git HTTPS</td><td>git::https://github.com/org/repo.git</td></tr>
+      <tr><td>Git + sous-dossier</td><td>git::https://…repo.git//subdir?ref=v1.0</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège — double slash</div>
+      Pour pointer vers un sous-dossier dans un repo Git, utiliser le <strong>double-slash</strong> <code>//</code>. Un seul slash ne fonctionne pas.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f25">
+  <div class="fiche-header" onclick="toggle('f25')">
+    <span class="fiche-num">25</span>
+    <span class="fiche-title">version argument — pour quel type de source ?</span>
+    <span class="fiche-arrow" id="a-f25">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f25">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      L'argument <code>version</code> dans un bloc module ne fonctionne qu'avec les sources de type <strong>Terraform Registry</strong> (public ou privé). Il est ignoré pour les chemins locaux et les sources Git.
+    </div>
+    <table>
+      <tr><th>Source</th><th>version argument</th></tr>
+      <tr><td>Registry (hashicorp/consul/aws)</td><td><span class="tag-ok">Supporté</span></td></tr>
+      <tr><td>Chemin local (./modules/vpc)</td><td><span class="tag-no">Non supporté</span></td></tr>
+      <tr><td>Git (git::https://…)</td><td><span class="tag-no">Non</span> → utiliser ?ref=</td></tr>
+    </table>
+    <div class="block block-memo">
+      <div class="block-label">Opérateur ~&gt;</div>
+      version = "~&gt; 3.0" autorise 3.x mais pas 4.0. Opérateur idiomatique Terraform.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f26">
+  <div class="fiche-header" onclick="toggle('f26')">
+    <span class="fiche-num">26</span>
+    <span class="fiche-title">TF_VAR_ — propagation aux modules enfants ?</span>
+    <span class="fiche-arrow" id="a-f26">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f26">
+    <div class="block block-piege">
+      <div class="block-label">Piège majeur</div>
+      Les variables d'environnement <code>TF_VAR_</code> et les fichiers <code>terraform.tfvars</code> sont lus <strong>uniquement par le module racine</strong>. Les modules enfants reçoivent leurs valeurs exclusivement via les arguments du bloc <code>module {}</code>.
+    </div>
+    <pre><span class="c-gray"># ✅ Bonne façon de passer une valeur à un module enfant :</span>
+<span class="c-tf">module</span> <span class="c-green">"vpc"</span> {
+  source   = <span class="c-green">"./modules/vpc"</span>
+  cidr     = var.vpc_cidr   <span class="c-gray"># ← passé via argument</span>
+}</pre>
+  </div>
+</div>
+
+<div class="fiche" id="f27">
+  <div class="fiche-header" onclick="toggle('f27')">
+    <span class="fiche-num">27</span>
+    <span class="fiche-title">Backend dans un module enfant — interdit</span>
+    <span class="fiche-arrow" id="a-f27">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f27">
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Le bloc <code>backend</code> dans un bloc <code>terraform {}</code> est <strong>uniquement valide dans le module racine</strong>. Placer un backend dans un module enfant provoque une erreur.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Module racine = là où on exécute <code>terraform init/plan/apply</code>. Il peut y avoir un seul backend par configuration. Tous les modules partagent le même state.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     FONCTIONS & EXPRESSIONS
+══════════════════════════════════════ -->
+<div class="cat-header cat-funcs">
+  <div class="cat-icon">🔣</div>
+  <span class="cat-name">Fonctions &amp; Expressions</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f28">
+  <div class="fiche-header" onclick="toggle('f28')">
+    <span class="fiche-num">28</span>
+    <span class="fiche-title">Fonctions incontournables à l'exam</span>
+    <span class="fiche-arrow" id="a-f28">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f28">
+    <table>
+      <tr><th>Fonction</th><th>Rôle &amp; exemple</th></tr>
+      <tr><td>length(list)</td><td>Nombre d'éléments : length(["a","b"]) → 2</td></tr>
+      <tr><td>toset(list)</td><td>Liste → set (retire les doublons)</td></tr>
+      <tr><td>merge(m1, m2)</td><td>Fusionne des maps (last wins)</td></tr>
+      <tr><td>concat(l1, l2)</td><td>Concatène des listes</td></tr>
+      <tr><td>contains(list, val)</td><td>true si val est dans la liste</td></tr>
+      <tr><td>lookup(map, key, def)</td><td>Valeur d'une map avec fallback</td></tr>
+      <tr><td>file(path)</td><td>Lit un fichier → string</td></tr>
+      <tr><td>templatefile(path, vars)</td><td>Rend un template Jinja-like</td></tr>
+      <tr><td>jsonencode(obj)</td><td>Objet → JSON string (IAM policies)</td></tr>
+      <tr><td>cidrsubnet(cidr, b, n)</td><td>Calcule un sous-réseau</td></tr>
+      <tr><td>can(expr)</td><td>true si l'expression ne produit pas d'erreur</td></tr>
+      <tr><td>one(list)</td><td>Retourne l'unique élément ou null (pour count=0/1)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="fiche" id="f29">
+  <div class="fiche-header" onclick="toggle('f29')">
+    <span class="fiche-num">29</span>
+    <span class="fiche-title">compact() et toset() — effets sur les listes</span>
+    <span class="fiche-arrow" id="a-f29">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f29">
+    <pre><span class="c-gray"># compact() supprime les chaînes vides et null :</span>
+compact([<span class="c-green">"a"</span>, <span class="c-green">""</span>, <span class="c-green">"b"</span>, null, <span class="c-green">"c"</span>])
+<span class="c-gray">→ ["a", "b", "c"]</span>
+
+<span class="c-gray"># toset() supprime les doublons (ordre non garanti) :</span>
+toset([<span class="c-green">"a"</span>, <span class="c-green">"b"</span>, <span class="c-green">"a"</span>, <span class="c-green">"c"</span>])
+<span class="c-gray">→ {"a", "b", "c"}</span></pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>toset()</code> ne retourne pas une liste — c'est un <strong>set</strong>. L'ordre est perdu. Pour passer à <code>for_each</code>, c'est parfait. Pour indexer avec [0], ce n'est pas adapté.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f30">
+  <div class="fiche-header" onclick="toggle('f30')">
+    <span class="fiche-num">30</span>
+    <span class="fiche-title">path.module vs path.root vs path.cwd</span>
+    <span class="fiche-arrow" id="a-f30">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f30">
+    <table>
+      <tr><th>Expression</th><th>Valeur</th></tr>
+      <tr><td>path.module</td><td>Chemin absolu du module courant</td></tr>
+      <tr><td>path.root</td><td>Chemin absolu du module racine</td></tr>
+      <tr><td>path.cwd</td><td>Répertoire de travail courant</td></tr>
+    </table>
+    <pre><span class="c-gray"># Usage typique dans un module :</span>
+user_data = templatefile(<span class="c-green">"${path.module}/scripts/init.sh"</span>, {})</pre>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Toujours utiliser <code>path.module</code> dans un module pour référencer des fichiers locaux. <code>path.root</code> pointe vers le module racine, pas le module courant.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LOCK FILE & PROVIDERS
+══════════════════════════════════════ -->
+<div class="cat-header cat-backend">
+  <div class="cat-icon">🔒</div>
+  <span class="cat-name">Lock file &amp; Providers</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f31">
+  <div class="fiche-header" onclick="toggle('f31')">
+    <span class="fiche-num">31</span>
+    <span class="fiche-title">.terraform.lock.hcl — rôle et gestion</span>
+    <span class="fiche-arrow" id="a-f31">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f31">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Le fichier <code>.terraform.lock.hcl</code> fixe les versions exactes des providers et leurs checksums. Il doit être <strong>commité dans Git</strong> pour garantir des builds reproductibles.
+    </div>
+    <table>
+      <tr><th>Fichier/Dossier</th><th>Git ?</th></tr>
+      <tr><td>.terraform.lock.hcl</td><td><span class="tag-ok">Oui</span> — épingle les versions</td></tr>
+      <tr><td>.terraform/</td><td><span class="tag-no">Non</span> — binaires providers</td></tr>
+      <tr><td>*.tfstate</td><td><span class="tag-no">Non</span> — secrets possibles</td></tr>
+      <tr><td>*.tfvars</td><td><span class="tag-warn">Parfois</span> — si pas de secrets</td></tr>
+    </table>
+    <pre><span class="c-green">terraform init -upgrade</span>  <span class="c-gray"># mise à jour providers + lock file</span></pre>
+  </div>
+</div>
+
+<div class="fiche" id="f32">
+  <div class="fiche-header" onclick="toggle('f32')">
+    <span class="fiche-num">32</span>
+    <span class="fiche-title">Contraintes de versions — opérateurs</span>
+    <span class="fiche-arrow" id="a-f32">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f32">
+    <table>
+      <tr><th>Opérateur</th><th>Signification</th></tr>
+      <tr><td>= 1.5.0</td><td>Exactement 1.5.0</td></tr>
+      <tr><td>>= 1.5</td><td>1.5 ou plus (sans plafond)</td></tr>
+      <tr><td>~> 1.5</td><td>>= 1.5.0 et &lt; 2.0.0</td></tr>
+      <tr><td>~> 1.5.0</td><td>>= 1.5.0 et &lt; 1.6.0</td></tr>
+      <tr><td>>= 1.5, &lt; 2.0</td><td>Plage explicite</td></tr>
+    </table>
+    <div class="block block-memo">
+      <div class="block-label">Mémo — pessimistic constraint operator</div>
+      <code>~></code> est l'opérateur idiomatique Terraform. <code>~> 1.5</code> autorise les mises à jour mineures (1.6, 1.7…) mais pas la version majeure suivante (2.0).
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f33">
+  <div class="fiche-header" onclick="toggle('f33')">
+    <span class="fiche-num">33</span>
+    <span class="fiche-title">Provider alias — plusieurs configurations du même provider</span>
+    <span class="fiche-arrow" id="a-f33">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f33">
+    <pre><span class="c-gray"># Deux régions AWS dans la même config :</span>
+<span class="c-tf">provider</span> <span class="c-green">"aws"</span> { region = <span class="c-green">"eu-west-1"</span> }
+
+<span class="c-tf">provider</span> <span class="c-green">"aws"</span> {
+  alias  = <span class="c-green">"us"</span>
+  region = <span class="c-green">"us-east-1"</span>
+}
+
+<span class="c-gray"># Référencer l'alias dans une ressource :</span>
+<span class="c-tf">resource</span> <span class="c-green">"aws_s3_bucket"</span> <span class="c-blue">"us_bucket"</span> {
+  provider = <span class="c-blue">aws.us</span>
+}</pre>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Dans la ressource, le mot-clé est <code>provider</code> (méta-argument), pas <code>alias</code>. La valeur est <code>aws.us</code> (type.alias), pas une string.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PIÈGES CERTIF
+══════════════════════════════════════ -->
+<div class="cat-header cat-certif">
+  <div class="cat-icon">🎯</div>
+  <span class="cat-name">Pièges certification HCTA-003</span>
+  <div class="cat-line"></div>
+</div>
+
+<div class="fiche" id="f34">
+  <div class="fiche-header" onclick="toggle('f34')">
+    <span class="fiche-num">34</span>
+    <span class="fiche-title">terraform apply échoue à mi-chemin — état du state ?</span>
+    <span class="fiche-arrow" id="a-f34">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f34">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Si <code>terraform apply</code> échoue à mi-parcours, le state reflète <strong>ce qui a été créé avec succès</strong>. Terraform n'a pas de rollback automatique. L'apply n'est pas transactionnel.
+    </div>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      Le state n'est pas vidé, ni rollbacké. Il contient les ressources partiellement créées. Lancer <code>terraform plan</code> après un échec montre ce qui reste à créer.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f35">
+  <div class="fiche-header" onclick="toggle('f35')">
+    <span class="fiche-num">35</span>
+    <span class="fiche-title">terraform refresh (déprécié) → -refresh-only</span>
+    <span class="fiche-arrow" id="a-f35">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f35">
+    <table>
+      <tr><th>Commande</th><th>Comportement</th></tr>
+      <tr><td>terraform refresh (déprécié)</td><td>Met à jour le state sans modifier l'infra</td></tr>
+      <tr><td>terraform apply -refresh-only</td><td>Moderne : idem, avec confirmation</td></tr>
+      <tr><td>terraform plan -refresh=false</td><td>Saute la réconciliation state/infra</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège</div>
+      <code>terraform refresh</code> est déprécié depuis Terraform 0.15.4. La réponse moderne à l'exam est <code>terraform apply -refresh-only</code>.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f36">
+  <div class="fiche-header" onclick="toggle('f36')">
+    <span class="fiche-num">36</span>
+    <span class="fiche-title">Configuration drift — comment Terraform le détecte</span>
+    <span class="fiche-arrow" id="a-f36">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f36">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      Le drift = l'infra réelle diverge du state (changement manuel hors Terraform). <code>terraform plan</code> le détecte en comparant l'infra réelle avec le state. Le plan montre ce qu'il faut corriger.
+    </div>
+    <div class="block block-memo">
+      <div class="block-label">Mémo</div>
+      Détecter : terraform plan. Corriger : terraform apply. Mettre à jour le state sans corriger : terraform apply -refresh-only.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f37">
+  <div class="fiche-header" onclick="toggle('f37')">
+    <span class="fiche-num">37</span>
+    <span class="fiche-title">terraform_remote_state — lire les outputs d'une autre config</span>
+    <span class="fiche-arrow" id="a-f37">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f37">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      La data source <code>terraform_remote_state</code> permet à une configuration B de lire les <strong>outputs</strong> du state d'une configuration A. Seules les outputs sont accessibles — pas tous les attributs.
+    </div>
+    <pre><span class="c-tf">data</span> <span class="c-green">"terraform_remote_state"</span> <span class="c-blue">"vpc"</span> {
+  backend = <span class="c-green">"s3"</span>
+  config = {
+    bucket = <span class="c-green">"my-state"</span>
+    key    = <span class="c-green">"vpc/terraform.tfstate"</span>
+    region = <span class="c-green">"eu-west-1"</span>
+  }
+}
+<span class="c-gray"># Usage :</span>
+vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id</pre>
+  </div>
+</div>
+
+<div class="fiche" id="f38">
+  <div class="fiche-header" onclick="toggle('f38')">
+    <span class="fiche-num">38</span>
+    <span class="fiche-title">Provisioners — pourquoi les éviter</span>
+    <span class="fiche-arrow" id="a-f38">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f38">
+    <div class="block block-retenir">
+      <div class="block-label">À retenir</div>
+      HashiCorp considère les provisioners comme un <strong>dernier recours</strong>. Ils brisent l'idempotence et créent des dépendances externes. Préférer user_data, cloud-init ou des outils de configuration management.
+    </div>
+    <table>
+      <tr><th>Provisioner</th><th>Rôle</th></tr>
+      <tr><td>local-exec</td><td>Exécute une commande sur la machine qui lance Terraform</td></tr>
+      <tr><td>remote-exec</td><td>Exécute une commande sur la ressource distante (via SSH/WinRM)</td></tr>
+      <tr><td>file</td><td>Copie un fichier ou dossier vers la ressource distante</td></tr>
+    </table>
+    <div class="block block-piege">
+      <div class="block-label">Piège certif</div>
+      Un provisioner <code>on_failure = continue</code> fait ignorer l'erreur du provisioner. La ressource reste dans le state mais est <strong>taintée</strong> automatiquement.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f39">
+  <div class="fiche-header" onclick="toggle('f39')">
+    <span class="fiche-num">39</span>
+    <span class="fiche-title">HCP Terraform vs Terraform CLI — différences clés</span>
+    <span class="fiche-arrow" id="a-f39">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f39">
+    <table>
+      <tr><th>Fonctionnalité</th><th>CLI seul</th><th>HCP Terraform</th></tr>
+      <tr><td>State remote</td><td>Backend à configurer</td><td>Intégré</td></tr>
+      <tr><td>State locking</td><td>DynamoDB (AWS) ou équiv.</td><td>Intégré</td></tr>
+      <tr><td>Approbation manuelle</td><td>Manuel</td><td>Workflows de validation</td></tr>
+      <tr><td>Sentinel policies</td><td>Non</td><td>Oui (Business+)</td></tr>
+      <tr><td>Registry privé</td><td>Non</td><td>Oui</td></tr>
+    </table>
+    <div class="block block-certif">
+      <div class="block-label">Certif</div>
+      La certification HCTA-003 teste aussi HCP Terraform. Sentinel = policy-as-code (plan bloqué si règles violées). Les run triggers permettent à un workspace de déclencher un autre workspace.
+    </div>
+  </div>
+</div>
+
+<div class="fiche" id="f40">
+  <div class="fiche-header" onclick="toggle('f40')">
+    <span class="fiche-num">40</span>
+    <span class="fiche-title">IaC déclarative vs impérative — Terraform est déclaratif</span>
+    <span class="fiche-arrow" id="a-f40">▼</span>
+  </div>
+  <div class="fiche-body" id="b-f40">
+    <table>
+      <tr><th></th><th>Déclaratif</th><th>Impératif</th></tr>
+      <tr><td>On décrit</td><td>Le QUOI (état final)</td><td>Le COMMENT (étapes)</td></tr>
+      <tr><td>Exemples</td><td>Terraform, CloudFormation</td><td>Bash, Ansible (procédural)</td></tr>
+      <tr><td>Idempotence</td><td>Naturelle</td><td>À gérer manuellement</td></tr>
+    </table>
+    <div class="block block-certif">
+      <div class="block-label">Certif — Domain 1 IaC Concepts (~7%)</div>
+      Terraform est déclaratif. Ansible peut être déclaratif (modules) ou impératif (tasks séquentielles). La réponse à "Terraform est-il déclaratif ?" est toujours <strong>oui</strong>.
+    </div>
+  </div>
+</div>
+
+<a class="back-top" href="#">↑ Retour en haut</a>
+
+</main>
+
+<script>
+const TOTAL = 40;
+function toggle(id) {
+  const body = document.getElementById('b-' + id);
+  const arrow = document.getElementById('a-' + id);
+  const isOpen = body.classList.toggle('open');
+  arrow.classList.toggle('open', isOpen);
+}
+function doSearch(val) {
+  const q = val.toLowerCase().trim();
+  const fiches = document.querySelectorAll('.fiche');
+  let count = 0;
+  fiches.forEach(f => {
+    const match = !q || f.textContent.toLowerCase().includes(q);
+    f.classList.toggle('hidden', !match);
+    if (match) count++;
+  });
+  document.getElementById('nav-count').textContent = q
+    ? count + ' résultat' + (count > 1 ? 's' : '')
+    : TOTAL + ' fiches';
+}
+</script>
+</body>
+</html>
