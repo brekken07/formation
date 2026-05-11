@@ -119,6 +119,13 @@
       "color": "pink",
       "modules": [
         {
+          "file": "ansible-fiches-revision.html",
+          "title": "Fiches de révisions",
+          "description": "Fiches de révisions Ansible.",
+          "tags": ["ANSIBLE", "PLAYBOOK"],
+          "status": "done"
+        },        
+        {
           "file": "ansible_reference.html",
           "title": "Guide de référence rapide",
           "description": "Guide de référence rapide Ansible.",
@@ -149,7 +156,7 @@
       "color": "blue",
       "modules": [
         {
-          "file": ".html",
+          "file": "terraform-fiches-revision.html",
           "title": "Fiches de révisions",
           "description": "Fiches de révisions pour la certification Terraform 003 Associate.",
           "tags": ["TERRAFORM"],
