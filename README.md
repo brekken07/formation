@@ -24,30 +24,6 @@ formation/
         └── deploy.yml      # Déploiement automatique sur GitHub Pages
 ```
 
----
-
-## 🚀 Formations disponibles
-
-### DevOps
-| Module | Titre | Statut |
-|--------|-------|--------|
-| 01 | CI/CD avec GitHub Actions | ✅ Terminé |
-| 02 | Git Pratique | 🆕 Nouveau |
-| 03 | Docker | 🆕 Nouveau |
-| 04 | Workflows avancés | 🔒 Bientôt |
-| 05 | Introduction Kubernetes | 🔒 Bientôt |
-
-### Linux / LPIC-1
-| Module | Titre | Statut |
-|--------|-------|--------|
-| 01 | Fiches de révision | 🆕 Nouveau |
-| 02 | Quizz Security Essentials FR | 🆕 Nouveau |
-| 03 | Quizz Security Essentials EN | 🆕 Nouveau |
-| 04 | Quizz LPIC 1 - Examen 101-500 FR | 🆕 Nouveau |
-| 05 | Quizz LPIC 1 - Examen 101-500 EN | 🆕 Nouveau |
-
----
-
 ## ➕ Ajouter un nouveau module
 
 1. **Ajoute le fichier HTML** dans le sous-dossier de la formation concernée :
