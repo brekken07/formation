@@ -1,11 +1,19 @@
+---
 extends: default
 rules:
   line-length:
     max: 120
   truthy:
-    allowed-values: ['true', 'false']
+    allowed-values: ['true', 'false', 'on']
+  document-start: disable
   comments:
     min-spaces-from-content: 1
+  new-lines:
+    type: unix
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
 ignore: |
   node_modules/
   .git/
+  .github/
