@@ -126,7 +126,7 @@
           "status": "done"
         },
         {
-          "file": "ansible_cahier_tp_complet.html",
+          "file": "ansible_cahier_tp.html",
           "title": "Cahier de TP Ansible",
           "description": "Cahier de TP complet pour débuter avec Ansible",
           "tags": ["ANSIBLE", "PLAYBOOK", "TP"],
