@@ -4,417 +4,127 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ansible — TP Fil Rouge</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:        #0d1117;
-  --bg2:       #161b22;
-  --bg3:       #21262d;
-  --border:    #30363d;
-  --border2:   #484f58;
-  --text:      #e6edf3;
-  --text2:     #8b949e;
-  --text3:     #6e7681;
-  --blue:      #388bfd;
-  --blue-dim:  #1f6feb;
-  --blue-bg:   #0d1f3c;
-  --blue-bg2:  #112240;
-  --green:     #3fb950;
-  --green-bg:  #0a2a12;
-  --green-dim: #196127;
-  --orange:    #d29922;
-  --orange-bg: #271f00;
-  --orange-dim:#9a6700;
-  --purple:    #a371f7;
-  --purple-bg: #1a0a3a;
-  --purple-dim:#6e40c9;
-  --teal:      #39d353;
-  --teal-bg:   #0a2014;
-  --red:       #f85149;
-  --red-bg:    #2a0a0a;
-  --code-bg:   #010409;
-  --code-text: #e6edf3;
-  --radius:    8px;
-  --radius-lg: 12px;
+  --bg:         #0d1117;
+  --bg2:        #161b22;
+  --bg3:        #21262d;
+  --border:     #30363d;
+  --border2:    #484f58;
+  --text:       #e6edf3;
+  --text2:      #adbac7;
+  --text3:      #768390;
+  --blue:       #4493f8;
+  --blue-dim:   #1f6feb;
+  --blue-bg:    #0d2149;
+  --green:      #3fb950;
+  --green-dim:  #196127;
+  --green-bg:   #0a2a12;
+  --orange:     #d29922;
+  --orange-dim: #9a6700;
+  --orange-bg:  #2b1d00;
+  --purple:     #bc8cff;
+  --purple-dim: #6e40c9;
+  --purple-bg:  #1e0a3c;
+  --teal:       #2dd4bf;
+  --teal-dim:   #0f766e;
+  --teal-bg:    #042f2e;
+  --red:        #f85149;
+  --red-bg:     #300d0d;
+  --code-bg:    #010409;
+  --radius:     10px;
+  --radius-lg:  16px;
+  --nav-h:      56px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; font-size: 17px; scroll-padding-top: calc(var(--nav-h) + 8px); }
 
 body {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.7;
-  font-size: 15px;
+  line-height: 1.75;
 }
 
-/* ── LAYOUT ── */
-.layout { display: flex; min-height: 100vh; }
-
-/* ── SIDEBAR ── */
-.sidebar {
-  width: 260px;
-  min-width: 260px;
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-.sidebar-header {
-  padding: 20px 16px 16px;
+/* ── TOPNAV ── */
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(13,17,23,.92);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 0;
 }
-.sidebar-logo {
-  font-size: 20px;
+.topnav-logo {
+  font-size: 17px;
   font-weight: 800;
   color: var(--blue);
-  letter-spacing: -0.5px;
+  letter-spacing: -.5px;
+  margin-right: 28px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.sidebar-sub {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 2px;
-}
-.sidebar-nav { padding: 12px 0; flex: 1; }
-.nav-section { padding: 8px 16px 4px; font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
-.nav-link {
-  display: block;
-  padding: 7px 16px;
-  font-size: 13px;
-  color: var(--text2);
-  text-decoration: none;
-  transition: all .15s;
-  border-left: 3px solid transparent;
-}
-.nav-link:hover { background: var(--bg3); color: var(--text); }
-.nav-link.active { color: var(--blue); border-left-color: var(--blue); background: var(--blue-bg); }
-.nav-acte {
-  display: block;
-  padding: 9px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  text-decoration: none;
-  transition: all .15s;
-  border-left: 3px solid transparent;
-}
-.nav-acte:hover { background: var(--bg3); }
-.nav-acte.a1 { border-left-color: #388bfd; }
-.nav-acte.a2 { border-left-color: #3fb950; }
-.nav-acte.a3 { border-left-color: #d29922; }
-.nav-acte.a4 { border-left-color: #a371f7; }
-.nav-acte.a5 { border-left-color: #f85149; }
-.nav-etape { display: block; padding: 5px 16px 5px 28px; font-size: 12px; color: var(--text3); text-decoration: none; transition: color .15s; }
-.nav-etape:hover { color: var(--text); }
-
-/* ── MAIN CONTENT ── */
-.main { flex: 1; max-width: 860px; padding: 40px 48px 80px; }
-
-/* ── HERO ── */
-.hero {
-  margin-bottom: 48px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid var(--border);
-}
-.hero-badge {
-  display: inline-block;
-  background: var(--blue-bg);
-  color: var(--blue);
-  border: 1px solid var(--blue-dim);
-  border-radius: 20px;
-  padding: 4px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  letter-spacing: 0.5px;
-}
-.hero h1 {
-  font-size: 52px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -2px;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-.hero h1 span { color: var(--blue); }
-.hero-sub {
-  font-size: 18px;
-  color: var(--text2);
-  margin-bottom: 24px;
-}
-.hero-scenario {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--blue);
-  border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  font-size: 14px;
-  color: var(--text2);
-  line-height: 1.8;
-  margin-bottom: 20px;
-}
-.hero-scenario strong { color: var(--text); }
-
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.info-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-}
-.info-card-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-.info-card p { font-size: 13px; color: var(--text2); font-family: 'JetBrains Mono', monospace; line-height: 2; }
-.info-card span { color: var(--blue); }
-
-.duree-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.duree-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px;
-  text-align: center;
-}
-.duree-num { font-size: 22px; font-weight: 800; }
-.duree-title { font-size: 11px; color: var(--text2); margin-top: 4px; line-height: 1.3; }
-.duree-time { font-size: 10px; color: var(--text3); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
-.d1 .duree-num { color: #388bfd; }
-.d2 .duree-num { color: #3fb950; }
-.d3 .duree-num { color: #d29922; }
-.d4 .duree-num { color: #a371f7; }
-.d5 .duree-num { color: #f85149; }
-
-/* ── ACTE HEADER ── */
-.acte-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 28px 32px;
-  border-radius: var(--radius-lg);
-  margin: 48px 0 32px;
-  border: 1px solid var(--border);
-}
-.acte-num {
-  font-size: 56px;
-  font-weight: 800;
-  line-height: 1;
-  min-width: 80px;
-  letter-spacing: -3px;
-}
-.acte-meta { flex: 1; }
-.acte-meta h2 { font-size: 26px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
-.acte-meta .duree { font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
-.acte-meta p { font-size: 14px; color: var(--text2); line-height: 1.7; }
-
-.acte-1 { background: linear-gradient(135deg, #0d1f3c 0%, #161b22 100%); border-color: #1f6feb; }
-.acte-1 .acte-num { color: #388bfd; }
-.acte-1 .acte-meta h2 { color: #388bfd; }
-.acte-1 .acte-meta .duree { color: #1f6feb; }
-
-.acte-2 { background: linear-gradient(135deg, #0a2a12 0%, #161b22 100%); border-color: #196127; }
-.acte-2 .acte-num { color: #3fb950; }
-.acte-2 .acte-meta h2 { color: #3fb950; }
-.acte-2 .acte-meta .duree { color: #196127; }
-
-.acte-3 { background: linear-gradient(135deg, #271f00 0%, #161b22 100%); border-color: #9a6700; }
-.acte-3 .acte-num { color: #d29922; }
-.acte-3 .acte-meta h2 { color: #d29922; }
-.acte-3 .acte-meta .duree { color: #9a6700; }
-
-.acte-4 { background: linear-gradient(135deg, #1a0a3a 0%, #161b22 100%); border-color: #6e40c9; }
-.acte-4 .acte-num { color: #a371f7; }
-.acte-4 .acte-meta h2 { color: #a371f7; }
-.acte-4 .acte-meta .duree { color: #6e40c9; }
-
-.acte-5 { background: linear-gradient(135deg, #2a0a0a 0%, #161b22 100%); border-color: #b91c1c; }
-.acte-5 .acte-num { color: #f85149; }
-.acte-5 .acte-meta h2 { color: #f85149; }
-.acte-5 .acte-meta .duree { color: #b91c1c; }
-
-/* ── ÉTAPE ── */
-.etape {
-  margin: 32px 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-.etape-header {
+.topnav-links {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 20px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-}
-.etape-num {
-  background: var(--blue-dim);
-  color: white;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-  padding: 4px 10px;
-  border-radius: 6px;
-  min-width: 44px;
-  text-align: center;
-}
-.etape-title { font-size: 16px; font-weight: 600; color: var(--text); }
-.etape-body { padding: 20px; }
-
-/* ── BOXES ── */
-.box { border-radius: var(--radius); padding: 16px 20px; margin: 16px 0; border-left: 4px solid; }
-.box-context { background: var(--blue-bg2); border-color: var(--blue-dim); }
-.box-context .box-label { color: var(--blue); }
-.box-mission { background: var(--purple-bg); border-color: var(--purple-dim); }
-.box-mission .box-label { color: var(--purple); }
-.box-tip { background: var(--green-bg); border-color: var(--green-dim); }
-.box-tip .box-label { color: var(--green); }
-.box-warn { background: var(--orange-bg); border-color: var(--orange-dim); }
-.box-warn .box-label { color: var(--orange); }
-.box-valider { background: var(--teal-bg); border-color: #0f4a25; }
-.box-valider .box-label { color: var(--teal); }
-
-.box-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.box p, .box li { font-size: 14px; color: var(--text2); line-height: 1.8; }
-.box strong { color: var(--text); }
-.box ul { padding-left: 20px; }
-.box li { margin: 2px 0; }
-
-/* ── SPOILER (INDICE / CORRECTION) ── */
-.spoiler { margin: 16px 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-.spoiler-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  cursor: pointer;
-  border: none;
-  font-family: 'Syne', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all .2s;
-  text-align: left;
-}
-.spoiler-btn .btn-left { display: flex; align-items: center; gap: 10px; }
-.spoiler-btn .icon { font-size: 16px; }
-.spoiler-btn .chevron { font-size: 12px; transition: transform .25s; color: inherit; opacity: 0.6; }
-.spoiler-btn.open .chevron { transform: rotate(180deg); }
-.spoiler-content {
-  display: none;
-  padding: 0 18px 18px;
-  font-size: 13px;
-  line-height: 1.8;
-}
-.spoiler-content.visible { display: block; }
-.spoiler-content p, .spoiler-content li { color: var(--text2); }
-.spoiler-content ul { padding-left: 20px; margin-top: 8px; }
-.spoiler-content li { margin: 3px 0; }
-
-/* Indice spoiler */
-.spoiler-indice .spoiler-btn {
-  background: #1a1400;
-  color: var(--orange);
-  border-bottom: 1px solid var(--border);
-}
-.spoiler-indice .spoiler-btn:hover { background: #221a00; }
-.spoiler-indice .spoiler-content { background: var(--orange-bg); }
-.spoiler-indice.open { border-color: var(--orange-dim); }
-
-/* Correction spoiler */
-.spoiler-correction .spoiler-btn {
-  background: #0a1a0c;
-  color: var(--green);
-  border-bottom: 1px solid var(--border);
-}
-.spoiler-correction .spoiler-btn:hover { background: #0d200f; }
-.spoiler-correction .spoiler-content { background: var(--green-bg); }
-.spoiler-correction.open { border-color: var(--green-dim); }
-
-/* ── CODE ── */
-pre {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 18px;
+  gap: 2px;
+  flex: 1;
   overflow-x: auto;
-  margin: 12px 0;
+  scrollbar-width: none;
 }
-code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  line-height: 1.8;
-  color: var(--code-text);
-}
-.spoiler-content pre { margin: 12px 0 0; }
-.inline-code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 6px;
-  color: var(--purple);
-}
+.topnav-links::-webkit-scrollbar { display: none; }
 
-/* ── TABLE ── */
-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-th { background: var(--bg3); color: var(--text2); font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--text2); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-tr:hover td { background: var(--bg2); }
-
-/* ── SECTION TITLES ── */
-.section-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 28px 0 12px;
+.nav-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text3);
+  text-decoration: none;
+  border-radius: 7px;
+  white-space: nowrap;
+  transition: all .15s;
+  flex-shrink: 0;
 }
-.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.nav-item:hover { background: var(--bg3); color: var(--text2); }
+.nav-item.active { color: var(--text); background: var(--bg3); }
 
-/* ── BILAN ── */
-.bilan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-.bilan-item {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  font-size: 13px;
-  color: var(--text2);
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
-.bilan-item::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+.nd-1 { background: var(--blue); }
+.nd-2 { background: var(--green); }
+.nd-3 { background: var(--orange); }
+.nd-4 { background: var(--purple); }
+.nd-5 { background: var(--red); }
+.nd-i { background: var(--text3); }
+
+.nav-sep {
+  width: 1px; height: 20px;
+  background: var(--border);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
 
 /* ── PROGRESS BAR ── */
 .progress-bar {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: var(--nav-h);
+  left: 0; right: 0;
   height: 3px;
-  background: var(--border);
-  z-index: 100;
+  background: transparent;
+  z-index: 201;
 }
 .progress-fill {
   height: 100%;
@@ -423,117 +133,241 @@ tr:hover td { background: var(--bg2); }
   transition: width .1s;
 }
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-/* ── SEPARATOR ── */
-.sep { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
-
-/* ── FINAL CMD ── */
-.final-cmd {
-  background: var(--code-bg);
-  border: 1px solid var(--green-dim);
-  border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  margin: 24px 0;
-  text-align: center;
+/* ── MAIN ── */
+.main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: calc(var(--nav-h) + 48px) 32px 100px;
 }
-.final-cmd p { font-size: 13px; color: var(--text3); margin-bottom: 8px; }
-.final-cmd code { font-size: 18px; color: var(--green); font-weight: 700; }
+
+/* ── HERO ── */
+.hero { margin-bottom: 64px; }
+.hero-badge {
+  display: inline-block;
+  background: var(--blue-bg);
+  color: var(--blue);
+  border: 1px solid var(--blue-dim);
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: 58px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -2.5px;
+  margin-bottom: 12px;
+}
+.hero h1 span { color: var(--blue); }
+.hero-sub { font-size: 20px; color: var(--text2); margin-bottom: 32px; }
+
+.scenario-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--blue);
+  border-radius: var(--radius-lg);
+  padding: 22px 26px;
+  font-size: 16px;
+  color: var(--text2);
+  line-height: 1.9;
+  margin-bottom: 24px;
+}
+.scenario-box strong { color: var(--text); }
+
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.info-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.info-card-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.info-card p { font-size: 14px; color: var(--text2); font-family: 'JetBrains Mono', monospace; line-height: 2.1; }
+.info-card span { color: var(--blue); }
+
+.duree-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.duree-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 10px; text-align: center; }
+.duree-num { font-size: 28px; font-weight: 800; line-height: 1; }
+.duree-title { font-size: 12px; color: var(--text2); margin-top: 6px; line-height: 1.4; }
+.duree-time { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+.d1 .duree-num { color: var(--blue); }
+.d2 .duree-num { color: var(--green); }
+.d3 .duree-num { color: var(--orange); }
+.d4 .duree-num { color: var(--purple); }
+.d5 .duree-num { color: var(--red); }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 12px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  margin: 32px 0 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── ACTE BANNER ── */
+.acte-banner {
+  display: flex; align-items: flex-start; gap: 24px;
+  padding: 30px 34px; border-radius: var(--radius-lg);
+  margin: 56px 0 32px; border: 1px solid;
+}
+.acte-num-big { font-size: 68px; font-weight: 800; line-height: 1; letter-spacing: -4px; min-width: 86px; }
+.acte-info { flex: 1; }
+.acte-info .acte-dur { font-size: 13px; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; opacity: .7; }
+.acte-info h2 { font-size: 28px; font-weight: 700; margin-bottom: 10px; letter-spacing: -.5px; }
+.acte-info p { font-size: 16px; color: var(--text2); line-height: 1.7; }
+
+.acte-banner.a1 { background: linear-gradient(135deg,#0d2149 0%,var(--bg2) 100%); border-color: var(--blue-dim); }
+.acte-banner.a1 .acte-num-big,.acte-banner.a1 .acte-info h2 { color: var(--blue); }
+.acte-banner.a1 .acte-dur { color: var(--blue); }
+.acte-banner.a2 { background: linear-gradient(135deg,#0a2a12 0%,var(--bg2) 100%); border-color: var(--green-dim); }
+.acte-banner.a2 .acte-num-big,.acte-banner.a2 .acte-info h2 { color: var(--green); }
+.acte-banner.a2 .acte-dur { color: var(--green); }
+.acte-banner.a3 { background: linear-gradient(135deg,#2b1d00 0%,var(--bg2) 100%); border-color: var(--orange-dim); }
+.acte-banner.a3 .acte-num-big,.acte-banner.a3 .acte-info h2 { color: var(--orange); }
+.acte-banner.a3 .acte-dur { color: var(--orange); }
+.acte-banner.a4 { background: linear-gradient(135deg,#1e0a3c 0%,var(--bg2) 100%); border-color: var(--purple-dim); }
+.acte-banner.a4 .acte-num-big,.acte-banner.a4 .acte-info h2 { color: var(--purple); }
+.acte-banner.a4 .acte-dur { color: var(--purple); }
+.acte-banner.a5 { background: linear-gradient(135deg,#300d0d 0%,var(--bg2) 100%); border-color: #b91c1c; }
+.acte-banner.a5 .acte-num-big,.acte-banner.a5 .acte-info h2 { color: var(--red); }
+.acte-banner.a5 .acte-dur { color: var(--red); }
+
+/* ── ÉTAPE ── */
+.etape { margin: 24px 0; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.etape-header { display: flex; align-items: center; gap: 16px; padding: 18px 24px; background: var(--bg2); border-bottom: 1px solid var(--border); }
+.etape-num { background: var(--blue-dim); color: #fff; font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; padding: 5px 12px; border-radius: 7px; white-space: nowrap; }
+.etape-title { font-size: 18px; font-weight: 600; }
+.etape-body { padding: 24px 26px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ── BOXES ── */
+.box { border-radius: var(--radius); padding: 18px 22px; border-left: 5px solid; }
+.box-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+.box p,.box li { font-size: 16px; color: var(--text2); line-height: 1.8; }
+.box ul { padding-left: 22px; margin-top: 8px; }
+.box li { margin: 4px 0; }
+.box strong { color: var(--text); }
+
+.box-context { background: var(--blue-bg); border-color: var(--blue-dim); }
+.box-context .box-label { color: var(--blue); }
+.box-mission { background: var(--purple-bg); border-color: var(--purple-dim); }
+.box-mission .box-label { color: var(--purple); }
+.box-tip { background: var(--green-bg); border-color: var(--green-dim); }
+.box-tip .box-label { color: var(--green); }
+.box-valider { background: var(--teal-bg); border-color: var(--teal-dim); }
+.box-valider .box-label { color: var(--teal); }
+
+/* ── SPOILERS ── */
+.spoiler { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+.spoiler-btn {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer; border: none;
+  font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+  transition: all .18s; text-align: left; gap: 12px;
+}
+.spoiler-btn .btn-left { display: flex; align-items: center; gap: 10px; }
+.spoiler-btn .s-icon { font-size: 18px; }
+.spoiler-btn .chevron { font-size: 13px; transition: transform .25s; opacity: .6; flex-shrink: 0; }
+.spoiler-btn.open .chevron { transform: rotate(180deg); }
+
+.spoiler-content { display: none; padding: 20px 22px; font-size: 15px; line-height: 1.8; }
+.spoiler-content.visible { display: block; }
+.spoiler-content p { color: var(--text2); margin-bottom: 10px; }
+.spoiler-content ul { padding-left: 22px; color: var(--text2); }
+.spoiler-content li { margin: 4px 0; }
+
+.sp-indice .spoiler-btn { background: #1f1400; color: var(--orange); }
+.sp-indice .spoiler-btn:hover { background: #281a00; }
+.sp-indice.open { border-color: var(--orange-dim); }
+.sp-indice .spoiler-content { background: var(--orange-bg); border-top: 1px solid var(--orange-dim); }
+
+.sp-correction .spoiler-btn { background: #0a180d; color: var(--green); }
+.sp-correction .spoiler-btn:hover { background: #0d1f10; }
+.sp-correction.open { border-color: var(--green-dim); }
+.sp-correction .spoiler-content { background: var(--green-bg); border-top: 1px solid var(--green-dim); }
+
+/* ── CODE ── */
+pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; overflow-x: auto; margin: 12px 0; }
+code { font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.9; color: var(--text); }
+.ic { font-family: 'JetBrains Mono', monospace; font-size: 14px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 5px; padding: 2px 7px; color: var(--purple); white-space: nowrap; }
+
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th { background: var(--bg3); color: var(--text2); font-size: 13px; font-weight: 600; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .5px; }
+td { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+tr:hover td { background: var(--bg2); }
+
+/* ── BILAN ── */
+.bilan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+.bilan-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; font-size: 15px; color: var(--text2); display: flex; align-items: center; gap: 12px; }
+.bilan-item::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 16px; flex-shrink: 0; }
+
+.final-cmd { background: var(--code-bg); border: 1px solid var(--green-dim); border-radius: var(--radius-lg); padding: 28px 32px; margin: 28px 0; text-align: center; }
+.final-cmd p { font-size: 15px; color: var(--text3); margin-bottom: 10px; }
+.final-cmd code { font-size: 20px; color: var(--green); font-weight: 700; }
+
+.sep { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 </style>
 </head>
 <body>
 
+<!-- TOPNAV -->
+<nav class="topnav">
+  <div class="topnav-logo">Ansible TP</div>
+  <div class="topnav-links">
+    <a class="nav-item" href="#intro"><span class="nav-dot nd-i"></span>Intro</a>
+    <div class="nav-sep"></div>
+    <a class="nav-item" href="#acte1"><span class="nav-dot nd-1"></span>Acte 1 — Fondations</a>
+    <a class="nav-item" href="#acte2"><span class="nav-dot nd-2"></span>Acte 2 — Préparer</a>
+    <a class="nav-item" href="#acte3"><span class="nav-dot nd-3"></span>Acte 3 — Informer</a>
+    <a class="nav-item" href="#acte4"><span class="nav-dot nd-4"></span>Acte 4 — Ressources</a>
+    <a class="nav-item" href="#acte5"><span class="nav-dot nd-5"></span>Acte 5 — Industrialiser</a>
+    <div class="nav-sep"></div>
+    <a class="nav-item" href="#bilan"><span class="nav-dot nd-i"></span>Bilan</a>
+  </div>
+</nav>
+
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 
-<div class="layout">
-
-<!-- ── SIDEBAR ── -->
-<aside class="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo">Ansible</div>
-    <div class="sidebar-sub">TP Fil Rouge — Journée complète</div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">Introduction</div>
-    <a class="nav-link" href="#intro">Scénario & Environnement</a>
-
-    <div class="nav-section">Actes</div>
-    <a class="nav-acte a1" href="#acte1">Acte 1 — Fondations</a>
-    <a class="nav-etape" href="#e1-1">1.1 Structure du projet</a>
-    <a class="nav-etape" href="#e1-2">1.2 Inventory</a>
-    <a class="nav-etape" href="#e1-3">1.3 Variables globales</a>
-    <a class="nav-etape" href="#e1-4">1.4 Connectivité</a>
-
-    <a class="nav-acte a2" href="#acte2">Acte 2 — Préparer</a>
-    <a class="nav-etape" href="#e2-1">2.1 Premier playbook</a>
-    <a class="nav-etape" href="#e2-2">2.2 Outils de base</a>
-    <a class="nav-etape" href="#e2-3">2.3 Comptes stagiaires</a>
-    <a class="nav-etape" href="#e2-4">2.4 Sudo sans MDP</a>
-
-    <a class="nav-acte a3" href="#acte3">Acte 3 — Informer</a>
-    <a class="nav-etape" href="#e3-1">3.1 Nginx</a>
-    <a class="nav-etape" href="#e3-2">3.2 Template HTML</a>
-    <a class="nav-etape" href="#e3-3">3.3 Déploiement & Handler</a>
-
-    <a class="nav-acte a4" href="#acte4">Acte 4 — Ressources</a>
-    <a class="nav-etape" href="#e4-1">4.1 Répertoire partagé</a>
-    <a class="nav-etape" href="#e4-2">4.2 apt download</a>
-    <a class="nav-etape" href="#e4-3">4.3 README dynamique</a>
-
-    <a class="nav-acte a5" href="#acte5">Acte 5 — Industrialiser</a>
-    <a class="nav-etape" href="#e5-1">5.1 Planifier les roles</a>
-    <a class="nav-etape" href="#e5-2">5.2 Structure des roles</a>
-    <a class="nav-etape" href="#e5-3">5.3 Fichiers main.yml</a>
-    <a class="nav-etape" href="#e5-4">5.4 site.yml final</a>
-
-    <div class="nav-section">Bilan</div>
-    <a class="nav-link" href="#bilan">Récapitulatif</a>
-  </nav>
-</aside>
-
-<!-- ── MAIN ── -->
+<!-- MAIN -->
 <main class="main">
 
-<!-- HERO -->
+<!-- INTRO -->
 <section id="intro">
   <div class="hero">
     <div class="hero-badge">Formation DevOps — Capgemini CIS</div>
     <h1>Ansible<br><span>Fil Rouge</span></h1>
     <p class="hero-sub">Déploiement automatisé d'un environnement de formation</p>
 
-    <div class="hero-scenario">
-      <strong>🏢 Scénario :</strong> Tu es administrateur système chez <strong>DevCorp</strong>.<br>
-      On te confie une mission : automatiser entièrement la préparation des environnements de formation pour les nouvelles promotions.<br><br>
+    <div class="scenario-box">
+      <strong>🏢 Scénario :</strong> Tu es administrateur système chez <strong>DevCorp</strong>. On te confie une mission : automatiser entièrement la préparation des environnements de formation pour les nouvelles promotions.<br><br>
       Chaque acte ajoute une brique. À la fin de la journée, <strong>une seule commande</strong> suffit à préparer toutes les machines — comptes, outils, page web, ressources.
     </div>
 
     <div class="info-grid">
       <div class="info-card">
         <div class="info-card-title">🖥 Environnement</div>
-        <p>
-          Contrôle&nbsp;&nbsp;&nbsp; <span>10.116.0.195</span><br>
-          machine2&nbsp;&nbsp;&nbsp; <span>10.116.0.238</span><br>
-          machine3&nbsp;&nbsp;&nbsp; <span>10.116.0.239</span><br>
-          OS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>Debian 13</span><br>
-          User&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span>setupuser</span>
-        </p>
+        <p>Contrôle &nbsp;<span>10.116.0.195</span><br>machine2 &nbsp;<span>10.116.0.238</span><br>machine3 &nbsp;<span>10.116.0.239</span><br>OS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>Debian 13</span><br>User &nbsp;&nbsp;&nbsp;&nbsp;<span>setupuser</span></p>
       </div>
       <div class="info-card">
         <div class="info-card-title">📋 Comment utiliser ce TP</div>
-        <p style="font-family:'Syne',sans-serif; font-size:13px; line-height:1.8; color:var(--text2)">
+        <p style="font-family:'Inter',sans-serif; font-size:15px; line-height:1.9;">
           • Lis l'objectif avant d'ouvrir les indices<br>
-          • Cherche par toi-même d'abord<br>
+          • Cherche par toi-même en premier<br>
           • L'indice oriente sans donner la réponse<br>
-          • La correction : en dernier recours uniquement<br>
+          • La correction : en dernier recours seulement<br>
           • Valide toujours avant de passer à la suite
         </p>
       </div>
     </div>
 
-    <div class="section-title">Progression de la journée</div>
+    <div class="section-label">Progression de la journée</div>
     <div class="duree-grid">
       <div class="duree-card d1"><div class="duree-num">1</div><div class="duree-title">Les fondations</div><div class="duree-time">1h</div></div>
       <div class="duree-card d2"><div class="duree-num">2</div><div class="duree-title">Préparer les machines</div><div class="duree-time">1h30</div></div>
@@ -544,30 +378,21 @@ tr:hover td { background: var(--bg2); }
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════ -->
-<!-- ACTE 1 -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ══════════ ACTE 1 -->
 <section id="acte1">
-  <div class="acte-header acte-1">
-    <div class="acte-num">01</div>
-    <div class="acte-meta">
-      <div class="duree">⏱ 1 heure</div>
+  <div class="acte-banner a1">
+    <div class="acte-num-big">01</div>
+    <div class="acte-info">
+      <div class="acte-dur">⏱ 1 heure</div>
       <h2>Les fondations</h2>
       <p>Avant d'automatiser quoi que ce soit, il faut savoir ce qu'on gère et vérifier qu'Ansible peut joindre les machines. Un mauvais inventory, c'est un playbook qui ne s'exécute jamais sur les bonnes cibles.</p>
     </div>
   </div>
 
-  <!-- 1.1 -->
   <div class="etape" id="e1-1">
-    <div class="etape-header">
-      <span class="etape-num">1.1</span>
-      <span class="etape-title">Créer la structure du projet</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">1.1</span><span class="etape-title">Créer la structure du projet</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Ansible cherche ses fichiers dans des emplacements conventionnels. La structure que tu crées maintenant servira de base pour toute la journée.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Ansible cherche ses fichiers dans des emplacements conventionnels. La structure que tu crées maintenant servira de base pour toute la journée.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
         <p>Crée l'arborescence suivante dans ton répertoire home :</p>
@@ -576,116 +401,65 @@ tr:hover td { background: var(--bg2); }
 │   └── group_vars/
 ├── roles/
 └── templates/</code></pre>
-        <p style="margin-top:8px">Vérifie avec : <code class="inline-code">find ~/devcorp-ansible -type d</code></p>
+        <p>Vérifie avec : <code class="ic">find ~/devcorp-ansible -type d</code></p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-1-1-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-1-1-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice — ne regarder qu'en cas de blocage</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <p>La commande <code class="inline-code">mkdir</code> avec l'option <code class="inline-code">-p</code> crée tous les dossiers intermédiaires en une seule fois.</p>
-          <p>Tu peux chaîner plusieurs <code class="inline-code">mkdir -p</code> sur une même ligne avec <code class="inline-code">&&</code>.</p>
-        </div>
+      <div class="spoiler sp-indice" id="s-1-1-i">
+        <button class="spoiler-btn" onclick="toggle('s-1-1-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice — ne regarder qu'en cas de blocage</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><p>La commande <code class="ic">mkdir -p</code> crée tous les dossiers intermédiaires en une seule fois. Tu peux chaîner plusieurs commandes avec <code class="ic">&&</code>.</p></div>
       </div>
     </div>
   </div>
 
-  <!-- 1.2 -->
   <div class="etape" id="e1-2">
-    <div class="etape-header">
-      <span class="etape-num">1.2</span>
-      <span class="etape-title">Créer l'inventory</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">1.2</span><span class="etape-title">Créer l'inventory</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>L'inventory est le cœur d'Ansible. Il dit QUI sont tes machines et COMMENT les joindre. On organise les machines en groupes — ici toutes les machines de formation appartiennent au groupe <code class="inline-code">[formation]</code>.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>L'inventory dit QUI sont tes machines et COMMENT les joindre. On les organise en groupes — toutes les machines de formation appartiennent au groupe <code class="ic">[formation]</code>.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Crée <code class="inline-code">inventory/hosts.ini</code> avec :</p>
-        <ul>
-          <li>Le groupe <code class="inline-code">[formation]</code> avec machine2 (10.116.0.238) et machine3 (10.116.0.239)</li>
-          <li>Le bloc <code class="inline-code">[formation:vars]</code> avec les 3 directives de connexion indispensables</li>
-          <li>Utilisateur : <code class="inline-code">setupuser</code> — Clé : <code class="inline-code">~/.ssh/ansible_key</code></li>
-        </ul>
-        <p style="margin-top:10px">Vérifie avec : <code class="inline-code">ansible all -i inventory/hosts.ini --list-hosts</code></p>
+        <p>Crée <code class="ic">inventory/hosts.ini</code> avec le groupe <code class="ic">[formation]</code>, ses deux machines (avec alias et IP), et le bloc <code class="ic">[formation:vars]</code> avec les 3 directives de connexion. Utilisateur : <code class="ic">setupuser</code> — Clé : <code class="ic">~/.ssh/ansible_key</code>.</p>
+        <p>Vérifie : <code class="ic">ansible all -i inventory/hosts.ini --list-hosts</code></p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-1-2-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-1-2-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-indice" id="s-1-2-i">
+        <button class="spoiler-btn" onclick="toggle('s-1-2-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p>Les noms de groupes et les alias de machines sont libres — tu les inventes.</p>
-          <p>Les directives <code class="inline-code">ansible_XXX</code> sont des mots-clés imposés par Ansible — tu ne peux pas les renommer.</p>
-          <p>Pour la clé SSH, la directive s'appelle <code class="inline-code">ansible_ssh_private_key_file</code>.</p>
-          <p>Pour Python : <code class="inline-code">ansible_python_interpreter</code>.</p>
+          <p>Noms de groupes et alias : libres. Directives <code class="ic">ansible_XXX</code> : imposées par Ansible.</p>
+          <p>Clé SSH : <code class="ic">ansible_ssh_private_key_file</code> — Python : <code class="ic">ansible_python_interpreter</code></p>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-1-2-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-1-2-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction — à n'ouvrir qu'après avoir cherché</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>[formation]
+      <div class="spoiler sp-correction" id="s-1-2-c">
+        <button class="spoiler-btn" onclick="toggle('s-1-2-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction — à n'ouvrir qu'après avoir cherché</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>[formation]
 machine2   ansible_host=10.116.0.238
 machine3   ansible_host=10.116.0.239
 
 [formation:vars]
 ansible_user=setupuser
 ansible_ssh_private_key_file=~/.ssh/ansible_key
-ansible_python_interpreter=/usr/bin/python3</code></pre>
-        </div>
+ansible_python_interpreter=/usr/bin/python3</code></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- 1.3 -->
   <div class="etape" id="e1-3">
-    <div class="etape-header">
-      <span class="etape-num">1.3</span>
-      <span class="etape-title">Créer le fichier de variables globales</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">1.3</span><span class="etape-title">Créer le fichier de variables globales</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Les variables externalisées dans <code class="inline-code">group_vars/</code> permettent de changer les données sans toucher aux playbooks. Le fichier <code class="inline-code">all.yml</code> s'applique automatiquement à toutes les machines. Le nom du fichier doit correspondre exactement au nom du groupe dans l'inventory.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Les variables dans <code class="ic">group_vars/</code> permettent de changer les données sans toucher aux playbooks. Le fichier <code class="ic">all.yml</code> s'applique automatiquement à toutes les machines. Son nom doit correspondre exactement au nom du groupe.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Crée <code class="inline-code">inventory/group_vars/all.yml</code> avec :</p>
-        <ul>
-          <li><code class="inline-code">formation_name</code> : le nom de ta formation</li>
-          <li><code class="inline-code">promotion</code> : le nom de la promo (ex: Promo Avril 2025)</li>
-          <li><code class="inline-code">stagiaires</code> : liste de 3 comptes (stagiaire01, 02, 03)</li>
-          <li><code class="inline-code">outils_base</code> : liste de paquets (vim, curl, git, htop, tree, jq)</li>
-          <li><code class="inline-code">partage_dir</code> : chemin du répertoire partagé (/opt/formation)</li>
-        </ul>
+        <p>Crée <code class="ic">inventory/group_vars/all.yml</code> avec ces 5 variables : <code class="ic">formation_name</code>, <code class="ic">promotion</code>, <code class="ic">stagiaires</code> (liste de 3 comptes), <code class="ic">outils_base</code> (vim, curl, git, htop, tree, jq), <code class="ic">partage_dir</code> (/opt/formation).</p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-1-3-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-1-3-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-indice" id="s-1-3-i">
+        <button class="spoiler-btn" onclick="toggle('s-1-3-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p>Un fichier group_vars commence par <code class="inline-code">---</code>.</p>
-          <p>Variable simple : <code class="inline-code">ma_variable: "ma valeur"</code></p>
-          <p>Liste :</p>
+          <p>Le fichier commence par <code class="ic">---</code>. Variable simple : <code class="ic">nom: "valeur"</code></p>
           <pre><code>ma_liste:
   - element1
   - element2</code></pre>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-1-3-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-1-3-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>---
+      <div class="spoiler sp-correction" id="s-1-3-c">
+        <button class="spoiler-btn" onclick="toggle('s-1-3-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>---
 
 formation_name: "Formation Ansible DevCorp"
 promotion: "Promo Avril 2025"
@@ -703,106 +477,68 @@ outils_base:
   - tree
   - jq
 
-partage_dir: /opt/formation</code></pre>
-        </div>
+partage_dir: /opt/formation</code></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- 1.4 -->
   <div class="etape" id="e1-4">
-    <div class="etape-header">
-      <span class="etape-num">1.4</span>
-      <span class="etape-title">Tester la connectivité et découvrir les commandes ad-hoc</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">1.4</span><span class="etape-title">Tester la connectivité et les commandes ad-hoc</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Les commandes ad-hoc exécutent un module directement en ligne de commande sans créer de fichier playbook. Utile pour tester et déboguer rapidement.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Les commandes ad-hoc exécutent un module directement en ligne de commande sans playbook. Utile pour tester et déboguer rapidement.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Exécute ces commandes dans l'ordre et observe les résultats :</p>
-        <pre><code># Tester la connectivité SSH + Python
+        <pre><code># 1. Tester SSH + Python
 ansible all -i inventory/hosts.ini -m ping
 
-# Vérifier l'uptime de toutes les machines
+# 2. Vérifier l'uptime
 ansible all -i inventory/hosts.ini -m command -a "uptime"
 
-# Afficher l'espace disque
+# 3. Espace disque
 ansible all -i inventory/hosts.ini -m command -a "df -h /"
 
-# Voir les facts de machine2 (cherche ansible_default_ipv4)
+# 4. Facts de machine2
 ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
       </div>
-      <div class="box box-valider">
-        <div class="box-label">🔍 Valider</div>
-        <ul>
-          <li>Le ping retourne <strong>SUCCESS / pong</strong> sur les deux machines</li>
-          <li>L'uptime affiche la durée de fonctionnement de chaque machine</li>
-          <li>Tu vois l'adresse IP de machine2 dans la sortie setup</li>
-        </ul>
-      </div>
+      <div class="box box-valider"><div class="box-label">🔍 Valider</div><ul><li>Le ping retourne <strong>SUCCESS / pong</strong> sur les deux machines</li><li>Tu vois l'adresse IP de machine2 dans la sortie setup</li></ul></div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════ -->
-<!-- ACTE 2 -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ══════════ ACTE 2 -->
 <section id="acte2">
-  <div class="acte-header acte-2">
-    <div class="acte-num">02</div>
-    <div class="acte-meta">
-      <div class="duree">⏱ 1h30</div>
+  <div class="acte-banner a2">
+    <div class="acte-num-big">02</div>
+    <div class="acte-info">
+      <div class="acte-dur">⏱ 1h30</div>
       <h2>Préparer les machines</h2>
-      <p>Les machines sont joignables. Il faut maintenant les configurer : outils, comptes stagiaires, et accès sudo automatisé pour les playbooks suivants.</p>
+      <p>Les machines sont joignables. Il faut maintenant les configurer : outils, comptes stagiaires, et sudo automatisé pour que les playbooks suivants n'aient plus besoin de mot de passe.</p>
     </div>
   </div>
 
-  <!-- 2.1 -->
   <div class="etape" id="e2-1">
-    <div class="etape-header">
-      <span class="etape-num">2.1</span>
-      <span class="etape-title">Créer le playbook principal site.yml</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">2.1</span><span class="etape-title">Créer le playbook principal site.yml</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Le <code class="inline-code">site.yml</code> est le point d'entrée de tout le projet. Pour l'instant il contiendra directement les tâches — on le refactorisera en roles à l'Acte 5.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Le <code class="ic">site.yml</code> est le point d'entrée du projet. Pour l'instant il contiendra directement les tâches — on le refactorisera en roles à l'Acte 5.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Crée <code class="inline-code">~/devcorp-ansible/site.yml</code> avec un seul play :</p>
-        <ul>
-          <li>Nom du play libre, hôtes : groupe <code class="inline-code">formation</code>, <code class="inline-code">become: true</code></li>
-          <li>Une tâche debug qui affiche : <code class="inline-code">Démarrage de la configuration de {{ ansible_hostname }}</code></li>
-        </ul>
-        <p style="margin-top:10px">Lance : <code class="inline-code">ansible-playbook -i inventory/hosts.ini site.yml --ask-become-pass</code></p>
+        <p>Crée <code class="ic">~/devcorp-ansible/site.yml</code> avec un play ciblant le groupe <code class="ic">formation</code>, <code class="ic">become: true</code>, et une tâche debug affichant <code class="ic">Démarrage de la configuration de {{ ansible_hostname }}</code>.</p>
+        <p>Lance : <code class="ic">ansible-playbook -i inventory/hosts.ini site.yml --ask-become-pass</code></p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-2-1-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-1-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>---
+      <div class="spoiler sp-indice" id="s-2-1-i">
+        <button class="spoiler-btn" onclick="toggle('s-2-1-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>---
 - name: Nom du play
   hosts: mon_groupe
   become: true
   tasks:
     - name: Ma tâche
       ansible.builtin.debug:
-        msg: "{{ ma_variable }}"</code></pre>
-        </div>
+        msg: "{{ ma_variable }}"</code></pre></div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-2-1-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-1-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>---
+      <div class="spoiler sp-correction" id="s-2-1-c">
+        <button class="spoiler-btn" onclick="toggle('s-2-1-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>---
 
 - name: Préparation de l'environnement DevCorp
   hosts: formation
@@ -812,287 +548,147 @@ ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
 
     - name: Annonce de démarrage
       ansible.builtin.debug:
-        msg: "Démarrage de la configuration de {{ ansible_hostname }}"</code></pre>
-        </div>
+        msg: "Démarrage de la configuration de {{ ansible_hostname }}"</code></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- 2.2 -->
   <div class="etape" id="e2-2">
-    <div class="etape-header">
-      <span class="etape-num">2.2</span>
-      <span class="etape-title">Installer les outils de base</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">2.2</span><span class="etape-title">Installer les outils de base</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Grâce à <code class="inline-code">loop</code>, une seule tâche suffit pour toute la liste. Si on ajoute un outil dans <code class="inline-code">all.yml</code>, il sera automatiquement installé au prochain lancement.</p>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Grâce à <code class="ic">loop</code>, une seule tâche suffit pour toute la liste. Si on ajoute un outil dans <code class="ic">all.yml</code>, il sera automatiquement installé au prochain lancement.</p></div>
+      <div class="box box-mission"><div class="box-label">📋 Ta mission</div><p>Ajoute une tâche qui installe tous les outils de <code class="ic">outils_base</code> avec le module <code class="ic">apt</code>, <code class="ic">update_cache: true</code>, et une boucle <code class="ic">loop</code>. Lance avec <code class="ic">--check</code> d'abord, puis sans.</p></div>
+      <div class="spoiler sp-indice" id="s-2-2-i">
+        <button class="spoiler-btn" onclick="toggle('s-2-2-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><p>Boucle avec une variable : <code class="ic">loop: "{{ ma_variable }}"</code> — élément courant : <code class="ic">name: "{{ item }}"</code> — guillemets obligatoires quand ça commence par <code class="ic">{{</code>.</p></div>
       </div>
-      <div class="box box-mission">
-        <div class="box-label">📋 Ta mission</div>
-        <p>Ajoute une tâche dans <code class="inline-code">site.yml</code> qui installe tous les outils de la variable <code class="inline-code">outils_base</code>.</p>
-        <ul>
-          <li>Utiliser une boucle <code class="inline-code">loop</code> avec la variable <code class="inline-code">outils_base</code></li>
-          <li>Module apt avec <code class="inline-code">update_cache: true</code> et <code class="inline-code">state: present</code></li>
-        </ul>
-        <p style="margin-top:8px">Lance avec <code class="inline-code">--check</code> d'abord, puis sans.</p>
-      </div>
-      <div class="spoiler spoiler-indice" id="s-2-2-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-2-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <p>Syntaxe de la boucle avec une variable : <code class="inline-code">loop: "{{ ma_variable }}"</code></p>
-          <p>Dans le module, le paquet courant s'écrit : <code class="inline-code">name: "{{ item }}"</code></p>
-          <p>N'oublie pas les guillemets autour de <code class="inline-code">{{ }}</code> quand la valeur commence par ces accolades.</p>
-        </div>
-      </div>
-      <div class="spoiler spoiler-correction" id="s-2-2-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-2-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>    - name: Installation des outils de base
+      <div class="spoiler sp-correction" id="s-2-2-c">
+        <button class="spoiler-btn" onclick="toggle('s-2-2-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>    - name: Installation des outils de base
       ansible.builtin.apt:
         name: "{{ item }}"
         state: present
         update_cache: true
-      loop: "{{ outils_base }}"</code></pre>
-        </div>
+      loop: "{{ outils_base }}"</code></pre></div>
       </div>
-      <div class="box box-valider">
-        <div class="box-label">🔍 Valider</div>
-        <p>Relance le playbook une deuxième fois. Tous les paquets déjà installés affichent <strong>ok</strong> (changed: 0). C'est l'idempotence en action.</p>
-      </div>
+      <div class="box box-valider"><div class="box-label">🔍 Valider</div><p>Relance le playbook une deuxième fois. Tous les paquets affichent <strong>ok</strong> (changed: 0) — l'idempotence en action.</p></div>
     </div>
   </div>
 
-  <!-- 2.3 -->
   <div class="etape" id="e2-3">
-    <div class="etape-header">
-      <span class="etape-num">2.3</span>
-      <span class="etape-title">Créer les comptes stagiaires</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">2.3</span><span class="etape-title">Créer les comptes stagiaires</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Chaque stagiaire a besoin d'un compte Linux avec home directory et accès sudo pour ses propres exercices.</p>
+      <div class="box box-mission"><div class="box-label">📋 Ta mission</div><p>Ajoute une tâche qui crée les comptes de <code class="ic">stagiaires</code> : shell <code class="ic">/bin/bash</code>, home créé, groupe secondaire <code class="ic">sudo</code>, state <code class="ic">present</code>. Vérifie : <code class="ic">ansible machine2 -i inventory/hosts.ini -m command -a "grep stagiaire /etc/passwd"</code></p></div>
+      <div class="spoiler sp-indice" id="s-2-3-i">
+        <button class="spoiler-btn" onclick="toggle('s-2-3-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><p>Module : <code class="ic">ansible.builtin.user</code> — Groupes secondaires : <code class="ic">groups</code> (pas <code class="ic">group</code>) — Home : <code class="ic">create_home: true</code></p></div>
       </div>
-      <div class="box box-mission">
-        <div class="box-label">📋 Ta mission</div>
-        <p>Ajoute une tâche qui crée les comptes de la variable <code class="inline-code">stagiaires</code> avec :</p>
-        <ul>
-          <li>Shell : <code class="inline-code">/bin/bash</code></li>
-          <li>Home créé automatiquement</li>
-          <li>Groupe secondaire : <code class="inline-code">sudo</code></li>
-          <li>State : <code class="inline-code">present</code></li>
-        </ul>
-        <p style="margin-top:8px">Vérifie : <code class="inline-code">ansible machine2 -i inventory/hosts.ini -m command -a "cat /etc/passwd" | grep stagiaire</code></p>
-      </div>
-      <div class="spoiler spoiler-indice" id="s-2-3-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-3-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <p>Le module à utiliser : <code class="inline-code">ansible.builtin.user</code></p>
-          <p>Pour les groupes secondaires, le paramètre s'appelle <code class="inline-code">groups</code> (pas <code class="inline-code">group</code>).</p>
-          <p>Pour créer le home : <code class="inline-code">create_home: true</code></p>
-        </div>
-      </div>
-      <div class="spoiler spoiler-correction" id="s-2-3-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-3-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>    - name: Création des comptes stagiaires
+      <div class="spoiler sp-correction" id="s-2-3-c">
+        <button class="spoiler-btn" onclick="toggle('s-2-3-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>    - name: Création des comptes stagiaires
       ansible.builtin.user:
         name: "{{ item }}"
         shell: /bin/bash
         create_home: true
         groups: sudo
         state: present
-      loop: "{{ stagiaires }}"</code></pre>
-        </div>
+      loop: "{{ stagiaires }}"</code></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- 2.4 -->
   <div class="etape" id="e2-4">
-    <div class="etape-header">
-      <span class="etape-num">2.4</span>
-      <span class="etape-title">Configurer sudo sans mot de passe pour Ansible</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">2.4</span><span class="etape-title">Configurer sudo sans mot de passe pour Ansible</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>En production, le compte Ansible doit pouvoir faire sudo sans mot de passe pour que les playbooks soient entièrement automatisables. On configure ça proprement via <code class="inline-code">/etc/sudoers.d/</code> — plus sûr que modifier <code class="inline-code">/etc/sudoers</code> directement.</p>
-      </div>
-      <div class="box box-mission">
-        <div class="box-label">📋 Ta mission</div>
-        <p>Ajoute une tâche qui crée le fichier <code class="inline-code">/etc/sudoers.d/setupuser</code> avec le contenu :</p>
-        <pre><code>setupuser ALL=(ALL) NOPASSWD: ALL</code></pre>
-        <ul>
-          <li>Utilise <code class="inline-code">ansible.builtin.copy</code> avec le paramètre <code class="inline-code">content:</code></li>
-          <li>Mode du fichier : <code class="inline-code">0440</code> (lecture seule, root uniquement)</li>
-          <li>Propriétaire et groupe : <code class="inline-code">root</code></li>
-        </ul>
-        <p style="margin-top:8px">Après ce lancement, tu pourras supprimer <code class="inline-code">--ask-become-pass</code> de toutes tes commandes.</p>
-      </div>
-      <div class="spoiler spoiler-indice" id="s-2-4-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-4-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>En production, le compte Ansible doit pouvoir faire sudo sans mot de passe pour l'automatisation complète. On configure ça via <code class="ic">/etc/sudoers.d/</code> — plus sûr que modifier directement <code class="ic">/etc/sudoers</code>.</p></div>
+      <div class="box box-mission"><div class="box-label">📋 Ta mission</div><p>Crée <code class="ic">/etc/sudoers.d/setupuser</code> avec le contenu <code class="ic">setupuser ALL=(ALL) NOPASSWD: ALL</code>. Utilise <code class="ic">ansible.builtin.copy</code> avec <code class="ic">content:</code>, mode <code class="ic">0440</code>, owner et group <code class="ic">root</code>. Après ce lancement réussi, tu peux supprimer <code class="ic">--ask-become-pass</code>.</p></div>
+      <div class="spoiler sp-indice" id="s-2-4-i">
+        <button class="spoiler-btn" onclick="toggle('s-2-4-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p><code class="inline-code">ansible.builtin.copy</code> avec <code class="inline-code">content:</code> au lieu de <code class="inline-code">src:</code> écrit du texte directement :</p>
+          <p><code class="ic">content:</code> écrit du texte directement sans fichier source. Le <code class="ic">\n</code> final est important.</p>
           <pre><code>ansible.builtin.copy:
-  content: "ma ligne de texte\n"
-  dest: /chemin/du/fichier
+  content: "ma ligne\n"
+  dest: /chemin/fichier
   mode: '0440'
   owner: root
   group: root</code></pre>
-          <p>Le <code class="inline-code">\n</code> à la fin est important — un fichier sudoers doit terminer par une newline.</p>
-          <p>Bonus : ajoute <code class="inline-code">validate: /usr/sbin/visudo -cf %s</code> pour valider la syntaxe avant d'écrire.</p>
+          <p>Bonus : <code class="ic">validate: /usr/sbin/visudo -cf %s</code> valide la syntaxe avant d'écrire.</p>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-2-4-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-2-4-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>    - name: Configuration sudo sans mot de passe pour setupuser
+      <div class="spoiler sp-correction" id="s-2-4-c">
+        <button class="spoiler-btn" onclick="toggle('s-2-4-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>    - name: Configuration sudo sans mot de passe pour setupuser
       ansible.builtin.copy:
         content: "setupuser ALL=(ALL) NOPASSWD: ALL\n"
         dest: /etc/sudoers.d/setupuser
         owner: root
         group: root
         mode: '0440'
-        validate: /usr/sbin/visudo -cf %s</code></pre>
-        </div>
+        validate: /usr/sbin/visudo -cf %s</code></pre></div>
       </div>
-      <div class="box box-valider">
-        <div class="box-label">🔍 Valider</div>
-        <p>Lance le playbook une dernière fois AVEC <code class="inline-code">--ask-become-pass</code>. Ensuite, lance-le sans ce paramètre — il doit fonctionner. Tu n'en auras plus besoin pour la suite.</p>
-      </div>
+      <div class="box box-valider"><div class="box-label">🔍 Valider</div><p>Lance une fois avec <code class="ic">--ask-become-pass</code>. Ensuite sans — il doit fonctionner. Tu n'en auras plus besoin pour la suite.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════ -->
-<!-- ACTE 3 -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ══════════ ACTE 3 -->
 <section id="acte3">
-  <div class="acte-header acte-3">
-    <div class="acte-num">03</div>
-    <div class="acte-meta">
-      <div class="duree">⏱ 1h30</div>
+  <div class="acte-banner a3">
+    <div class="acte-num-big">03</div>
+    <div class="acte-info">
+      <div class="acte-dur">⏱ 1h30</div>
       <h2>Informer les stagiaires</h2>
       <p>Les comptes sont créés, les outils installés. Maintenant chaque stagiaire doit savoir où il est et ce qui est disponible. On déploie une page web d'accueil personnalisée par machine.</p>
     </div>
   </div>
 
-  <!-- 3.1 -->
   <div class="etape" id="e3-1">
-    <div class="etape-header">
-      <span class="etape-num">3.1</span>
-      <span class="etape-title">Installer et démarrer nginx</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">3.1</span><span class="etape-title">Installer et démarrer nginx</span></div>
     <div class="etape-body">
-      <div class="box box-mission">
-        <div class="box-label">📋 Ta mission</div>
-        <p>Ajoute deux tâches dans <code class="inline-code">site.yml</code> :</p>
-        <ul>
-          <li>Installer le paquet <code class="inline-code">nginx</code> avec apt (state: present)</li>
-          <li>Démarrer le service nginx et l'activer au boot (state: started, enabled: true)</li>
-        </ul>
-        <p style="margin-top:8px">Lance le playbook puis vérifie : <code class="inline-code">http://10.116.0.238</code> et <code class="inline-code">http://10.116.0.239</code></p>
-        <p>Tu dois voir la page par défaut de nginx.</p>
-      </div>
-      <div class="spoiler spoiler-indice" id="s-3-1-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-3-1-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <p>Pour l'installation : <code class="inline-code">ansible.builtin.apt</code> avec <code class="inline-code">update_cache: true</code></p>
-          <p>Pour le service : <code class="inline-code">ansible.builtin.service</code></p>
-          <p>Les valeurs de state pour un service : <code class="inline-code">started</code> / <code class="inline-code">stopped</code> / <code class="inline-code">restarted</code> / <code class="inline-code">reloaded</code></p>
-        </div>
+      <div class="box box-mission"><div class="box-label">📋 Ta mission</div><p>Ajoute deux tâches : installer <code class="ic">nginx</code> et démarrer le service (<code class="ic">state: started</code>, <code class="ic">enabled: true</code>). Vérifie dans un navigateur : <code class="ic">http://10.116.0.238</code> → page par défaut nginx.</p></div>
+      <div class="spoiler sp-indice" id="s-3-1-i">
+        <button class="spoiler-btn" onclick="toggle('s-3-1-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><p>Installation : <code class="ic">ansible.builtin.apt</code> — Service : <code class="ic">ansible.builtin.service</code> — State possibles : <code class="ic">started</code> / <code class="ic">stopped</code> / <code class="ic">restarted</code> / <code class="ic">reloaded</code></p></div>
       </div>
     </div>
   </div>
 
-  <!-- 3.2 -->
   <div class="etape" id="e3-2">
-    <div class="etape-header">
-      <span class="etape-num">3.2</span>
-      <span class="etape-title">Créer le template de la page d'accueil</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">3.2</span><span class="etape-title">Créer le template de la page d'accueil</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Un template Jinja2 est un fichier texte avec des zones dynamiques. Ansible remplace les <code class="inline-code">{{ variable }}</code> et évalue les <code class="inline-code">{% blocs %}</code> avant de déposer le fichier sur la machine. Chaque machine reçoit un fichier différent, personnalisé avec ses propres valeurs.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Un template Jinja2 génère des fichiers dynamiques. Ansible remplace les <code class="ic">{{ variable }}</code> et évalue les <code class="ic">{% blocs %}</code> avant de déposer le fichier. Chaque machine reçoit un fichier personnalisé.</p></div>
 
-      <div class="section-title">Facts Ansible disponibles</div>
+      <div class="section-label">Facts Ansible disponibles</div>
       <table>
         <thead><tr><th>Fact</th><th>Contenu</th></tr></thead>
         <tbody>
-          <tr><td>ansible_hostname</td><td>Nom d'hôte de la machine</td></tr>
+          <tr><td>ansible_hostname</td><td>Nom d'hôte</td></tr>
           <tr><td>ansible_default_ipv4.address</td><td>Adresse IP principale</td></tr>
-          <tr><td>ansible_os_family</td><td>Famille d'OS (Debian, RedHat…)</td></tr>
           <tr><td>ansible_distribution</td><td>Distribution Linux</td></tr>
-          <tr><td>ansible_distribution_version</td><td>Version de la distribution</td></tr>
+          <tr><td>ansible_distribution_version</td><td>Version</td></tr>
           <tr><td>ansible_memtotal_mb</td><td>RAM totale en Mo</td></tr>
-          <tr><td>ansible_processor_vcpus</td><td>Nombre de vCPU</td></tr>
           <tr><td>ansible_date_time.date</td><td>Date courante</td></tr>
         </tbody>
       </table>
 
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Crée <code class="inline-code">templates/accueil.html.j2</code> qui affiche :</p>
-        <ul>
-          <li>Le nom de la formation et la promotion</li>
-          <li>Le hostname et l'IP de la machine (facts)</li>
-          <li>La distribution et sa version</li>
-          <li>La RAM disponible</li>
-          <li>La liste des stagiaires (boucle for)</li>
-          <li>La liste des outils installés (boucle for)</li>
-          <li>La date de déploiement</li>
-        </ul>
+        <p>Crée <code class="ic">templates/accueil.html.j2</code> affichant : nom de la formation, promotion, hostname, IP, distribution, RAM, liste des stagiaires (boucle for), liste des outils (boucle for), date de déploiement.</p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-3-2-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-3-2-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-indice" id="s-3-2-i">
+        <button class="spoiler-btn" onclick="toggle('s-3-2-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p>Syntaxe Jinja2 :</p>
-          <pre><code>{{ ma_variable }}          # afficher une variable
-{{ mon_fact.sous_cle }}    # afficher un fact imbriqué
-{% for x in ma_liste %}    # boucle
-  {{ x }}                  # élément courant
-{% endfor %}               # fin de boucle
-{% if condition %}         # conditionnel
-{% endif %}</code></pre>
-          <p>⚠ <code class="inline-code">ansible_default_ipv4.address</code> s'écrit avec deux <strong>d</strong> dans <em>address</em>.</p>
+          <pre><code>{{ ma_variable }}         {# afficher une variable #}
+{{ fact.sous_cle }}       {# fact imbriqué #}
+{% for x in ma_liste %}   {# boucle #}
+  {{ x }}
+{% endfor %}</code></pre>
+          <p>⚠ <code class="ic">ansible_default_ipv4.address</code> — deux <strong>d</strong> dans <em>address</em>. Erreur très fréquente.</p>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-3-2-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-3-2-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>&lt;!DOCTYPE html&gt;
+      <div class="spoiler sp-correction" id="s-3-2-c">
+        <button class="spoiler-btn" onclick="toggle('s-3-2-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang="fr"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -1106,8 +702,7 @@ ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
 &lt;/head&gt;
 &lt;body&gt;
     &lt;h1&gt;{{ formation_name }}&lt;/h1&gt;
-    &lt;p&gt;&lt;em&gt;{{ promotion }} — Déployé le {{ ansible_date_time.date }}&lt;/em&gt;&lt;/p&gt;
-
+    &lt;p&gt;{{ promotion }} — Déployé le {{ ansible_date_time.date }}&lt;/p&gt;
     &lt;div class="info"&gt;
         &lt;h2&gt;Informations machine&lt;/h2&gt;
         &lt;ul&gt;
@@ -1117,14 +712,12 @@ ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
             &lt;li&gt;RAM : {{ ansible_memtotal_mb }} Mo&lt;/li&gt;
         &lt;/ul&gt;
     &lt;/div&gt;
-
     &lt;h2&gt;Stagiaires&lt;/h2&gt;
     &lt;ul&gt;
     {% for s in stagiaires %}
         &lt;li&gt;{{ s }}&lt;/li&gt;
     {% endfor %}
     &lt;/ul&gt;
-
     &lt;h2&gt;Outils disponibles&lt;/h2&gt;
     &lt;ul&gt;
     {% for o in outils_base %}
@@ -1132,51 +725,33 @@ ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
     {% endfor %}
     &lt;/ul&gt;
 &lt;/body&gt;
-&lt;/html&gt;</code></pre>
-        </div>
+&lt;/html&gt;</code></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- 3.3 -->
   <div class="etape" id="e3-3">
-    <div class="etape-header">
-      <span class="etape-num">3.3</span>
-      <span class="etape-title">Déployer le template et configurer le handler</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">3.3</span><span class="etape-title">Déployer le template et configurer le handler</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Le handler permet de redémarrer nginx <strong>uniquement si la page a changé</strong>. Sans handler, nginx redémarrerait à chaque exécution — inutile et perturbant pour les utilisateurs connectés.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Le handler redémarre nginx <strong>uniquement si la page a changé</strong>. Sans handler, nginx redémarrerait à chaque exécution — inutile et perturbant pour les stagiaires connectés.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Dans <code class="inline-code">site.yml</code> :</p>
         <ul>
-          <li>Ajoute une tâche qui déploie <code class="inline-code">accueil.html.j2</code> vers <code class="inline-code">/var/www/html/index.html</code> avec mode <code class="inline-code">0644</code> et un <code class="inline-code">notify</code></li>
-          <li>Ajoute un bloc <code class="inline-code">handlers:</code> (même niveau que <code class="inline-code">tasks:</code>) avec un handler qui redémarre nginx</li>
+          <li>Tâche : déployer <code class="ic">accueil.html.j2</code> → <code class="ic">/var/www/html/index.html</code>, mode <code class="ic">0644</code>, avec <code class="ic">notify</code></li>
+          <li>Bloc <code class="ic">handlers:</code> (même niveau que <code class="ic">tasks:</code>) avec un handler qui redémarre nginx</li>
         </ul>
-        <p style="margin-top:8px">Teste en deux temps : avec puis sans modification du template.</p>
+        <p>Teste en deux temps : avec puis sans modification du template.</p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-3-3-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-3-3-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-indice" id="s-3-3-i">
+        <button class="spoiler-btn" onclick="toggle('s-3-3-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p>Module template : <code class="inline-code">ansible.builtin.template</code> avec <code class="inline-code">src: accueil.html.j2</code></p>
-          <p>Le <code class="inline-code">notify</code> et le <code class="inline-code">name</code> du handler doivent être <strong>strictement identiques</strong>.</p>
-          <p>Le handler utilise <code class="inline-code">ansible.builtin.service</code> avec <code class="inline-code">state: restarted</code></p>
-          <p>Le bloc <code class="inline-code">handlers:</code> se place au même niveau d'indentation que <code class="inline-code">tasks:</code>.</p>
+          <p>Module : <code class="ic">ansible.builtin.template</code> — Le <code class="ic">notify</code> et le <code class="ic">name</code> du handler doivent être <strong>strictement identiques</strong>.</p>
+          <p>Le bloc <code class="ic">handlers:</code> se place au même niveau d'indentation que <code class="ic">tasks:</code>.</p>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-3-3-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-3-3-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>  # Dans tasks:
+      <div class="spoiler sp-correction" id="s-3-3-c">
+        <button class="spoiler-btn" onclick="toggle('s-3-3-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>  # Dans tasks:
     - name: Déploiement de la page d'accueil
       ansible.builtin.template:
         src: accueil.html.j2
@@ -1189,76 +764,42 @@ ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
     - name: Redémarrer nginx
       ansible.builtin.service:
         name: nginx
-        state: restarted</code></pre>
-        </div>
+        state: restarted</code></pre></div>
       </div>
-      <div class="box box-valider">
-        <div class="box-label">🔍 Valider</div>
-        <ul>
-          <li><code class="inline-code">http://10.116.0.238</code> affiche le hostname et l'IP de machine2</li>
-          <li><code class="inline-code">http://10.116.0.239</code> affiche les infos de machine3</li>
-          <li>Même structure, contenu différent sur chaque machine</li>
-        </ul>
-      </div>
+      <div class="box box-valider"><div class="box-label">🔍 Valider</div><ul><li><code class="ic">http://10.116.0.238</code> → hostname et IP de machine2</li><li><code class="ic">http://10.116.0.239</code> → hostname et IP de machine3</li></ul></div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════ -->
-<!-- ACTE 4 -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ══════════ ACTE 4 -->
 <section id="acte4">
-  <div class="acte-header acte-4">
-    <div class="acte-num">04</div>
-    <div class="acte-meta">
-      <div class="duree">⏱ 1h30</div>
+  <div class="acte-banner a4">
+    <div class="acte-num-big">04</div>
+    <div class="acte-info">
+      <div class="acte-dur">⏱ 1h30</div>
       <h2>Mettre des ressources à disposition</h2>
-      <p>Les stagiaires ont leurs comptes et leur page d'accueil. Il faut maintenant leur préparer un répertoire partagé avec les ressources du TP : paquets téléchargés, README dynamique.</p>
+      <p>Les stagiaires ont leurs comptes et leur page d'accueil. Il faut maintenant préparer un répertoire partagé : paquets téléchargés, README dynamique.</p>
     </div>
   </div>
 
-  <!-- 4.1 -->
   <div class="etape" id="e4-1">
-    <div class="etape-header">
-      <span class="etape-num">4.1</span>
-      <span class="etape-title">Créer le répertoire partagé</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">4.1</span><span class="etape-title">Créer le répertoire partagé</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Le répertoire <code class="inline-code">/opt/formation</code> sera le point de dépôt commun. Tous les stagiaires peuvent y lire. Seul setupuser (via Ansible) peut y écrire.</p>
-      </div>
-      <div class="box box-mission">
-        <div class="box-label">📋 Ta mission</div>
-        <p>Crée le répertoire principal <code class="inline-code">{{ partage_dir }}</code> (owner: root, group: sudo, mode: 0755), puis les sous-répertoires :</p>
-        <ul>
-          <li><code class="inline-code">{{ partage_dir }}/paquets</code></li>
-          <li><code class="inline-code">{{ partage_dir }}/configs</code></li>
-          <li><code class="inline-code">{{ partage_dir }}/scripts</code></li>
-        </ul>
-        <p style="margin-top:8px">Essaie de créer les 3 sous-répertoires en <strong>une seule tâche avec une boucle</strong>.</p>
-      </div>
-      <div class="spoiler spoiler-indice" id="s-4-1-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-4-1-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Le répertoire <code class="ic">/opt/formation</code> sera le dépôt commun. Tous les stagiaires peuvent y lire. Seul setupuser (via Ansible) peut y écrire.</p></div>
+      <div class="box box-mission"><div class="box-label">📋 Ta mission</div><p>Crée <code class="ic">{{ partage_dir }}</code> (owner: root, group: sudo, mode: 0755), puis les sous-répertoires <code class="ic">paquets</code>, <code class="ic">configs</code>, <code class="ic">scripts</code> — idéalement en une seule tâche avec une boucle.</p></div>
+      <div class="spoiler sp-indice" id="s-4-1-i">
+        <button class="spoiler-btn" onclick="toggle('s-4-1-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p>Module pour créer des dossiers : <code class="inline-code">ansible.builtin.file</code> avec <code class="inline-code">state: directory</code></p>
-          <p>Tu peux utiliser une boucle <code class="inline-code">loop</code> avec une liste de chemins complets :</p>
+          <p>Module : <code class="ic">ansible.builtin.file</code> avec <code class="ic">state: directory</code></p>
           <pre><code>loop:
-  - /opt/formation/paquets
-  - /opt/formation/configs</code></pre>
-          <p>Ou mieux, utilise la variable : <code class="inline-code">"{{ partage_dir }}/paquets"</code></p>
+  - "{{ partage_dir }}/paquets"
+  - "{{ partage_dir }}/configs"
+  - "{{ partage_dir }}/scripts"</code></pre>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-4-1-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-4-1-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>    - name: Créer le répertoire de partage principal
+      <div class="spoiler sp-correction" id="s-4-1-c">
+        <button class="spoiler-btn" onclick="toggle('s-4-1-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>    - name: Créer le répertoire principal
       ansible.builtin.file:
         path: "{{ partage_dir }}"
         state: directory
@@ -1276,53 +817,32 @@ ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
       loop:
         - "{{ partage_dir }}/paquets"
         - "{{ partage_dir }}/configs"
-        - "{{ partage_dir }}/scripts"</code></pre>
-        </div>
+        - "{{ partage_dir }}/scripts"</code></pre></div>
       </div>
     </div>
   </div>
 
-  <!-- 4.2 -->
   <div class="etape" id="e4-2">
-    <div class="etape-header">
-      <span class="etape-num">4.2</span>
-      <span class="etape-title">Télécharger des paquets sans les installer</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">4.2</span><span class="etape-title">Télécharger des paquets sans les installer</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p><code class="inline-code">apt download</code> télécharge les fichiers <code class="inline-code">.deb</code> sans les installer. Utile pour créer un dépôt local ou préparer une installation hors ligne. On utilise <code class="inline-code">ansible.builtin.command</code> car apt download n'a pas de module Ansible dédié.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p><code class="ic">apt download</code> télécharge les <code class="ic">.deb</code> sans les installer. On utilise <code class="ic">ansible.builtin.command</code> car apt download n'a pas de module dédié.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Télécharge les paquets <code class="inline-code">nginx</code>, <code class="inline-code">curl</code>, <code class="inline-code">vim</code> dans <code class="inline-code">{{ partage_dir }}/paquets/</code>.</p>
-        <ul>
-          <li>La commande doit s'exécuter dans le bon répertoire (<code class="inline-code">chdir</code>)</li>
-          <li>La tâche doit être <strong>idempotente</strong> : ne pas re-télécharger si le .deb existe déjà</li>
-          <li>Utilise une boucle sur la liste des paquets</li>
-        </ul>
+        <p>Télécharge <code class="ic">nginx</code>, <code class="ic">curl</code>, <code class="ic">vim</code> dans <code class="ic">{{ partage_dir }}/paquets/</code>. Contraintes : utilise <code class="ic">chdir</code> pour exécuter dans le bon répertoire, et <code class="ic">creates</code> pour rendre la tâche idempotente.</p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-4-2-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-4-2-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-indice" id="s-4-2-i">
+        <button class="spoiler-btn" onclick="toggle('s-4-2-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p>Module <code class="inline-code">command</code> avec <code class="inline-code">chdir</code> et <code class="inline-code">creates</code> :</p>
           <pre><code>ansible.builtin.command:
   cmd: apt download {{ item }}
-  chdir: /chemin/du/repertoire
+  chdir: /chemin/repertoire
   creates: /chemin/{{ item }}_*.deb</code></pre>
-          <p>Le paramètre <code class="inline-code">creates</code> rend la tâche idempotente : si le fichier/pattern existe déjà, la tâche est <code class="inline-code">skipped</code>.</p>
+          <p><code class="ic">creates</code> : si le fichier/pattern existe déjà, la tâche est <strong>skipped</strong> → idempotence.</p>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-4-2-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-4-2-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>    - name: Téléchargement des paquets de formation
+      <div class="spoiler sp-correction" id="s-4-2-c">
+        <button class="spoiler-btn" onclick="toggle('s-4-2-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>    - name: Téléchargement des paquets de formation
       ansible.builtin.command:
         cmd: "apt download {{ item }}"
         chdir: "{{ partage_dir }}/paquets"
@@ -1330,57 +850,23 @@ ansible machine2 -i inventory/hosts.ini -m setup | grep -A5 ipv4</code></pre>
       loop:
         - nginx
         - curl
-        - vim</code></pre>
-        </div>
+        - vim</code></pre></div>
       </div>
-      <div class="box box-valider">
-        <div class="box-label">🔍 Valider</div>
-        <p><code class="inline-code">ansible machine2 -i inventory/hosts.ini -m command -a "ls -lh /opt/formation/paquets"</code></p>
-        <p style="margin-top:8px">Lance le playbook une 2e fois — les tâches de téléchargement doivent être <strong>skipped</strong>.</p>
-      </div>
+      <div class="box box-valider"><div class="box-label">🔍 Valider</div><p><code class="ic">ansible machine2 -i inventory/hosts.ini -m command -a "ls -lh /opt/formation/paquets"</code> — Lance le playbook une 2e fois : les téléchargements doivent être <strong>skipped</strong>.</p></div>
     </div>
   </div>
 
-  <!-- 4.3 -->
   <div class="etape" id="e4-3">
-    <div class="etape-header">
-      <span class="etape-num">4.3</span>
-      <span class="etape-title">Déployer un README dynamique</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">4.3</span><span class="etape-title">Déployer un README dynamique</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Un fichier README dans <code class="inline-code">/opt/formation/</code> guidera les stagiaires. On le génère avec un template pour qu'il contienne les vraies informations de la machine.</p>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Un template peut générer n'importe quel type de fichier — pas seulement du HTML. Un README texte guidera les stagiaires avec les vraies informations de leur machine.</p></div>
+      <div class="box box-mission"><div class="box-label">📋 Ta mission</div><p>Crée <code class="ic">templates/README.j2</code> (fichier texte) avec : titre, promotion, date, infos machine, liste des outils, instructions SSH par stagiaire. Déploie-le vers <code class="ic">{{ partage_dir }}/README.txt</code>.</p></div>
+      <div class="spoiler sp-indice" id="s-4-3-i">
+        <button class="spoiler-btn" onclick="toggle('s-4-3-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><p>Titres en texte brut : utilise des <code class="ic">=</code> ou des <code class="ic">-</code>. Filtre utile : <code class="ic">{{ ma_variable | upper }}</code>. Tu peux boucler sur <code class="ic">stagiaires</code> pour générer les lignes SSH.</p></div>
       </div>
-      <div class="box box-mission">
-        <div class="box-label">📋 Ta mission</div>
-        <p>Crée <code class="inline-code">templates/README.j2</code> — un fichier <strong>texte</strong> (pas HTML) avec :</p>
-        <ul>
-          <li>Titre de la formation et promotion</li>
-          <li>Date de déploiement et infos machine</li>
-          <li>Liste des outils installés</li>
-          <li>Liste des paquets disponibles dans <code class="inline-code">/opt/formation/paquets/</code></li>
-          <li>Instructions de connexion SSH par stagiaire</li>
-        </ul>
-        <p style="margin-top:8px">Puis ajoute une tâche qui déploie ce README vers <code class="inline-code">{{ partage_dir }}/README.txt</code></p>
-      </div>
-      <div class="spoiler spoiler-indice" id="s-4-3-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-4-3-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <p>Un template peut générer n'importe quel type de fichier, pas seulement du HTML.</p>
-          <p>Pour un titre en texte brut, utilise des <code class="inline-code">=</code> ou des <code class="inline-code">-</code>.</p>
-          <p>La liste des outils vient de la variable <code class="inline-code">outils_base</code> dans <code class="inline-code">all.yml</code>.</p>
-          <p>Filtre Jinja2 utile : <code class="inline-code">{{ ma_variable | upper }}</code> pour mettre en majuscules.</p>
-        </div>
-      </div>
-      <div class="spoiler spoiler-correction" id="s-4-3-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-4-3-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-correction" id="s-4-3-c">
+        <button class="spoiler-btn" onclick="toggle('s-4-3-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
           <pre><code># templates/README.j2
 ================================================
@@ -1396,10 +882,6 @@ OUTILS INSTALLÉS
 {% for o in outils_base %}
   - {{ o }}
 {% endfor %}
-
-PAQUETS DISPONIBLES
--------------------
-  Répertoire : {{ partage_dir }}/paquets/
 
 CONNEXION
 ---------
@@ -1420,129 +902,89 @@ Page d'accueil : http://{{ ansible_default_ipv4.address }}</code></pre>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════ -->
-<!-- ACTE 5 -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ══════════ ACTE 5 -->
 <section id="acte5">
-  <div class="acte-header acte-5">
-    <div class="acte-num">05</div>
-    <div class="acte-meta">
-      <div class="duree">⏱ 1h30</div>
+  <div class="acte-banner a5">
+    <div class="acte-num-big">05</div>
+    <div class="acte-info">
+      <div class="acte-dur">⏱ 1h30</div>
       <h2>Industrialiser</h2>
       <p>Le projet fonctionne, mais tout est dans un seul playbook. Difficile à maintenir, impossible à réutiliser. On découpe en roles — une brique par responsabilité.</p>
     </div>
   </div>
 
-  <!-- 5.1 -->
   <div class="etape" id="e5-1">
-    <div class="etape-header">
-      <span class="etape-num">5.1</span>
-      <span class="etape-title">Planifier la découpe en roles</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">5.1</span><span class="etape-title">Planifier la découpe en roles</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Avant de créer les fichiers, réfléchis à la découpe. Un bon role a une seule responsabilité. Si le nom d'un role contient <em>"et"</em>, c'est souvent le signe qu'il faut le couper en deux.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Avant de créer les fichiers, réfléchis à la découpe. Un bon role a une seule responsabilité. Si son nom contient <em>"et"</em>, c'est souvent le signe qu'il faut le couper en deux.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Identifie quelles tâches de ton <code class="inline-code">site.yml</code> appartiennent à chaque role :</p>
+        <p>Note sur papier la répartition des tâches dans ces 4 roles :</p>
         <ul>
-          <li><strong>common</strong> → ce qui est commun à toute machine (outils, utilisateurs, sudo)</li>
-          <li><strong>webserver</strong> → tout ce qui concerne nginx (install, service, template, handler)</li>
-          <li><strong>partage</strong> → répertoires, téléchargements, README</li>
-          <li><strong>securite</strong> → (nouveau) configurer SSH : PermitRootLogin no, PasswordAuthentication no</li>
+          <li><strong>common</strong> — outils, utilisateurs, sudo</li>
+          <li><strong>webserver</strong> — nginx install, service, template, handler</li>
+          <li><strong>partage</strong> — répertoires, téléchargements, README</li>
+          <li><strong>securite</strong> — SSH : PermitRootLogin no, PasswordAuthentication no</li>
         </ul>
-        <p style="margin-top:8px">Note sur papier la répartition avant de créer les fichiers.</p>
       </div>
-      <div class="box box-tip">
-        <div class="box-label">✅ Conseil</div>
-        <p>Commence toujours par la découpe sur papier. Créer les fichiers avant d'avoir clarifié les responsabilités mène souvent à tout réorganiser ensuite.</p>
-      </div>
+      <div class="box box-tip"><div class="box-label">✅ Conseil</div><p>Commence toujours par la découpe sur papier. Créer les fichiers avant d'avoir clarifié les responsabilités mène souvent à tout réorganiser ensuite.</p></div>
     </div>
   </div>
 
-  <!-- 5.2 -->
   <div class="etape" id="e5-2">
-    <div class="etape-header">
-      <span class="etape-num">5.2</span>
-      <span class="etape-title">Créer la structure des roles</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">5.2</span><span class="etape-title">Créer la structure des roles</span></div>
     <div class="etape-body">
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Crée l'arborescence complète des 4 roles :</p>
+        <p>Crée l'arborescence complète des 4 roles et déplace les templates dans les bons dossiers :</p>
         <pre><code>roles/
 ├── common/tasks/
 ├── webserver/tasks/
 ├── webserver/handlers/
-├── webserver/templates/
+├── webserver/templates/       ← accueil.html.j2
 ├── partage/tasks/
-├── partage/templates/
-└── securite/tasks/
-    securite/handlers/</code></pre>
-        <p style="margin-top:10px">Déplace ensuite <code class="inline-code">accueil.html.j2</code> et <code class="inline-code">README.j2</code> dans les bons dossiers <code class="inline-code">templates/</code>.</p>
-        <p style="margin-top:6px">Vérifie : <code class="inline-code">find roles/ -type d</code></p>
+├── partage/templates/         ← README.j2
+├── securite/tasks/
+└── securite/handlers/</code></pre>
+        <p>Vérifie : <code class="ic">find roles/ -type d</code></p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-5-2-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-5-2-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-indice" id="s-5-2-i">
+        <button class="spoiler-btn" onclick="toggle('s-5-2-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p><code class="inline-code">mkdir -p</code> crée tous les dossiers intermédiaires en une fois.</p>
-          <p>Pour déplacer : <code class="inline-code">mv templates/accueil.html.j2 roles/webserver/templates/</code></p>
-          <p>Dans un role, les templates sont cherchés dans <code class="inline-code">roles/nom_role/templates/</code> — tu n'écris que le nom du fichier dans <code class="inline-code">src:</code>, plus le chemin complet.</p>
+          <p><code class="ic">mkdir -p</code> crée tous les dossiers en une fois.</p>
+          <p>Déplacer : <code class="ic">mv templates/accueil.html.j2 roles/webserver/templates/</code></p>
+          <p>Dans un role, <code class="ic">src:</code> ne contient que le nom du fichier — Ansible cherche dans <code class="ic">roles/nom_role/templates/</code> automatiquement.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 5.3 -->
   <div class="etape" id="e5-3">
-    <div class="etape-header">
-      <span class="etape-num">5.3</span>
-      <span class="etape-title">Créer les fichiers main.yml de chaque role</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">5.3</span><span class="etape-title">Créer les fichiers main.yml de chaque role</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Un <code class="inline-code">main.yml</code> de role ne contient que la liste des tâches — <strong>pas d'entête de play</strong>. On commence directement par le premier tiret. Les variables de <code class="inline-code">group_vars/all.yml</code> sont disponibles automatiquement.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Un <code class="ic">main.yml</code> de role ne contient que la liste des tâches — <strong>pas d'entête de play</strong>. On commence directement par le premier tiret. Les variables de <code class="ic">group_vars/all.yml</code> sont disponibles automatiquement.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Crée les 4 fichiers <code class="inline-code">roles/*/tasks/main.yml</code> en répartissant les tâches selon la découpe de l'étape 5.1.</p>
+        <p>Crée les fichiers <code class="ic">tasks/main.yml</code> des 4 roles selon la découpe de l'étape 5.1. N'oublie pas :</p>
         <ul>
-          <li><code class="inline-code">roles/webserver/handlers/main.yml</code> — le handler nginx</li>
-          <li><code class="inline-code">roles/securite/tasks/main.yml</code> — deux tâches <code class="inline-code">lineinfile</code> pour SSH</li>
-          <li><code class="inline-code">roles/securite/handlers/main.yml</code> — handler restart sshd</li>
+          <li><code class="ic">roles/webserver/handlers/main.yml</code> — handler nginx</li>
+          <li><code class="ic">roles/securite/tasks/main.yml</code> — deux tâches <code class="ic">lineinfile</code></li>
+          <li><code class="ic">roles/securite/handlers/main.yml</code> — handler sshd</li>
         </ul>
-        <p style="margin-top:8px">Dans le role webserver, le <code class="inline-code">src</code> du template devient juste <code class="inline-code">accueil.html.j2</code> sans chemin.</p>
       </div>
-      <div class="spoiler spoiler-indice" id="s-5-3-i">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-5-3-i')">
-          <span class="btn-left"><span class="icon">💡</span> Indice</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-indice" id="s-5-3-i">
+        <button class="spoiler-btn" onclick="toggle('s-5-3-i')"><span class="btn-left"><span class="s-icon">💡</span>Indice pour le role securite</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
-          <p>Pour le role securite, utilise <code class="inline-code">ansible.builtin.lineinfile</code> :</p>
           <pre><code>ansible.builtin.lineinfile:
   path: /etc/ssh/sshd_config
   regexp: '^#?PermitRootLogin'
   line: 'PermitRootLogin no'
 notify: Redémarrer sshd</code></pre>
-          <p>Le handler correspondant :</p>
-          <pre><code>- name: Redémarrer sshd
-  ansible.builtin.service:
-    name: sshd
-    state: restarted</code></pre>
+          <p>Le <code class="ic">^#?</code> gère la ligne commentée ET non commentée en une seule regexp.</p>
         </div>
       </div>
-      <div class="spoiler spoiler-correction" id="s-5-3-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-5-3-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction complète des 4 roles</span>
-          <span class="chevron">▼</span>
-        </button>
+      <div class="spoiler sp-correction" id="s-5-3-c">
+        <button class="spoiler-btn" onclick="toggle('s-5-3-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction complète des 4 roles</span><span class="chevron">▼</span></button>
         <div class="spoiler-content">
           <pre><code># roles/common/tasks/main.yml
 - name: Installation des outils de base
@@ -1618,35 +1060,19 @@ notify: Redémarrer sshd</code></pre>
     </div>
   </div>
 
-  <!-- 5.4 -->
   <div class="etape" id="e5-4">
-    <div class="etape-header">
-      <span class="etape-num">5.4</span>
-      <span class="etape-title">Réécrire le site.yml final</span>
-    </div>
+    <div class="etape-header"><span class="etape-num">5.4</span><span class="etape-title">Réécrire le site.yml final</span></div>
     <div class="etape-body">
-      <div class="box box-context">
-        <div class="box-label">🎯 Contexte</div>
-        <p>Le <code class="inline-code">site.yml</code> ne doit plus contenir aucune tâche — il ne fait qu'appeler les roles dans le bon ordre. On ajoute des tags pour pouvoir exécuter seulement certains roles.</p>
-      </div>
+      <div class="box box-context"><div class="box-label">🎯 Contexte</div><p>Le <code class="ic">site.yml</code> ne doit plus contenir aucune tâche — il appelle les roles dans le bon ordre et leur associe des tags pour l'exécution sélective.</p></div>
       <div class="box box-mission">
         <div class="box-label">📋 Ta mission</div>
-        <p>Réécris <code class="inline-code">site.yml</code> pour appeler les 4 roles dans cet ordre : securite → common → webserver → partage.</p>
-        <p style="margin-top:8px">Ajoute un tag sur chaque role (le nom du role comme tag). Syntaxe :</p>
-        <pre><code>roles:
-  - role: mon_role
-    tags: mon_role</code></pre>
-        <p style="margin-top:8px">Teste les tags :</p>
+        <p>Réécris <code class="ic">site.yml</code> pour appeler les 4 roles dans l'ordre : securite → common → webserver → partage, chacun avec son tag. Teste :</p>
         <pre><code>ansible-playbook -i inventory/hosts.ini site.yml --tags webserver
 ansible-playbook -i inventory/hosts.ini site.yml --tags common,partage</code></pre>
       </div>
-      <div class="spoiler spoiler-correction" id="s-5-4-c">
-        <button class="spoiler-btn" onclick="toggleSpoiler('s-5-4-c')">
-          <span class="btn-left"><span class="icon">✅</span> Correction</span>
-          <span class="chevron">▼</span>
-        </button>
-        <div class="spoiler-content">
-          <pre><code>---
+      <div class="spoiler sp-correction" id="s-5-4-c">
+        <button class="spoiler-btn" onclick="toggle('s-5-4-c')"><span class="btn-left"><span class="s-icon">✅</span>Correction</span><span class="chevron">▼</span></button>
+        <div class="spoiler-content"><pre><code>---
 
 - name: Déploiement environnement de formation DevCorp
   hosts: formation
@@ -1660,36 +1086,33 @@ ansible-playbook -i inventory/hosts.ini site.yml --tags common,partage</code></p
     - role: webserver
       tags: webserver
     - role: partage
-      tags: partage</code></pre>
-        </div>
+      tags: partage</code></pre></div>
       </div>
       <div class="box box-valider">
         <div class="box-label">🔍 Valider le projet complet</div>
         <ul>
-          <li>Lancer le playbook complet sans erreur</li>
+          <li>Lancer le playbook complet — aucune erreur</li>
           <li>Tester les tags — seul le role ciblé s'exécute</li>
           <li>Vérifier la page web sur les deux IPs</li>
-          <li><code class="inline-code">ansible all -i inventory/hosts.ini -m command -a "cat /opt/formation/README.txt"</code></li>
-          <li><code class="inline-code">ansible all -i inventory/hosts.ini -m command -a "grep PermitRootLogin /etc/ssh/sshd_config"</code></li>
+          <li><code class="ic">ansible all -i inventory/hosts.ini -m command -a "cat /opt/formation/README.txt"</code></li>
+          <li><code class="ic">ansible all -i inventory/hosts.ini -m command -a "grep PermitRootLogin /etc/ssh/sshd_config"</code></li>
         </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════ -->
-<!-- BILAN -->
-<!-- ════════════════════════════════════════════════ -->
+<!-- ══════════ BILAN -->
 <section id="bilan">
   <hr class="sep">
-  <h2 style="font-size:28px; font-weight:800; letter-spacing:-1px; margin-bottom:16px">Bilan de la journée</h2>
+  <h2 style="font-size:34px; font-weight:800; letter-spacing:-1.5px; margin-bottom:20px;">Bilan de la journée</h2>
 
   <div class="final-cmd">
     <p>Une seule commande pour préparer toutes les machines :</p>
     <code>ansible-playbook -i inventory/hosts.ini site.yml</code>
   </div>
 
-  <div class="section-title">Notions maîtrisées</div>
+  <div class="section-label">Notions maîtrisées</div>
   <div class="bilan-grid">
     <div class="bilan-item">Inventory, groupes, variables</div>
     <div class="bilan-item">Commandes ad-hoc</div>
@@ -1701,16 +1124,15 @@ ansible-playbook -i inventory/hosts.ini site.yml --tags common,partage</code></p
     <div class="bilan-item">Handlers conditionnels</div>
     <div class="bilan-item">Roles indépendants</div>
     <div class="bilan-item">Tags pour exécution sélective</div>
-    <div class="bilan-item">lineinfile pour configs SSH</div>
+    <div class="bilan-item">lineinfile pour SSH</div>
     <div class="bilan-item">sudo sans mot de passe</div>
   </div>
 
-  <div class="section-title">Structure finale du projet</div>
+  <div class="section-label">Structure finale du projet</div>
   <pre><code>devcorp-ansible/
 ├── inventory/
 │   ├── hosts.ini
-│   └── group_vars/
-│       └── all.yml
+│   └── group_vars/all.yml
 ├── roles/
 │   ├── common/tasks/main.yml
 │   ├── webserver/tasks/main.yml
@@ -1722,7 +1144,7 @@ ansible-playbook -i inventory/hosts.ini site.yml --tags common,partage</code></p
 │   └── securite/handlers/main.yml
 └── site.yml</code></pre>
 
-  <div class="section-title">Pour aller plus loin</div>
+  <div class="section-label">Pour aller plus loin</div>
   <div class="bilan-grid">
     <div class="bilan-item">ansible-galaxy — roles communautaires</div>
     <div class="bilan-item">Ansible Vault — chiffrer les secrets</div>
@@ -1734,44 +1156,36 @@ ansible-playbook -i inventory/hosts.ini site.yml --tags common,partage</code></p
 </section>
 
 </main>
-</div>
 
 <script>
-// Spoiler toggle
-function toggleSpoiler(id) {
+function toggle(id) {
   const el = document.getElementById(id);
   const btn = el.querySelector('.spoiler-btn');
   const content = el.querySelector('.spoiler-content');
-  const chevron = btn.querySelector('.chevron');
   const isOpen = content.classList.contains('visible');
   content.classList.toggle('visible', !isOpen);
   btn.classList.toggle('open', !isOpen);
   el.classList.toggle('open', !isOpen);
 }
 
-// Progress bar
 window.addEventListener('scroll', () => {
   const total = document.body.scrollHeight - window.innerHeight;
   const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
   document.getElementById('progressFill').style.width = pct + '%';
 });
 
-// Active nav link on scroll
-const sections = document.querySelectorAll('section[id], .etape[id]');
-const navLinks = document.querySelectorAll('.nav-link, .nav-acte, .nav-etape');
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.id;
-      navLinks.forEach(l => l.classList.remove('active'));
-      const active = document.querySelector(`a[href="#${id}"]`);
-      if (active) active.classList.add('active');
+const sections = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.nav-item');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
     }
   });
-}, { threshold: 0.3, rootMargin: '-80px 0px -60% 0px' });
-
-sections.forEach(s => observer.observe(s));
+}, { threshold: 0.2, rootMargin: '-60px 0px -60% 0px' });
+sections.forEach(s => obs.observe(s));
 </script>
 </body>
 </html>
