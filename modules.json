@@ -156,14 +156,14 @@
           "status": "done"
         },
         {
-          "file": ".html",
+          "file": "terraform-exam-hcta003.html",
           "title": "Quizz Terraform 1",
           "description": "Quizz Terraform 1 - Examen Terraform 003 Associate en anglais.",
           "tags": ["TERRAFORM"],
           "status": "done"
         },
         {
-          "file": ".html",
+          "file": "terraform-exam-hcta003-2.html",
           "title": "Quizz Terraform 2",
           "description": "Quizz Terraform 2 - Examen Terraform 003 Associate en anglais.",
           "tags": ["TERRAFORM"],
