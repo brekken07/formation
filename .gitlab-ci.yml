@@ -1,0 +1,11 @@
+stages:
+  - deploy
+
+deploy-site:
+  stage: deploy
+  script:
+    - echo "Déploiement du site en cours..."
+    - rsync -av --delete $CI_PROJECT_DIR/ /srv/site-formation/
+    - echo "Déploiement terminé !"
+  only:
+    - main
