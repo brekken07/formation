@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P0·M2 TP — Git Avancé | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-hover:#21262d;--bg-code:#161b22;--border:#30363d;--border-bright:#484f58;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#484f58;--accent-green:#3fb950;--accent-blue:#58a6ff;--accent-purple:#bc8cff;--accent-orange:#f0883e;--accent-yellow:#d29922;--accent-red:#f85149;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--sidebar-width:260px;--topbar-height:56px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7}
+.topbar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 24px;height:var(--topbar-height);display:flex;align-items:center;gap:16px;position:fixed;top:0;left:0;right:0;z-index:200}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent-green);text-decoration:none}
+.topbar-sep{color:var(--border-bright)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);font-family:var(--mono);flex:1}
+.breadcrumb a{color:var(--text-secondary);text-decoration:none}.breadcrumb .current{color:var(--accent-orange)}
+.topbar-actions{display:flex;gap:8px;margin-left:auto}
+.btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:6px;text-decoration:none;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-cours{background:rgba(88,166,255,.1);color:var(--accent-blue);border-color:rgba(88,166,255,.3)}.btn-cours:hover{background:rgba(88,166,255,.2)}
+.btn-nav{background:transparent;color:var(--text-secondary);border-color:var(--border)}.btn-nav:hover{background:var(--bg-hover);color:var(--text-primary)}
+.layout{display:flex;padding-top:var(--topbar-height);min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:var(--bg-secondary);border-right:1px solid var(--border);position:fixed;top:var(--topbar-height);left:0;bottom:0;overflow-y:auto;padding:24px 0}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-section{padding:0 16px;margin-bottom:24px}
+.sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 8px;margin-bottom:8px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:all .15s}
+.sidebar-item:hover{background:var(--bg-hover);color:var(--text-primary)}.sidebar-item.active{background:rgba(240,136,62,.1);color:var(--accent-orange)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border-bright);flex-shrink:0}
+.tp-num{font-family:var(--mono);font-size:10px;background:var(--bg-card);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--text-muted);margin-left:auto}
+.sidebar-item.active .tp-num{background:rgba(240,136,62,.15);border-color:rgba(240,136,62,.3);color:var(--accent-orange)}
+.sidebar-divider{height:1px;background:var(--border);margin:12px 16px}
+.content{margin-left:var(--sidebar-width);flex:1;max-width:860px;padding:48px 56px}
+.module-header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.module-path{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.module-title{font-size:28px;font-weight:600;line-height:1.2;margin-bottom:12px}
+.module-title span{color:var(--accent-orange)}
+.module-desc{color:var(--text-secondary);font-size:15px;margin-bottom:20px}
+.module-meta{display:flex;gap:20px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text-muted)}.meta-item .val{color:var(--text-secondary)}
+.intro-box{background:rgba(240,136,62,.06);border:1px solid rgba(240,136,62,.2);border-left:3px solid var(--accent-orange);border-radius:8px;padding:20px 24px;margin-bottom:40px}
+.intro-box h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-orange);margin-bottom:12px}
+.intro-box p{font-size:14px;color:var(--text-secondary);margin-bottom:8px}.intro-box p:last-child{margin-bottom:0}
+.intro-box code{font-family:var(--mono);font-size:12px;background:var(--bg-card);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.tp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:40px;overflow:hidden;scroll-margin-top:80px}
+.tp-card-header{background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;gap:16px}
+.tp-badge{font-family:var(--mono);font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.tp1{background:rgba(88,166,255,.12);color:var(--accent-blue);border:1px solid rgba(88,166,255,.3)}
+.tp2{background:rgba(63,185,80,.12);color:var(--accent-green);border:1px solid rgba(63,185,80,.3)}
+.tp3{background:rgba(188,140,255,.12);color:var(--accent-purple);border:1px solid rgba(188,140,255,.3)}
+.tp4{background:rgba(240,136,62,.12);color:var(--accent-orange);border:1px solid rgba(240,136,62,.3)}
+.tp-header-text{flex:1}
+.tp-title{font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.tp-subtitle{font-size:13px;color:var(--text-secondary)}
+.diff{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid;white-space:nowrap}
+.diff-easy{color:var(--accent-green);border-color:rgba(63,185,80,.3);background:rgba(63,185,80,.06)}
+.diff-medium{color:var(--accent-yellow);border-color:rgba(210,153,34,.3);background:rgba(210,153,34,.06)}
+.diff-hard{color:var(--accent-red);border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.06)}
+.tp-body{padding:28px}
+.tp-section{margin-bottom:28px}
+.tp-section h4{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tp-section h4::before{content:'';width:3px;height:16px;background:var(--accent-orange);border-radius:2px;flex-shrink:0}
+.tp-section p{font-size:14px;color:var(--text-secondary);margin-bottom:12px;line-height:1.7}
+.tp-section p code,.tp-section li code{font-family:var(--mono);font-size:12px;background:var(--bg-secondary);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.tp-section ul,.tp-section ol{padding-left:20px;display:flex;flex-direction:column;gap:8px;color:var(--text-secondary);font-size:14px}
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.code-lang{font-family:var(--mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.code-copy{font-family:var(--mono);font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}.code-copy:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.code-block pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--text-primary)}
+.cm{color:#6e7681;font-style:italic}.fn{color:var(--accent-blue)}.st{color:#a5d6ff}.va{color:var(--accent-purple)}
+.expected-output{background:#010409;border:1px solid var(--border);border-left:3px solid var(--accent-green);border-radius:8px;padding:16px;margin:12px 0}
+.expected-output .label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--accent-green);margin-bottom:10px}
+.expected-output pre{font-family:var(--mono);font-size:12px;color:#7ee787;line-height:1.6;white-space:pre-wrap}
+.validation-box{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:18px 22px;margin-top:20px}
+.validation-box h5{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--accent-green);margin-bottom:12px}
+.validation-box ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.validation-box li{font-size:13px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px}
+.validation-box li::before{content:'☐';color:var(--text-muted);font-family:var(--mono);flex-shrink:0}
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;display:flex;gap:10px;font-size:13px}
+.callout-body{flex:1;color:var(--text-secondary)}
+.callout-title{font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.callout.warning{background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.2)}.callout.warning .callout-title{color:var(--accent-yellow)}
+.callout.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)}.callout.tip .callout-title{color:var(--accent-green)}
+.commit-section{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-top:16px}
+.commit-section h5{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:32px;border-top:1px solid var(--border)}
+.nav-bottom a{font-family:var(--mono);font-size:12px;color:var(--text-secondary);text-decoration:none;padding:10px 16px;border:1px solid var(--border);border-radius:8px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.nav-bottom a:hover{border-color:var(--border-bright);color:var(--text-primary);background:var(--bg-hover)}
+</style>
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a><span class="topbar-sep">›</span>
+    <a href="#">Phase 0</a><span class="topbar-sep">›</span>
+    <span class="current">M2 · Git Avancé · TP</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase0-module2-cours.html" class="btn btn-cours">📖 Retour au cours</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Cahier de TP</div>
+    <a href="#tp1" class="sidebar-item active"><span class="dot" style="background:var(--accent-blue)"></span>TP 2.1 — Config & repo<span class="tp-num">01</span></a>
+    <a href="#tp2" class="sidebar-item"><span class="dot" style="background:var(--accent-green)"></span>TP 2.2 — Workflow branches<span class="tp-num">02</span></a>
+    <a href="#tp3" class="sidebar-item"><span class="dot" style="background:var(--accent-purple)"></span>TP 2.3 — Rebase & conflits<span class="tp-num">03</span></a>
+    <a href="#tp4" class="sidebar-item"><span class="dot" style="background:var(--accent-orange)"></span>TP 2.4 — Hooks & synthèse<span class="tp-num">04</span></a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Navigation</div>
+    <a href="phase0-module2-cours.html" class="sidebar-item"><span class="dot"></span>Retour au cours</a>
+    <a href="index.html" class="sidebar-item"><span class="dot"></span>← Dashboard</a>
+  </div>
+</aside>
+<main class="content">
+  <div class="module-header">
+    <div class="module-path">phase-0 / module-2 / travaux-pratiques</div>
+    <h1 class="module-title">Cahier de TP — <span>Git Avancé</span></h1>
+    <p class="module-desc">4 exercices progressifs pour maîtriser Git dans un contexte d'équipe et de CI/CD.</p>
+    <div class="module-meta">
+      <span class="meta-item">⚡ <span class="val">4 exercices</span></span>
+      <span class="meta-item">⏱ <span class="val">~3h</span></span>
+      <span class="meta-item">📦 <span class="val">Dépôt : devcorp</span></span>
+    </div>
+  </div>
+
+  <div class="intro-box">
+    <h4>// Avant de commencer</h4>
+    <p>Tous les TP se font sur le dépôt <code>devcorp</code> déjà créé. Tu travailles sur ta branche <code>develop</code> comme base, et tu crées des branches de feature pour chaque exercice.</p>
+    <p>Garde <code>git lg</code> ouvert dans un second terminal pour visualiser l'évolution du graphe en temps réel.</p>
+  </div>
+
+  <!-- TP 2.1 -->
+  <div class="tp-card" id="tp1">
+    <div class="tp-card-header">
+      <span class="tp-badge tp1">TP 2.1</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Configuration & initialisation du dépôt</div>
+        <div class="tp-subtitle">Config globale, aliases, structure de branches</div>
+      </div>
+      <span class="diff diff-easy">Débutant</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Configurer Git de façon professionnelle et mettre en place la structure de branches du projet DevCorp.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Étapes</h4>
+        <ol>
+          <li>Appliquer toute la configuration globale du cours (user, aliases, pull.rebase, etc.)</li>
+          <li>Vérifier la configuration avec <code>git config --global --list</code></li>
+          <li>Dans le dépôt <code>devcorp</code>, créer la branche <code>develop</code> si elle n'existe pas</li>
+          <li>Créer un fichier <code>README.md</code> structuré avec : présentation du projet, stack technique (React, Python/Node, PostgreSQL), et les phases du programme</li>
+          <li>Committer sur <code>develop</code> avec le bon format de message</li>
+          <li>Pousser <code>main</code> et <code>develop</code> sur GitHub</li>
+          <li>Configurer la protection de branche sur GitHub (Settings → Branches) : interdire les push directs sur <code>main</code></li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Résultat attendu</h4>
+        <div class="expected-output">
+          <div class="label">// git lg</div>
+          <pre>* a1b2c3d (HEAD -> develop, origin/develop) docs: add project README
+* e4f5g6h (origin/main, main) chore: initial project structure</pre>
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li><code>git lg</code> affiche le graphe correctement</li>
+          <li><code>git config --global alias.lg</code> retourne la commande configurée</li>
+          <li>Les branches <code>main</code> et <code>develop</code> existent sur GitHub</li>
+          <li>Le README est lisible et structuré</li>
+          <li>La protection de branche est active sur <code>main</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 2.2 -->
+  <div class="tp-card" id="tp2">
+    <div class="tp-card-header">
+      <span class="tp-badge tp2">TP 2.2</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Workflow de branches GitFlow</div>
+        <div class="tp-subtitle">Feature branches, merge --no-ff, historique propre</div>
+      </div>
+      <span class="diff diff-easy">Débutant</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Simuler le travail de deux développeurs en parallèle sur deux features différentes, puis les intégrer dans <code>develop</code>.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Étapes</h4>
+        <ol>
+          <li>Depuis <code>develop</code>, créer la branche <code>feature/project-structure</code></li>
+          <li>Y créer l'arborescence du projet DevCorp :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">mkdir</span> -p frontend backend database scripts
+<span class="fn">touch</span> frontend/.gitkeep backend/.gitkeep
+<span class="fn">touch</span> database/.gitkeep scripts/.gitkeep
+<span class="fn">touch</span> docker-compose.yml .env.example</pre></div>
+          </li>
+          <li>Faire 2 commits distincts (structure + fichiers de config)</li>
+          <li>Depuis <code>develop</code> (sans merger feature/project-structure), créer <code>feature/gitignore</code></li>
+          <li>Y créer un <code>.gitignore</code> complet (celui du cours)</li>
+          <li>Committer sur <code>feature/gitignore</code></li>
+          <li>Merger <code>feature/gitignore</code> dans <code>develop</code> avec <code>--no-ff</code></li>
+          <li>Merger <code>feature/project-structure</code> dans <code>develop</code> avec <code>--no-ff</code></li>
+          <li>Observer le graphe avec <code>git lg</code> — les deux features doivent apparaître comme des "bulles" distinctes</li>
+          <li>Supprimer les deux branches de feature (local + remote)</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Résultat attendu dans git lg</h4>
+        <div class="expected-output">
+          <div class="label">// git lg après les deux merges</div>
+          <pre>*   c3d4e5f (HEAD -> develop) merge: project structure for DevCorp
+|\
+| * b2c3d4e feat(project): add docker-compose and env template
+| * a1b2c3d feat(project): add directory structure
+|/
+*   f6g7h8i merge: gitignore for DevOps project
+|\
+| * e5f6g7h chore: add comprehensive .gitignore
+|/
+* d4e5f6g docs: add project README</pre>
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li><code>git lg</code> montre deux "bulles" de merge distinctes</li>
+          <li>Les branches de feature sont supprimées localement et sur GitHub</li>
+          <li>Le <code>.gitignore</code> contient bien les entrées <code>.env</code> et <code>*.key</code></li>
+          <li>Le fichier <code>.env.example</code> est bien versionné (contrairement à <code>.env</code>)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 2.3 -->
+  <div class="tp-card" id="tp3">
+    <div class="tp-card-header">
+      <span class="tp-badge tp3">TP 2.3</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Rebase interactif & résolution de conflits</div>
+        <div class="tp-subtitle">rebase -i, squash, résolution de conflits, reflog</div>
+      </div>
+      <span class="diff diff-medium">Intermédiaire</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Pratiquer le rebase interactif pour nettoyer un historique "brouillon", résoudre un conflit provoqué volontairement, et récupérer un commit après un reset.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Partie A — Rebase interactif</h4>
+        <ol>
+          <li>Créer la branche <code>feature/scripts-bash</code> depuis <code>develop</code></li>
+          <li>Y déplacer les scripts Bash du Module 1 dans le dossier <code>scripts/</code></li>
+          <li>Faire volontairement 4 commits "sales" :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">git</span> commit -m <span class="st">"add check script"</span>          <span class="cm"># message trop court</span>
+<span class="fn">git</span> commit -m <span class="st">"fix typo"</span>                  <span class="cm"># trivial</span>
+<span class="fn">git</span> commit -m <span class="st">"WIP"</span>                       <span class="cm"># brouillon</span>
+<span class="fn">git</span> commit -m <span class="st">"add all bash scripts"</span>      <span class="cm"># ok</span></pre></div>
+          </li>
+          <li>Nettoyer avec <code>git rebase -i HEAD~4</code> :
+            <ul>
+              <li>Squasher les 3 premiers dans le dernier</li>
+              <li>Réécrire le message final au format conventional commit</li>
+            </ul>
+          </li>
+          <li>Vérifier que <code>git lg</code> ne montre plus qu'un seul commit propre</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Partie B — Conflit volontaire</h4>
+        <ol>
+          <li>Sur <code>develop</code>, modifier la première ligne du <code>README.md</code> et committer</li>
+          <li>Sur <code>feature/scripts-bash</code>, modifier la même ligne différemment et committer</li>
+          <li>Tenter de rebaser <code>feature/scripts-bash</code> sur <code>develop</code> → conflit</li>
+          <li>Résoudre le conflit manuellement, garder les deux contenus fusionnés</li>
+          <li>Continuer le rebase</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Partie C — Récupération avec reflog</h4>
+        <ol>
+          <li>Faire un commit quelconque sur <code>feature/scripts-bash</code></li>
+          <li>Faire un <code>git reset --hard HEAD~1</code> (le commit est "perdu")</li>
+          <li>Retrouver le hash du commit perdu avec <code>git reflog</code></li>
+          <li>Récupérer le commit et le réappliquer</li>
+        </ol>
+      </div>
+      <div class="callout warning">
+        <span>⚠️</span>
+        <div class="callout-body">
+          <div class="callout-title">Important</div>
+          Ne jamais faire de rebase interactif sur des commits déjà poussés sur une branche partagée. Dans ce TP, on travaille exclusivement sur une branche locale avant de pousser.
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li>Les 4 commits sales ont été réduits à 1 commit au format conventional</li>
+          <li>Le conflit a été résolu sans perdre de contenu</li>
+          <li>Le commit "perdu" a été retrouvé et récupéré via reflog</li>
+          <li><code>git lg</code> montre un historique propre</li>
+        </ul>
+      </div>
+      <div class="commit-section">
+        <h5>// Merger quand tout est propre</h5>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">git</span> checkout develop
+<span class="fn">git</span> merge --no-ff feature/scripts-bash -m <span class="st">"merge: bash scripts into project"</span>
+<span class="fn">git</span> branch -d feature/scripts-bash</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 2.4 -->
+  <div class="tp-card" id="tp4">
+    <div class="tp-card-header">
+      <span class="tp-badge tp4">TP 2.4</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Hooks Git & SSH multi-remote — TP de synthèse</div>
+        <div class="tp-subtitle">pre-commit, commit-msg, SSH GitHub + GitLab</div>
+      </div>
+      <span class="diff diff-medium">Intermédiaire</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Partie A — Hooks Git</h4>
+        <ol>
+          <li>Créer le hook <code>pre-commit</code> du cours dans le dépôt <code>devcorp</code></li>
+          <li>Tester qu'il bloque bien un fichier <code>.env</code> stagé :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">echo</span> <span class="st">"DB_PASS=secret"</span> &gt; .env
+<span class="fn">git</span> add .env
+<span class="fn">git</span> commit -m <span class="st">"test"</span>   <span class="cm"># doit être bloqué par le hook</span></pre></div>
+          </li>
+          <li>Créer le hook <code>commit-msg</code> du cours</li>
+          <li>Tester qu'il bloque un message non conforme :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">git</span> commit -m <span class="st">"ajout fichier"</span>                           <span class="cm"># bloqué</span>
+<span class="fn">git</span> commit -m <span class="st">"feat(hooks): add pre-commit and commit-msg"</span>  <span class="cm"># OK</span></pre></div>
+          </li>
+          <li>Créer le dossier <code>.githooks/</code> à la racine, y déplacer les hooks, configurer <code>core.hooksPath</code></li>
+          <li>Versionner le dossier <code>.githooks/</code> dans Git</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Partie B — SSH multi-remote</h4>
+        <ol>
+          <li>Générer deux paires de clés ED25519 (une pour GitHub, une pour GitLab)</li>
+          <li>Configurer <code>~/.ssh/config</code> comme dans le cours</li>
+          <li>Ajouter les clés publiques dans GitHub et GitLab (Settings → SSH Keys)</li>
+          <li>Tester les deux connexions avec <code>ssh -T</code></li>
+          <li>Ajouter le dépôt GitLab comme second remote :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">git</span> remote add gitlab git@gitlab.com:&lt;user&gt;/devcorp.git
+<span class="fn">git</span> push gitlab develop</pre></div>
+          </li>
+          <li>Vérifier que le dépôt est bien mirrored sur GitLab</li>
+        </ol>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li>Le hook <code>pre-commit</code> bloque les fichiers <code>.env</code></li>
+          <li>Le hook <code>commit-msg</code> bloque les messages non conformes</li>
+          <li>Les hooks sont versionnés dans <code>.githooks/</code></li>
+          <li><code>ssh -T git@github.com</code> retourne une authentification réussie</li>
+          <li><code>ssh -T git@gitlab.com</code> retourne une authentification réussie</li>
+          <li>Le dépôt <code>devcorp</code> est visible sur GitLab avec l'historique complet</li>
+        </ul>
+      </div>
+      <div class="commit-section">
+        <h5>// Commits finaux</h5>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">git</span> add .githooks/
+<span class="fn">git</span> commit -m <span class="st">"feat(git): add shared pre-commit and commit-msg hooks"</span>
+<span class="fn">git</span> push origin develop
+<span class="fn">git</span> push gitlab develop</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bottom">
+    <a href="phase0-module2-cours.html">← Retour au cours</a>
+    <a href="phase1-module1-cours.html">Phase 1 · Docker →</a>
+  </div>
+</main>
+</div>
+<script>
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ copié';setTimeout(()=>btn.textContent='copier',2000)})}
+const tps=document.querySelectorAll('.tp-card');
+const items=document.querySelectorAll('.sidebar-item[href^="#"]');
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){const id=en.target.id;items.forEach(i=>i.classList.toggle('active',i.getAttribute('href')==='#'+id))}})},{rootMargin:'-10% 0px -70% 0px'});
+tps.forEach(t=>obs.observe(t));
+</script>
+</body>
+</html>

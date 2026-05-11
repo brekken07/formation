@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P1·M2 TP — Docker Compose | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-hover:#21262d;--bg-code:#161b22;--border:#30363d;--border-bright:#484f58;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#484f58;--accent-green:#3fb950;--accent-blue:#58a6ff;--accent-purple:#bc8cff;--accent-orange:#f0883e;--accent-yellow:#d29922;--accent-red:#f85149;--accent-teal:#39d353;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--sidebar-width:260px;--topbar-height:56px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7}
+.topbar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 24px;height:var(--topbar-height);display:flex;align-items:center;gap:16px;position:fixed;top:0;left:0;right:0;z-index:200}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent-green);text-decoration:none}
+.topbar-sep{color:var(--border-bright)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);font-family:var(--mono);flex:1}
+.breadcrumb a{color:var(--text-secondary);text-decoration:none}.breadcrumb .current{color:var(--accent-orange)}
+.topbar-actions{display:flex;gap:8px;margin-left:auto}
+.btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:6px;text-decoration:none;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-cours{background:rgba(57,211,83,.1);color:var(--accent-teal);border-color:rgba(57,211,83,.3)}.btn-cours:hover{background:rgba(57,211,83,.2)}
+.btn-nav{background:transparent;color:var(--text-secondary);border-color:var(--border)}.btn-nav:hover{background:var(--bg-hover);color:var(--text-primary)}
+.layout{display:flex;padding-top:var(--topbar-height);min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:var(--bg-secondary);border-right:1px solid var(--border);position:fixed;top:var(--topbar-height);left:0;bottom:0;overflow-y:auto;padding:24px 0}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-section{padding:0 16px;margin-bottom:24px}
+.sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 8px;margin-bottom:8px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:all .15s}
+.sidebar-item:hover{background:var(--bg-hover);color:var(--text-primary)}.sidebar-item.active{background:rgba(240,136,62,.1);color:var(--accent-orange)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border-bright);flex-shrink:0}
+.tp-num{font-family:var(--mono);font-size:10px;background:var(--bg-card);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--text-muted);margin-left:auto}
+.sidebar-item.active .tp-num{background:rgba(240,136,62,.15);border-color:rgba(240,136,62,.3);color:var(--accent-orange)}
+.sidebar-divider{height:1px;background:var(--border);margin:12px 16px}
+.content{margin-left:var(--sidebar-width);flex:1;max-width:860px;padding:48px 56px}
+.module-header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.module-path{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.module-title{font-size:28px;font-weight:600;line-height:1.2;margin-bottom:12px}
+.module-title span{color:var(--accent-teal)}
+.module-desc{color:var(--text-secondary);font-size:15px;margin-bottom:20px}
+.module-meta{display:flex;gap:20px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text-muted)}.meta-item .val{color:var(--text-secondary)}
+.intro-box{background:rgba(240,136,62,.06);border:1px solid rgba(240,136,62,.2);border-left:3px solid var(--accent-orange);border-radius:8px;padding:20px 24px;margin-bottom:40px}
+.intro-box h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-orange);margin-bottom:12px}
+.intro-box p{font-size:14px;color:var(--text-secondary);margin-bottom:8px}.intro-box p:last-child{margin-bottom:0}
+.intro-box code{font-family:var(--mono);font-size:12px;background:var(--bg-card);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.tp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:40px;overflow:hidden;scroll-margin-top:80px}
+.tp-card-header{background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;gap:16px}
+.tp-badge{font-family:var(--mono);font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.tp1{background:rgba(88,166,255,.12);color:var(--accent-blue);border:1px solid rgba(88,166,255,.3)}
+.tp2{background:rgba(63,185,80,.12);color:var(--accent-green);border:1px solid rgba(63,185,80,.3)}
+.tp3{background:rgba(188,140,255,.12);color:var(--accent-purple);border:1px solid rgba(188,140,255,.3)}
+.tp4{background:rgba(240,136,62,.12);color:var(--accent-orange);border:1px solid rgba(240,136,62,.3)}
+.tp-header-text{flex:1}
+.tp-title{font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.tp-subtitle{font-size:13px;color:var(--text-secondary)}
+.diff{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid;white-space:nowrap}
+.diff-easy{color:var(--accent-green);border-color:rgba(63,185,80,.3);background:rgba(63,185,80,.06)}
+.diff-medium{color:var(--accent-yellow);border-color:rgba(210,153,34,.3);background:rgba(210,153,34,.06)}
+.diff-hard{color:var(--accent-red);border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.06)}
+.tp-body{padding:28px}
+.tp-section{margin-bottom:28px}
+.tp-section h4{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tp-section h4::before{content:'';width:3px;height:16px;background:var(--accent-teal);border-radius:2px;flex-shrink:0}
+.tp-section p{font-size:14px;color:var(--text-secondary);margin-bottom:12px;line-height:1.7}
+.tp-section p code,.tp-section li code{font-family:var(--mono);font-size:12px;background:var(--bg-secondary);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.tp-section ul,.tp-section ol{padding-left:20px;display:flex;flex-direction:column;gap:8px;color:var(--text-secondary);font-size:14px}
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.code-lang{font-family:var(--mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.code-copy{font-family:var(--mono);font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}.code-copy:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.code-block pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--text-primary)}
+.cm{color:#6e7681;font-style:italic}.fn{color:var(--accent-blue)}.st{color:#a5d6ff}.va{color:var(--accent-purple)}.kw{color:#ff7b72}
+.expected-output{background:#010409;border:1px solid var(--border);border-left:3px solid var(--accent-green);border-radius:8px;padding:16px;margin:12px 0}
+.expected-output .label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--accent-green);margin-bottom:10px}
+.expected-output pre{font-family:var(--mono);font-size:12px;color:#7ee787;line-height:1.6;white-space:pre-wrap}
+.validation-box{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:18px 22px;margin-top:20px}
+.validation-box h5{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--accent-green);margin-bottom:12px}
+.validation-box ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.validation-box li{font-size:13px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px}
+.validation-box li::before{content:'☐';color:var(--text-muted);font-family:var(--mono);flex-shrink:0}
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;display:flex;gap:10px;font-size:13px}
+.callout-body{flex:1;color:var(--text-secondary)}
+.callout-title{font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.callout.warning{background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.2)}.callout.warning .callout-title{color:var(--accent-yellow)}
+.callout.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)}.callout.tip .callout-title{color:var(--accent-green)}
+.callout.info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2)}.callout.info .callout-title{color:var(--accent-blue)}
+.callout.danger{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2)}.callout.danger .callout-title{color:var(--accent-red)}
+.commit-section{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-top:16px}
+.commit-section h5{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:32px;border-top:1px solid var(--border)}
+.nav-bottom a{font-family:var(--mono);font-size:12px;color:var(--text-secondary);text-decoration:none;padding:10px 16px;border:1px solid var(--border);border-radius:8px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.nav-bottom a:hover{border-color:var(--border-bright);color:var(--text-primary);background:var(--bg-hover)}
+.phase-end{background:rgba(57,211,83,.05);border:1px solid rgba(57,211,83,.2);border-radius:12px;padding:28px;margin-top:48px;text-align:center}
+.phase-end h3{font-size:18px;font-weight:600;color:var(--accent-teal);margin-bottom:8px}
+.phase-end p{font-size:14px;color:var(--text-secondary)}
+</style>
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a><span class="topbar-sep">›</span>
+    <a href="#">Phase 1</a><span class="topbar-sep">›</span>
+    <span class="current">M2 · Docker Compose · TP</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase1-module2-cours.html" class="btn btn-cours">📖 Retour au cours</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Cahier de TP</div>
+    <a href="#tp1" class="sidebar-item active"><span class="dot" style="background:var(--accent-blue)"></span>TP 4.1 — Premier Compose<span class="tp-num">01</span></a>
+    <a href="#tp2" class="sidebar-item"><span class="dot" style="background:var(--accent-green)"></span>TP 4.2 — DevCorp complet<span class="tp-num">02</span></a>
+    <a href="#tp3" class="sidebar-item"><span class="dot" style="background:var(--accent-purple)"></span>TP 4.3 — Dev vs Prod<span class="tp-num">03</span></a>
+    <a href="#tp4" class="sidebar-item"><span class="dot" style="background:var(--accent-orange)"></span>TP 4.4 — Synthèse Phase 1<span class="tp-num">04</span></a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Navigation</div>
+    <a href="phase1-module2-cours.html" class="sidebar-item"><span class="dot"></span>Retour au cours</a>
+    <a href="phase1-module1-tp.html" class="sidebar-item"><span class="dot"></span>← TP Docker</a>
+    <a href="index.html" class="sidebar-item"><span class="dot"></span>Dashboard</a>
+  </div>
+</aside>
+<main class="content">
+  <div class="module-header">
+    <div class="module-path">phase-1 / module-2 / travaux-pratiques</div>
+    <h1 class="module-title">Cahier de TP — <span>Docker Compose</span></h1>
+    <p class="module-desc">4 exercices pour passer des commandes manuelles à un fichier déclaratif — et clore la Phase 1.</p>
+    <div class="module-meta">
+      <span class="meta-item">⚡ <span class="val">4 exercices</span></span>
+      <span class="meta-item">⏱ <span class="val">~4h</span></span>
+      <span class="meta-item">📦 <span class="val">Dépôt : devcorp/</span></span>
+    </div>
+  </div>
+
+  <div class="intro-box">
+    <h4>// Contexte</h4>
+    <p>Tu as la stack DevCorp qui tourne avec des commandes <code>docker run</code> manuelles. L'objectif de ces TP est de tout migrer vers Compose, d'ajouter les healthchecks, de séparer les environnements dev et prod, puis de conclure la Phase 1 avec une stack 100 % reproductible en une commande.</p>
+    <p>Point de départ : le dossier <code>devcorp/</code> avec <code>backend/</code>, <code>frontend/</code>, <code>database/</code> et <code>scripts/</code> déjà en place depuis les TP précédents.</p>
+  </div>
+
+  <!-- TP 4.1 -->
+  <div class="tp-card" id="tp1">
+    <div class="tp-card-header">
+      <span class="tp-badge tp1">TP 4.1</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Découverte de Compose — stack minimale</div>
+        <div class="tp-subtitle">Premier docker-compose.yml, commandes de base</div>
+      </div>
+      <span class="diff diff-easy">Débutant</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Écrire un premier <code>docker-compose.yml</code> simple avec deux services (backend + base de données), sans healthcheck ni configuration avancée. L'objectif est de comprendre la syntaxe de base et les commandes fondamentales.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Étapes</h4>
+        <ol>
+          <li>Arrêter tous les conteneurs lancés manuellement dans les TP précédents</li>
+          <li>À la racine du projet, créer <code>docker-compose.yml</code> avec deux services : <code>database</code> (postgres:15-alpine) et <code>backend</code> (build depuis <code>./backend</code>)</li>
+          <li>Configurer les variables d'environnement nécessaires directement dans le fichier (pas de <code>.env</code> encore)</li>
+          <li>Définir un réseau <code>devcorp-net</code> et un volume <code>db-data</code></li>
+          <li>Tester les commandes essentielles :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> compose config          <span class="cm"># valider le YAML</span>
+<span class="fn">docker</span> compose up -d           <span class="cm"># démarrer</span>
+<span class="fn">docker</span> compose ps              <span class="cm"># état des services</span>
+<span class="fn">docker</span> compose logs -f backend <span class="cm"># logs en temps réel</span>
+<span class="fn">docker</span> compose exec backend sh <span class="cm"># entrer dans le conteneur</span>
+<span class="fn">docker</span> compose down            <span class="cm"># arrêter et nettoyer</span></pre></div>
+          </li>
+          <li>Observer la différence entre <code>down</code> (volume conservé) et <code>down -v</code> (volume supprimé)</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Résultat attendu</h4>
+        <div class="expected-output">
+          <div class="label">// docker compose ps</div>
+          <pre>NAME               IMAGE                    COMMAND                  SERVICE    CREATED         STATUS
+devcorp-backend    devcorp-backend:1.0.0    "uvicorn app.main..."    backend    2 minutes ago   Up 2 minutes
+devcorp-db         postgres:15-alpine       "docker-entrypoint..."   database   2 minutes ago   Up 2 minutes</pre>
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li><code>docker compose config</code> ne retourne aucune erreur</li>
+          <li>Les deux services démarrent avec <code>up -d</code></li>
+          <li><code>curl http://localhost:8000/health</code> répond <code>{"status":"ok"}</code></li>
+          <li>Le backend atteint la DB par son nom de service (<code>ping database</code> depuis le conteneur)</li>
+          <li>Le volume <code>db-data</code> survit à un <code>down</code> mais pas à <code>down -v</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 4.2 -->
+  <div class="tp-card" id="tp2">
+    <div class="tp-card-header">
+      <span class="tp-badge tp2">TP 4.2</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Stack DevCorp complète avec healthchecks</div>
+        <div class="tp-subtitle">3 services, depends_on conditionnel, fichier .env</div>
+      </div>
+      <span class="diff diff-medium">Intermédiaire</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Écrire le fichier Compose de production de DevCorp : les 3 services complets (database, backend, frontend), avec healthchecks sur chacun, dépendances conditionnelles, et toutes les variables sensibles dans un fichier <code>.env</code>.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Étapes</h4>
+        <ol>
+          <li>Créer le fichier <code>.env</code> avec toutes les variables du projet (voir cours) et ajouter <code>.env</code> au <code>.gitignore</code></li>
+          <li>Créer <code>.env.example</code> avec les clés mais sans valeurs sensibles, et le versionner</li>
+          <li>Réécrire <code>docker-compose.yml</code> avec :
+            <ul>
+              <li>Les 3 services : <code>database</code>, <code>backend</code>, <code>frontend</code></li>
+              <li>Un healthcheck sur chaque service (pg_isready pour la DB, curl /health pour le backend, curl / pour le frontend)</li>
+              <li>Des <code>depends_on</code> avec <code>condition: service_healthy</code> dans la chaîne</li>
+              <li>Toutes les variables d'environnement depuis <code>${VAR}</code></li>
+              <li>Le port 80 exposé uniquement pour le frontend</li>
+              <li>Le backend lié sur <code>127.0.0.1:8000</code> (pas accessible de l'extérieur)</li>
+            </ul>
+          </li>
+          <li>Lancer et observer le démarrage ordonné :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> compose up           <span class="cm"># sans -d pour voir les logs</span>
+<span class="cm"># Observer : database healthy → backend démarre → backend healthy → frontend démarre</span></pre></div>
+          </li>
+          <li>Vérifier les health statuts :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> compose ps
+<span class="cm"># STATUS doit afficher "Up X minutes (healthy)" pour chaque service</span>
+<span class="fn">docker</span> inspect devcorp-backend --format <span class="st">'{{.State.Health.Status}}'</span></pre></div>
+          </li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Résultat attendu</h4>
+        <div class="expected-output">
+          <div class="label">// docker compose ps après démarrage complet</div>
+          <pre>NAME                IMAGE                      STATUS
+devcorp-db          postgres:15-alpine         Up 3 minutes (healthy)
+devcorp-backend     devcorp-backend:1.0.0      Up 2 minutes (healthy)
+devcorp-frontend    devcorp-frontend:1.0.0     Up 1 minute  (healthy)</pre>
+        </div>
+      </div>
+      <div class="callout warning">
+        <span>⚠️</span>
+        <div class="callout-body">
+          <div class="callout-title">start_period pour PostgreSQL</div>
+          PostgreSQL peut mettre 10 à 30 secondes à accepter des connexions au premier démarrage (initialisation du cluster). Mets <code>start_period: 30s</code> pour éviter que le healthcheck déclare la DB "unhealthy" prématurément.
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li>Les 3 services affichent <code>(healthy)</code> dans <code>docker compose ps</code></li>
+          <li>La page frontend est accessible sur le port 80</li>
+          <li>Le port 8000 n'est PAS accessible depuis l'extérieur (seulement 127.0.0.1)</li>
+          <li>Aucune valeur sensible n'est en dur dans <code>docker-compose.yml</code></li>
+          <li><code>.env</code> est dans le <code>.gitignore</code>, <code>.env.example</code> est versionné</li>
+          <li>Tuer la DB (<code>docker compose stop database</code>) puis la relancer sans recréer backend/frontend</li>
+        </ul>
+      </div>
+      <div class="commit-section">
+        <h5>// Commits attendus</h5>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">git</span> add docker-compose.yml .env.example
+<span class="fn">git</span> commit -m <span class="st">"feat(compose): add full 3-tier stack with healthchecks"</span>
+<span class="fn">git</span> push origin develop</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 4.3 -->
+  <div class="tp-card" id="tp3">
+    <div class="tp-card-header">
+      <span class="tp-badge tp3">TP 4.3</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Environnements dev vs prod</div>
+        <div class="tp-subtitle">Override, bind mount hot-reload, profils, Adminer</div>
+      </div>
+      <span class="diff diff-medium">Intermédiaire</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Mettre en place un workflow dev confortable : hot-reload du code sans rebuild d'image, outils de debug additionnels (Adminer pour la DB), et profils Compose pour activer/désactiver des services.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Partie A — Surcharge dev</h4>
+        <ol>
+          <li>Créer <code>docker-compose.override.yml</code> qui :
+            <ul>
+              <li>Monte le code source <code>./backend/app</code> dans le conteneur (bind mount)</li>
+              <li>Lance uvicorn avec <code>--reload</code></li>
+              <li>Passe <code>APP_ENV=development</code></li>
+              <li>Ajoute le service <code>adminer</code> (image <code>adminer:latest</code>, port 8080) sur le réseau <code>devcorp-net</code></li>
+            </ul>
+          </li>
+          <li>Tester le hot-reload :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> compose up -d
+<span class="cm"># Modifier backend/app/main.py — ajouter un endpoint /version</span>
+<span class="cm"># Observer les logs uvicorn — rechargement automatique</span>
+<span class="fn">curl</span> http://localhost:8000/version
+<span class="cm"># Doit répondre sans avoir fait de rebuild</span></pre></div>
+          </li>
+          <li>Vérifier Adminer sur <code>http://localhost:8080</code> — se connecter à la DB DevCorp</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Partie B — Lancement production</h4>
+        <ol>
+          <li>Lancer sans le fichier override (comme en prod) :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> compose down
+<span class="fn">docker</span> compose -f docker-compose.yml up -d
+<span class="cm"># Adminer ne doit pas être présent</span>
+<span class="cm"># Hot-reload désactivé</span>
+<span class="fn">docker</span> compose ps   <span class="cm"># seulement 3 services, pas adminer</span></pre></div>
+          </li>
+          <li>Valider que <code>docker compose config</code> diffère selon le mode (avec ou sans override)</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Partie C — Profils</h4>
+        <ol>
+          <li>Ajouter un service <code>mailhog</code> (image <code>mailhog/mailhog</code>) avec le profil <code>debug</code> dans l'override</li>
+          <li>Tester :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> compose up -d                    <span class="cm"># mailhog absent</span>
+<span class="fn">docker</span> compose --profile debug up -d   <span class="cm"># mailhog présent</span></pre></div>
+          </li>
+        </ol>
+      </div>
+      <div class="callout tip">
+        <span>💡</span>
+        <div class="callout-body">
+          <div class="callout-title">Posture formateur — ce pattern est universel</div>
+          Le couple <code>docker-compose.yml</code> + <code>docker-compose.override.yml</code> est le standard que tu retrouveras dans tous les projets professionnels. C'est aussi exactement ce que fait GitLab CI quand il lance des services additionnels pendant les pipelines.
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li>Modifier <code>main.py</code> déclenche le hot-reload sans rebuild</li>
+          <li>Adminer est accessible sur :8080 en mode dev, absent en mode prod</li>
+          <li>Le mode prod ne charge pas l'override (vérifier avec <code>docker compose config</code>)</li>
+          <li>Le profil <code>debug</code> démarre mailhog, le mode normal non</li>
+        </ul>
+      </div>
+      <div class="commit-section">
+        <h5>// Commit</h5>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">git</span> add docker-compose.override.yml
+<span class="fn">git</span> commit -m <span class="st">"feat(compose): add dev override with hot-reload and Adminer"</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 4.4 -->
+  <div class="tp-card" id="tp4">
+    <div class="tp-card-header">
+      <span class="tp-badge tp4">TP 4.4</span>
+      <div class="tp-header-text">
+        <div class="tp-title">TP de synthèse Phase 1 — DevCorp containerisé</div>
+        <div class="tp-subtitle">Consolidation complète, script de déploiement Compose, vérification finale</div>
+      </div>
+      <span class="diff diff-hard">Avancé</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Consolider tout le travail de la Phase 1 en un projet propre, documenté et reproductible. À la fin de ce TP, n'importe qui avec Docker installé doit pouvoir cloner le dépôt et lancer la stack en moins de 5 minutes.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Partie A — Nettoyage et consolidation</h4>
+        <ol>
+          <li>Vérifier que tous les Dockerfiles ont un <code>.dockerignore</code> associé</li>
+          <li>Vérifier que toutes les images utilisent un utilisateur non-root</li>
+          <li>Vérifier que <code>.env</code> est dans le <code>.gitignore</code> et que <code>.env.example</code> est complet</li>
+          <li>Tagger les images avec la version <code>1.0.0</code> :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> compose build
+<span class="fn">docker</span> images | grep devcorp  <span class="cm"># vérifier les tags</span></pre></div>
+          </li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Partie B — Script de déploiement Compose</h4>
+        <p>Créer <code>scripts/deploy.sh</code> qui remplace l'ancien <code>stack.sh</code> du TP Docker. Ce script doit :</p>
+        <ul>
+          <li>Vérifier que <code>docker</code> et <code>docker compose</code> sont installés</li>
+          <li>Vérifier que le fichier <code>.env</code> existe (sinon afficher un message d'aide)</li>
+          <li>Faire un <code>docker compose pull</code> si les images ne sont pas à construire localement</li>
+          <li>Lancer <code>docker compose up -d --build</code></li>
+          <li>Attendre que tous les services soient <code>healthy</code> (boucle de vérification)</li>
+          <li>Afficher un résumé : URLs accessibles, état des services</li>
+        </ul>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash — structure du script</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre>#!/bin/bash
+set -euo pipefail
+
+<span class="cm"># Fonctions log</span>
+log_info()  { echo -e "\033[0;32m[INFO]\033[0m  $*"; }
+log_error() { echo -e "\033[0;31m[ERROR]\033[0m $*" >&2; }
+log_warn()  { echo -e "\033[0;33m[WARN]\033[0m  $*"; }
+
+<span class="cm"># Vérifications prérequis</span>
+check_requirements() { ... }
+
+<span class="cm"># Attendre que tous les services soient healthy</span>
+wait_for_healthy() {
+    local max_wait=120
+    local waited=0
+    while [[ $waited -lt $max_wait ]]; do
+        <span class="cm"># docker inspect --format ... pour vérifier le health status</span>
+        ...
+    done
+}
+
+<span class="cm"># Déploiement</span>
+deploy() { ... }
+
+<span class="cm"># Résumé</span>
+show_summary() { ... }
+
+main() {
+    check_requirements
+    deploy
+    wait_for_healthy
+    show_summary
+}
+
+main "$@"</pre></div>
+      </div>
+      <div class="tp-section">
+        <h4>Partie C — Documentation</h4>
+        <ol>
+          <li>Mettre à jour le <code>README.md</code> avec une section "Démarrage rapide" :
+            <ul>
+              <li>Prérequis (Docker Engine 20.10+)</li>
+              <li>Cloner le dépôt</li>
+              <li>Copier <code>.env.example</code> en <code>.env</code> et remplir les valeurs</li>
+              <li>Lancer <code>./scripts/deploy.sh</code></li>
+              <li>URLs des services</li>
+            </ul>
+          </li>
+          <li>Ajouter une section "Architecture" avec un schéma ASCII de la stack</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Partie D — Test de reproductibilité</h4>
+        <p>Le test final : simuler un déploiement depuis zéro.</p>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="cm"># 1. Tout nettoyer (images, conteneurs, volumes)</span>
+<span class="fn">docker</span> compose down -v
+<span class="fn">docker</span> rmi devcorp-backend:1.0.0 devcorp-frontend:1.0.0 2>/dev/null || true
+<span class="fn">docker</span> system prune -f
+
+<span class="cm"># 2. Repartir de zéro</span>
+<span class="fn">./scripts/deploy.sh</span>
+
+<span class="cm"># 3. Vérifier que tout fonctionne</span>
+<span class="fn">curl</span> http://localhost/           <span class="cm"># frontend</span>
+<span class="fn">curl</span> http://localhost:8000/health <span class="cm"># backend</span>
+<span class="fn">docker</span> compose ps                 <span class="cm"># tous healthy</span></pre></div>
+      </div>
+      <div class="callout info">
+        <span>ℹ️</span>
+        <div class="callout-body">
+          <div class="callout-title">Phase 1 terminée — ce que tu as construit</div>
+          Tu as une application 3-tiers entièrement conteneurisée, avec des Dockerfiles optimisés, des healthchecks, une séparation dev/prod, et un déploiement reproductible en une commande. C'est exactement ce que la Phase 2 (CI/CD GitLab) va automatiser sur un pipeline.
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation finale Phase 1</h5>
+        <ul>
+          <li>La stack démarre depuis zéro avec <code>./scripts/deploy.sh</code> sans intervention manuelle</li>
+          <li>Les 3 services sont <code>healthy</code> après démarrage</li>
+          <li>La page frontend est accessible et affiche le statut du backend</li>
+          <li>Le README permet à quelqu'un de démarrer sans te demander d'aide</li>
+          <li>Aucun secret n'est committé dans Git (<code>git log -p | grep PASSWORD</code> ne retourne rien)</li>
+          <li>Les images utilisent des utilisateurs non-root</li>
+          <li>L'historique Git est propre (conventional commits, branches de feature)</li>
+        </ul>
+      </div>
+      <div class="commit-section">
+        <h5>// Commits finaux Phase 1</h5>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">git</span> add scripts/deploy.sh
+<span class="fn">git</span> commit -m <span class="st">"feat(scripts): add Compose-based deploy script"</span>
+
+<span class="fn">git</span> add README.md
+<span class="fn">git</span> commit -m <span class="st">"docs: add quickstart and architecture documentation"</span>
+
+<span class="fn">git</span> push origin develop
+
+<span class="cm"># Merger develop dans main pour marquer la fin de la Phase 1</span>
+<span class="fn">git</span> checkout main
+<span class="fn">git</span> merge --no-ff develop -m <span class="st">"release: Phase 1 — DevCorp containerized stack v1.0.0"</span>
+<span class="fn">git</span> tag -a v1.0.0 -m <span class="st">"Phase 1 complete: Docker + Docker Compose"</span>
+<span class="fn">git</span> push origin main --tags</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-end">
+    <h3>🎉 Phase 1 complète</h3>
+    <p>DevCorp tourne dans des conteneurs, le déploiement est reproductible, le dépôt est propre. La Phase 2 va automatiser tout ça avec un pipeline GitLab CI/CD.</p>
+  </div>
+
+  <div class="nav-bottom">
+    <a href="phase1-module2-cours.html">← Retour au cours</a>
+    <a href="index.html">Dashboard →</a>
+  </div>
+</main>
+</div>
+<script>
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ copié';setTimeout(()=>btn.textContent='copier',2000)})}
+const tps=document.querySelectorAll('.tp-card');
+const items=document.querySelectorAll('.sidebar-item[href^="#"]');
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){const id=en.target.id;items.forEach(i=>i.classList.toggle('active',i.getAttribute('href')==='#'+id))}})},{rootMargin:'-10% 0px -70% 0px'});
+tps.forEach(t=>obs.observe(t));
+</script>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P1·M2 Cours — Docker Compose | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-hover:#21262d;--bg-code:#161b22;--border:#30363d;--border-bright:#484f58;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#484f58;--accent-green:#3fb950;--accent-blue:#58a6ff;--accent-purple:#bc8cff;--accent-orange:#f0883e;--accent-yellow:#d29922;--accent-red:#f85149;--accent-teal:#39d353;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--sidebar-width:260px;--topbar-height:56px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7}
+.topbar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 24px;height:var(--topbar-height);display:flex;align-items:center;gap:16px;position:fixed;top:0;left:0;right:0;z-index:200}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent-green);text-decoration:none}
+.topbar-sep{color:var(--border-bright)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);font-family:var(--mono);flex:1}
+.breadcrumb a{color:var(--text-secondary);text-decoration:none}.breadcrumb a:hover{color:var(--accent-teal)}.breadcrumb .current{color:var(--accent-teal)}
+.topbar-actions{display:flex;gap:8px;margin-left:auto}
+.btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:6px;text-decoration:none;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-tp{background:rgba(240,136,62,.1);color:var(--accent-orange);border-color:rgba(240,136,62,.3)}.btn-tp:hover{background:rgba(240,136,62,.2)}
+.btn-nav{background:transparent;color:var(--text-secondary);border-color:var(--border)}.btn-nav:hover{background:var(--bg-hover);color:var(--text-primary)}
+.layout{display:flex;padding-top:var(--topbar-height);min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:var(--bg-secondary);border-right:1px solid var(--border);position:fixed;top:var(--topbar-height);left:0;bottom:0;overflow-y:auto;padding:24px 0}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-section{padding:0 16px;margin-bottom:24px}
+.sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 8px;margin-bottom:8px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:all .15s}
+.sidebar-item:hover{background:var(--bg-hover);color:var(--text-primary)}.sidebar-item.active{background:rgba(57,211,83,.1);color:var(--accent-teal)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border-bright);flex-shrink:0}.sidebar-item.active .dot{background:var(--accent-teal)}
+.sidebar-divider{height:1px;background:var(--border);margin:12px 16px}
+.content{margin-left:var(--sidebar-width);flex:1;max-width:860px;padding:48px 56px}
+.module-header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.module-path{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.module-title{font-size:28px;font-weight:600;color:var(--text-primary);line-height:1.2;margin-bottom:12px}
+.module-subtitle{color:var(--text-secondary);font-size:15px;margin-bottom:20px}
+.module-meta{display:flex;gap:20px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text-muted)}.meta-item .val{color:var(--text-secondary)}
+.objectives{background:rgba(57,211,83,.06);border:1px solid rgba(57,211,83,.2);border-left:3px solid var(--accent-teal);border-radius:8px;padding:20px 24px;margin-bottom:40px}
+.objectives h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-teal);margin-bottom:12px}
+.objectives ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.objectives ul li{font-size:14px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px}
+.objectives ul li::before{content:'→';color:var(--accent-teal);font-family:var(--mono);flex-shrink:0;margin-top:1px}
+.section{margin-bottom:56px;scroll-margin-top:80px}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.section h2{font-size:20px;font-weight:600;color:var(--text-primary);margin-bottom:16px;line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text-primary);margin-top:32px;margin-bottom:12px}
+.section p{color:var(--text-secondary);margin-bottom:16px;line-height:1.75}
+.section p code,.section li code{font-family:var(--mono);font-size:13px;background:var(--bg-card);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.section ul,.section ol{color:var(--text-secondary);padding-left:20px;margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.code-lang{font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.code-copy{font-family:var(--mono);font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}.code-copy:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.code-block pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--text-primary)}
+.cm{color:#6e7681;font-style:italic}.kw{color:#ff7b72}.fn{color:var(--accent-blue)}.st{color:#a5d6ff}.va{color:var(--accent-purple)}.nu{color:var(--accent-orange)}.sh{color:#6e7681}
+.schema-block{background:#010409;border:1px solid var(--border);border-radius:10px;padding:20px;margin:20px 0;overflow-x:auto}
+.schema-block pre{font-family:var(--mono);font-size:12px;line-height:1.6;color:#7ee787;white-space:pre}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:12px}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}.callout-body{flex:1}
+.callout-title{font-family:var(--mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.callout-body p{font-size:13px;margin-bottom:0;color:var(--text-secondary)}
+.callout.warning{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25)}.callout.warning .callout-title{color:var(--accent-yellow)}
+.callout.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)}.callout.tip .callout-title{color:var(--accent-green)}
+.callout.info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2)}.callout.info .callout-title{color:var(--accent-blue)}
+.callout.danger{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2)}.callout.danger .callout-title{color:var(--accent-red)}
+.summary-table{width:100%;border-collapse:collapse;font-size:13px;margin:20px 0}
+.summary-table th{background:var(--bg-card);color:var(--text-muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:10px 14px;text-align:left;border:1px solid var(--border)}
+.summary-table td{padding:10px 14px;border:1px solid var(--border);color:var(--text-secondary);vertical-align:top}
+.summary-table td:first-child{font-family:var(--mono);color:var(--accent-orange);white-space:nowrap}
+.summary-table tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:32px;border-top:1px solid var(--border)}
+.nav-bottom a{font-family:var(--mono);font-size:12px;color:var(--text-secondary);text-decoration:none;padding:10px 16px;border:1px solid var(--border);border-radius:8px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.nav-bottom a:hover{border-color:var(--border-bright);color:var(--text-primary);background:var(--bg-hover)}
+</style>
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a><span class="topbar-sep">›</span>
+    <a href="#">Phase 1</a><span class="topbar-sep">›</span>
+    <span class="current">M2 · Docker Compose · Cours</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase1-module2-tp.html" class="btn btn-tp">⚡ Aller aux TP</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Phase 1 · M2</div>
+    <a href="#s1" class="sidebar-item active"><span class="dot"></span>Pourquoi Compose ?</a>
+    <a href="#s2" class="sidebar-item"><span class="dot"></span>Structure du fichier</a>
+    <a href="#s3" class="sidebar-item"><span class="dot"></span>Services</a>
+    <a href="#s4" class="sidebar-item"><span class="dot"></span>Réseaux & volumes</a>
+    <a href="#s5" class="sidebar-item"><span class="dot"></span>Variables & .env</a>
+    <a href="#s6" class="sidebar-item"><span class="dot"></span>Healthchecks & depends_on</a>
+    <a href="#s7" class="sidebar-item"><span class="dot"></span>Profils & surcharge</a>
+    <a href="#s8" class="sidebar-item"><span class="dot"></span>Commandes essentielles</a>
+    <a href="#s9" class="sidebar-item"><span class="dot"></span>Récapitulatif</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Navigation</div>
+    <a href="phase1-module2-tp.html" class="sidebar-item"><span class="dot" style="background:var(--accent-orange)"></span>Cahier de TP</a>
+    <a href="phase1-module1-cours.html" class="sidebar-item"><span class="dot"></span>← M1 Docker</a>
+    <a href="index.html" class="sidebar-item"><span class="dot"></span>Dashboard</a>
+  </div>
+</aside>
+<main class="content">
+  <div class="module-header">
+    <div class="module-path">phase-1 / module-2 / cours</div>
+    <h1 class="module-title">Docker Compose</h1>
+    <p class="module-subtitle">Orchestrer des applications multi-conteneurs avec un seul fichier déclaratif.</p>
+    <div class="module-meta">
+      <span class="meta-item">📅 <span class="val">Semaines 4–5</span></span>
+      <span class="meta-item">⏱ <span class="val">~6h</span></span>
+      <span class="meta-item">🎯 <span class="val">Phase 1 · Module 2</span></span>
+      <span class="meta-item">📦 <span class="val">Projet : DevCorp 3-tiers</span></span>
+    </div>
+  </div>
+
+  <div class="objectives">
+    <h4>// Objectifs du module</h4>
+    <ul>
+      <li>Comprendre pourquoi Compose remplace les scripts de démarrage manuels</li>
+      <li>Écrire un fichier <code>docker-compose.yml</code> complet pour DevCorp</li>
+      <li>Gérer les dépendances entre services avec <code>depends_on</code> et healthchecks</li>
+      <li>Séparer la configuration sensible dans des fichiers <code>.env</code></li>
+      <li>Utiliser les surcharges Compose pour les environnements dev/prod</li>
+      <li>Maîtriser les commandes <code>docker compose</code> du quotidien</li>
+    </ul>
+  </div>
+
+  <!-- S1 -->
+  <section class="section" id="s1">
+    <div class="section-num">// 01</div>
+    <h2>Pourquoi Docker Compose ?</h2>
+    <p>Dans le TP précédent, tu as lancé la stack DevCorp avec un script Bash de 80 lignes. C'est fonctionnel — mais pas déclaratif, pas lisible par un collègue, et difficile à maintenir. Docker Compose résout ça.</p>
+
+    <div class="schema-block"><pre>
+AVANT (scripts Bash)                  APRÈS (Docker Compose)
+──────────────────────────────────    ──────────────────────────────────
+docker network create devcorp-net     docker compose up -d
+docker volume create devcorp-db
+docker run -d --name db ...
+docker run -d --name backend ...
+docker run -d --name frontend ...
+(80 lignes de script)
+</pre></div>
+
+    <p>Compose lit un fichier YAML déclaratif (<code>docker-compose.yml</code>) qui décrit l'état désiré de ton application : quels services, sur quels réseaux, avec quels volumes, dans quel ordre. C'est l'Infrastructure as Code appliquée au niveau conteneur.</p>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">Compose V2 — la syntaxe moderne</div>
+        <p>Depuis Docker Desktop 3.4+ et Docker Engine 20.10+, la commande est <code>docker compose</code> (sans tiret). L'ancienne commande <code>docker-compose</code> (avec tiret, version Python) est dépréciée. On utilise exclusivement la V2 dans ce cours.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S2 -->
+  <section class="section" id="s2">
+    <div class="section-num">// 02</div>
+    <h2>Structure du fichier docker-compose.yml</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml — anatomie d'un docker-compose.yml</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># docker-compose.yml — structure générale</span>
+
+<span class="cm"># Pas de "version:" depuis Compose V2 — il est ignoré</span>
+
+<span class="va">services</span>:        <span class="cm"># les conteneurs à lancer</span>
+  <span class="va">database</span>:
+    <span class="cm"># configuration du service...</span>
+
+  <span class="va">backend</span>:
+    <span class="cm"># configuration du service...</span>
+
+  <span class="va">frontend</span>:
+    <span class="cm"># configuration du service...</span>
+
+<span class="va">networks</span>:        <span class="cm"># réseaux à créer</span>
+  <span class="va">devcorp-net</span>:
+    <span class="va">driver</span>: bridge
+
+<span class="va">volumes</span>:         <span class="cm"># volumes à créer</span>
+  <span class="va">db-data</span>:
+  <span class="va">backend-logs</span>:</pre>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <div class="callout-title">YAML — les pièges classiques</div>
+        <p>YAML est sensible à l'indentation (2 espaces, jamais de tabulations). Les listes commencent par <code>-</code>. Les chaînes avec des caractères spéciaux (<code>:</code>, <code>#</code>) doivent être entre guillemets. En cas de doute, valide avec <code>docker compose config</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S3 -->
+  <section class="section" id="s3">
+    <div class="section-num">// 03</div>
+    <h2>Services — configuration complète</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml — docker-compose.yml DevCorp</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="va">services</span>:
+
+  <span class="cm"># ── Base de données ─────────────────────────────────────────</span>
+  <span class="va">database</span>:
+    <span class="va">image</span>: postgres:15-alpine          <span class="cm"># image depuis le registry</span>
+    <span class="va">container_name</span>: devcorp-db         <span class="cm"># nom fixe du conteneur</span>
+    <span class="va">restart</span>: unless-stopped
+    <span class="va">environment</span>:
+      POSTGRES_USER: <span class="st">${DB_USER}</span>        <span class="cm"># depuis le .env</span>
+      POSTGRES_PASSWORD: <span class="st">${DB_PASSWORD}</span>
+      POSTGRES_DB: <span class="st">${DB_NAME}</span>
+    <span class="va">volumes</span>:
+      - db-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  <span class="cm"># init au démarrage</span>
+    <span class="va">networks</span>:
+      - devcorp-net
+    <span class="va">healthcheck</span>:
+      <span class="va">test</span>: [<span class="st">"CMD-SHELL"</span>, <span class="st">"pg_isready -U ${DB_USER} -d ${DB_NAME}"</span>]
+      <span class="va">interval</span>: 10s
+      <span class="va">timeout</span>: 5s
+      <span class="va">retries</span>: 5
+      <span class="va">start_period</span>: 30s
+
+  <span class="cm"># ── Backend ─────────────────────────────────────────────────</span>
+  <span class="va">backend</span>:
+    <span class="va">build</span>:
+      <span class="va">context</span>: ./backend              <span class="cm"># dossier contenant le Dockerfile</span>
+      <span class="va">dockerfile</span>: Dockerfile
+      <span class="va">args</span>:
+        APP_VERSION: <span class="st">${APP_VERSION:-1.0.0}</span>
+    <span class="va">image</span>: devcorp-backend:<span class="st">${APP_VERSION:-1.0.0}</span>
+    <span class="va">container_name</span>: devcorp-backend
+    <span class="va">restart</span>: unless-stopped
+    <span class="va">environment</span>:
+      APP_ENV: <span class="st">${APP_ENV:-production}</span>
+      DB_HOST: database                 <span class="cm"># nom du service = nom DNS interne</span>
+      DB_PORT: <span class="st">"5432"</span>
+      DB_USER: <span class="st">${DB_USER}</span>
+      DB_PASSWORD: <span class="st">${DB_PASSWORD}</span>
+      DB_NAME: <span class="st">${DB_NAME}</span>
+    <span class="va">ports</span>:
+      - <span class="st">"127.0.0.1:8000:8000"</span>          <span class="cm"># bind sur localhost seulement (sécurité)</span>
+    <span class="va">depends_on</span>:
+      <span class="va">database</span>:
+        <span class="va">condition</span>: service_healthy    <span class="cm"># attend que la DB soit prête</span>
+    <span class="va">networks</span>:
+      - devcorp-net
+    <span class="va">volumes</span>:
+      - backend-logs:/app/logs
+    <span class="va">healthcheck</span>:
+      <span class="va">test</span>: [<span class="st">"CMD-SHELL"</span>, <span class="st">"curl -sf http://localhost:8000/health || exit 1"</span>]
+      <span class="va">interval</span>: 15s
+      <span class="va">timeout</span>: 5s
+      <span class="va">retries</span>: 3
+
+  <span class="cm"># ── Frontend ────────────────────────────────────────────────</span>
+  <span class="va">frontend</span>:
+    <span class="va">build</span>:
+      <span class="va">context</span>: ./frontend
+    <span class="va">image</span>: devcorp-frontend:<span class="st">${APP_VERSION:-1.0.0}</span>
+    <span class="va">container_name</span>: devcorp-frontend
+    <span class="va">restart</span>: unless-stopped
+    <span class="va">ports</span>:
+      - <span class="st">"80:80"</span>
+      - <span class="st">"443:443"</span>
+    <span class="va">depends_on</span>:
+      <span class="va">backend</span>:
+        <span class="va">condition</span>: service_healthy
+    <span class="va">networks</span>:
+      - devcorp-net
+
+<span class="va">networks</span>:
+  <span class="va">devcorp-net</span>:
+    <span class="va">driver</span>: bridge
+
+<span class="va">volumes</span>:
+  <span class="va">db-data</span>:
+  <span class="va">backend-logs</span>:</pre>
+    </div>
+  </section>
+
+  <!-- S4 -->
+  <section class="section" id="s4">
+    <div class="section-num">// 04</div>
+    <h2>Réseaux & volumes dans Compose</h2>
+    <p>Compose crée automatiquement un réseau par défaut pour ton projet (nommé <code>&lt;projet&gt;_default</code>). Il est recommandé de définir explicitement tes réseaux pour plus de contrôle et de clarté.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml — réseaux avancés</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="va">networks</span>:
+  <span class="cm"># Réseau interne — pas d'accès à internet</span>
+  <span class="va">backend-net</span>:
+    <span class="va">internal</span>: true          <span class="cm"># les conteneurs ne peuvent pas sortir sur internet</span>
+
+  <span class="cm"># Réseau externe existant (créé en dehors de Compose)</span>
+  <span class="va">monitoring-net</span>:
+    <span class="va">external</span>: true           <span class="cm"># Compose ne le crée pas, il l'utilise</span>
+
+  <span class="cm"># Réseau avec configuration IP fixe</span>
+  <span class="va">devcorp-net</span>:
+    <span class="va">driver</span>: bridge
+    <span class="va">ipam</span>:
+      <span class="va">config</span>:
+        - <span class="va">subnet</span>: 172.20.0.0/16</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml — volumes avancés</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="va">volumes</span>:
+  <span class="cm"># Volume nommé simple (géré par Docker)</span>
+  <span class="va">db-data</span>:
+
+  <span class="cm"># Volume avec driver spécifique (NFS, cloud...)</span>
+  <span class="va">shared-data</span>:
+    <span class="va">driver</span>: local
+    <span class="va">driver_opts</span>:
+      <span class="va">type</span>: nfs
+      <span class="va">o</span>: addr=192.168.1.100,rw
+      <span class="va">device</span>: :/exports/data
+
+  <span class="cm"># Volume externe (créé en dehors de Compose)</span>
+  <span class="va">existing-data</span>:
+    <span class="va">external</span>: true</pre>
+    </div>
+  </section>
+
+  <!-- S5 -->
+  <section class="section" id="s5">
+    <div class="section-num">// 05</div>
+    <h2>Variables d'environnement & fichiers .env</h2>
+    <p>Ne jamais mettre de valeurs sensibles en dur dans le <code>docker-compose.yml</code>. Compose charge automatiquement un fichier <code>.env</code> à la racine du projet.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — .env (ne pas versionner)</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># .env — chargé automatiquement par docker compose</span>
+<span class="cm"># Ne JAMAIS committer ce fichier</span>
+
+APP_VERSION=1.0.0
+APP_ENV=production
+
+DB_USER=devcorp
+DB_PASSWORD=changeme_in_prod_please
+DB_NAME=devcorp
+
+POSTGRES_HOST_AUTH_METHOD=scram-sha-256</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — .env.example (à versionner)</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># .env.example — template sans valeurs sensibles</span>
+<span class="cm"># Copier en .env et remplir les valeurs</span>
+
+APP_VERSION=1.0.0
+APP_ENV=production
+
+DB_USER=devcorp
+DB_PASSWORD=           <span class="cm"># à remplir</span>
+DB_NAME=devcorp</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml — syntaxe des variables dans Compose</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="va">services</span>:
+  <span class="va">backend</span>:
+    <span class="va">environment</span>:
+      <span class="cm"># Passer la variable depuis l'environnement hôte ou .env</span>
+      DB_PASSWORD: <span class="st">${DB_PASSWORD}</span>
+
+      <span class="cm"># Avec valeur par défaut si non définie</span>
+      APP_ENV: <span class="st">${APP_ENV:-production}</span>
+
+      <span class="cm"># Valeur fixe (ok pour les non-sensibles)</span>
+      PYTHONUNBUFFERED: <span class="st">"1"</span>
+
+    <span class="cm"># Ou charger depuis un fichier .env spécifique</span>
+    <span class="va">env_file</span>:
+      - .env
+      - .env.local          <span class="cm"># surcharge locale (prioritaire)</span></pre>
+    </div>
+
+    <div class="callout danger">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">Secrets en production</div>
+        <p>Les fichiers <code>.env</code> sont pratiques en dev mais insuffisants en production — le fichier peut être lu par quiconque a accès au serveur. En production, on utilisera HashiCorp Vault ou les secrets Kubernetes. C'est l'objet de la Phase 6.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S6 -->
+  <section class="section" id="s6">
+    <div class="section-num">// 06</div>
+    <h2>Healthchecks & depends_on</h2>
+    <p>Le problème classique : le backend démarre avant que la base de données soit prête et plante immédiatement. Sans healthcheck, <code>depends_on</code> attend seulement que le conteneur soit <em>démarré</em> — pas qu'il soit <em>prêt</em>.</p>
+
+    <div class="schema-block"><pre>
+SANS healthcheck                      AVEC healthcheck
+──────────────────────────────────    ──────────────────────────────────
+DB démarre (process lancé)            DB démarre
+Backend démarre immédiatement         DB → healthcheck toutes les 10s
+Backend tente de connecter à DB       DB → healthy (pg_isready OK)
+DB pas encore prête → ERREUR          Backend démarre (condition: healthy)
+Backend crash (restart loop)          Backend → connexion DB réussie ✓
+</pre></div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml — healthchecks complets</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="va">services</span>:
+  <span class="va">database</span>:
+    <span class="va">image</span>: postgres:15-alpine
+    <span class="va">healthcheck</span>:
+      <span class="va">test</span>: [<span class="st">"CMD-SHELL"</span>, <span class="st">"pg_isready -U ${DB_USER}"</span>]
+      <span class="va">interval</span>: 10s      <span class="cm"># fréquence des vérifications</span>
+      <span class="va">timeout</span>: 5s        <span class="cm"># délai max pour une vérification</span>
+      <span class="va">retries</span>: 5         <span class="cm"># nombre d'échecs avant "unhealthy"</span>
+      <span class="va">start_period</span>: 30s  <span class="cm"># délai avant le premier check (démarrage lent)</span>
+
+  <span class="va">backend</span>:
+    <span class="va">depends_on</span>:
+      <span class="va">database</span>:
+        <span class="va">condition</span>: service_healthy   <span class="cm"># attend healthy, pas juste started</span>
+    <span class="va">healthcheck</span>:
+      <span class="va">test</span>: [<span class="st">"CMD-SHELL"</span>, <span class="st">"curl -sf http://localhost:8000/health"</span>]
+      <span class="va">interval</span>: 15s
+      <span class="va">timeout</span>: 3s
+      <span class="va">retries</span>: 3
+
+  <span class="va">frontend</span>:
+    <span class="va">depends_on</span>:
+      <span class="va">backend</span>:
+        <span class="va">condition</span>: service_healthy</pre>
+    </div>
+  </section>
+
+  <!-- S7 -->
+  <section class="section" id="s7">
+    <div class="section-num">// 07</div>
+    <h2>Profils & surcharge de fichiers</h2>
+    <p>En développement, on veut des outils supplémentaires (Adminer pour voir la DB, logs en mode debug). En production, on veut des réglages plus stricts. Compose gère ça avec les profils et la surcharge de fichiers.</p>
+
+    <h3>Surcharge avec docker-compose.override.yml</h3>
+    <p>Compose charge automatiquement <code>docker-compose.yml</code> puis <code>docker-compose.override.yml</code> et fusionne les deux. C'est le mécanisme standard pour les différences dev/prod.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml — docker-compose.override.yml (dev uniquement)</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># docker-compose.override.yml — chargé automatiquement en dev</span>
+<span class="cm"># Ne pas committer si les valeurs sont sensibles</span>
+
+<span class="va">services</span>:
+  <span class="va">backend</span>:
+    <span class="va">build</span>:
+      <span class="va">target</span>: development           <span class="cm"># build stage dev du Dockerfile multi-stage</span>
+    <span class="va">volumes</span>:
+      - ./backend/app:/app            <span class="cm"># bind mount pour hot-reload</span>
+    <span class="va">environment</span>:
+      APP_ENV: development
+    <span class="va">command</span>: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  <span class="cm"># Outil d'administration DB — seulement en dev</span>
+  <span class="va">adminer</span>:
+    <span class="va">image</span>: adminer:latest
+    <span class="va">ports</span>:
+      - <span class="st">"8080:8080"</span>
+    <span class="va">networks</span>:
+      - devcorp-net</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — utilisation selon l'environnement</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Développement (charge compose.yml + override.yml automatiquement)</span>
+<span class="fn">docker</span> compose up -d
+
+<span class="cm"># Production (uniquement le fichier principal)</span>
+<span class="fn">docker</span> compose -f docker-compose.yml up -d
+
+<span class="cm"># Combinaison explicite</span>
+<span class="fn">docker</span> compose -f docker-compose.yml -f docker-compose.prod.yml up -d</pre>
+    </div>
+
+    <h3>Profils — services optionnels</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">yaml</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="va">services</span>:
+  <span class="va">backend</span>:
+    <span class="cm"># pas de profil = toujours démarré</span>
+
+  <span class="va">adminer</span>:
+    <span class="va">image</span>: adminer
+    <span class="va">profiles</span>: [<span class="st">"debug"</span>]       <span class="cm"># démarré seulement avec --profile debug</span>
+
+  <span class="va">mailhog</span>:
+    <span class="va">image</span>: mailhog/mailhog
+    <span class="va">profiles</span>: [<span class="st">"debug"</span>, <span class="st">"mail"</span>]</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Stack normale</span>
+<span class="fn">docker</span> compose up -d
+
+<span class="cm"># Avec les outils de debug</span>
+<span class="fn">docker</span> compose --profile debug up -d</pre>
+    </div>
+  </section>
+
+  <!-- S8 -->
+  <section class="section" id="s8">
+    <div class="section-num">// 08</div>
+    <h2>Commandes essentielles du quotidien</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — référence des commandes Compose</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># ── Démarrage ──────────────────────────────────────────────</span>
+<span class="fn">docker</span> compose up -d              <span class="cm"># démarrer en arrière-plan</span>
+<span class="fn">docker</span> compose up -d --build      <span class="cm"># forcer la reconstruction des images</span>
+<span class="fn">docker</span> compose up backend         <span class="cm"># démarrer un seul service</span>
+
+<span class="cm"># ── Arrêt ──────────────────────────────────────────────────</span>
+<span class="fn">docker</span> compose stop               <span class="cm"># arrêter sans supprimer</span>
+<span class="fn">docker</span> compose down               <span class="cm"># arrêter et supprimer conteneurs + réseau</span>
+<span class="fn">docker</span> compose down -v            <span class="cm"># + supprimer les volumes (DANGER en prod)</span>
+
+<span class="cm"># ── Surveillance ───────────────────────────────────────────</span>
+<span class="fn">docker</span> compose ps                 <span class="cm"># état des services</span>
+<span class="fn">docker</span> compose logs               <span class="cm"># logs de tous les services</span>
+<span class="fn">docker</span> compose logs -f backend    <span class="cm"># logs d'un service en follow</span>
+<span class="fn">docker</span> compose logs --tail=50     <span class="cm"># 50 dernières lignes</span>
+<span class="fn">docker</span> compose top                <span class="cm"># processus dans les conteneurs</span>
+
+<span class="cm"># ── Exécution ──────────────────────────────────────────────</span>
+<span class="fn">docker</span> compose exec backend bash  <span class="cm"># shell dans un conteneur qui tourne</span>
+<span class="fn">docker</span> compose run --rm backend pytest  <span class="cm"># lancer une commande one-shot</span>
+
+<span class="cm"># ── Build ──────────────────────────────────────────────────</span>
+<span class="fn">docker</span> compose build              <span class="cm"># construire toutes les images</span>
+<span class="fn">docker</span> compose build backend      <span class="cm"># construire une seule image</span>
+<span class="fn">docker</span> compose build --no-cache   <span class="cm"># sans cache</span>
+
+<span class="cm"># ── Validation ─────────────────────────────────────────────</span>
+<span class="fn">docker</span> compose config             <span class="cm"># valider et afficher la config fusionnée</span>
+<span class="fn">docker</span> compose config --services  <span class="cm"># lister les services définis</span>
+
+<span class="cm"># ── Mise à jour d'un service sans tout redémarrer ──────────</span>
+<span class="fn">docker</span> compose up -d --no-deps --build backend  <span class="cm"># rebuild + restart backend seulement</span></pre>
+    </div>
+  </section>
+
+  <!-- S9 -->
+  <section class="section" id="s9">
+    <div class="section-num">// 09</div>
+    <h2>Récapitulatif</h2>
+    <table class="summary-table">
+      <thead><tr><th>Concept</th><th>Usage</th><th>Piège à éviter</th></tr></thead>
+      <tbody>
+        <tr><td>docker compose up -d</td><td>Démarrer la stack</td><td>Oublier --build après modification du Dockerfile</td></tr>
+        <tr><td>depends_on + condition: healthy</td><td>Ordre de démarrage fiable</td><td>depends_on sans condition = ordre non garanti</td></tr>
+        <tr><td>healthcheck</td><td>Détecter si le service est vraiment prêt</td><td>start_period trop court pour les DB lentes</td></tr>
+        <tr><td>Fichier .env</td><td>Séparer la configuration sensible</td><td>Committer le .env dans Git</td></tr>
+        <tr><td>docker compose down -v</td><td>Nettoyage complet</td><td>Supprime les volumes de données en prod !</td></tr>
+        <tr><td>override.yml</td><td>Différences dev/prod</td><td>Oublier de l'ajouter au .gitignore si sensible</td></tr>
+        <tr><td>docker compose config</td><td>Valider le YAML avant de déployer</td><td>Ne pas valider = surprises en prod</td></tr>
+        <tr><td>Noms de services = DNS</td><td>backend atteint database via "database:5432"</td><td>Utiliser des IPs au lieu des noms de services</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="nav-bottom">
+    <a href="phase1-module1-cours.html">← M1 · Docker Fondamentaux</a>
+    <a href="phase1-module2-tp.html">⚡ Cahier de TP →</a>
+  </div>
+</main>
+</div>
+<script>
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ copié';setTimeout(()=>btn.textContent='copier',2000)})}
+const sections=document.querySelectorAll('.section');
+const items=document.querySelectorAll('.sidebar-item[href^="#"]');
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){const id=en.target.id;items.forEach(i=>i.classList.toggle('active',i.getAttribute('href')==='#'+id))}})},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

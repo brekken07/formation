@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P0·M2 Cours — Git Avancé | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-hover:#21262d;--bg-code:#161b22;--border:#30363d;--border-bright:#484f58;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#484f58;--accent-green:#3fb950;--accent-blue:#58a6ff;--accent-purple:#bc8cff;--accent-orange:#f0883e;--accent-yellow:#d29922;--accent-red:#f85149;--accent-teal:#39d353;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--sidebar-width:260px;--topbar-height:56px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7}
+.topbar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 24px;height:var(--topbar-height);display:flex;align-items:center;gap:16px;position:fixed;top:0;left:0;right:0;z-index:200}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent-green);text-decoration:none;white-space:nowrap}
+.topbar-sep{color:var(--border-bright)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);font-family:var(--mono);flex:1}
+.breadcrumb a{color:var(--text-secondary);text-decoration:none}.breadcrumb a:hover{color:var(--accent-blue)}.breadcrumb .current{color:var(--accent-blue)}
+.topbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:6px;text-decoration:none;border:1px solid;transition:all .15s;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.btn-tp{background:rgba(240,136,62,.1);color:var(--accent-orange);border-color:rgba(240,136,62,.3)}.btn-tp:hover{background:rgba(240,136,62,.2)}
+.btn-nav{background:transparent;color:var(--text-secondary);border-color:var(--border)}.btn-nav:hover{background:var(--bg-hover);color:var(--text-primary)}
+.layout{display:flex;padding-top:var(--topbar-height);min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:var(--bg-secondary);border-right:1px solid var(--border);position:fixed;top:var(--topbar-height);left:0;bottom:0;overflow-y:auto;padding:24px 0}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-section{padding:0 16px;margin-bottom:24px}
+.sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 8px;margin-bottom:8px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:all .15s}
+.sidebar-item:hover{background:var(--bg-hover);color:var(--text-primary)}.sidebar-item.active{background:rgba(88,166,255,.1);color:var(--accent-blue)}
+.sidebar-item .dot{width:6px;height:6px;border-radius:50%;background:var(--border-bright);flex-shrink:0}.sidebar-item.active .dot{background:var(--accent-blue)}
+.sidebar-divider{height:1px;background:var(--border);margin:12px 16px}
+.content{margin-left:var(--sidebar-width);flex:1;max-width:860px;padding:48px 56px}
+.module-header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.module-path{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.module-title{font-size:28px;font-weight:600;color:var(--text-primary);line-height:1.2;margin-bottom:12px}
+.module-subtitle{color:var(--text-secondary);font-size:15px;margin-bottom:20px}
+.module-meta{display:flex;gap:20px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text-muted)}.meta-item .val{color:var(--text-secondary)}
+.objectives{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-left:3px solid var(--accent-blue);border-radius:8px;padding:20px 24px;margin-bottom:40px}
+.objectives h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-blue);margin-bottom:12px}
+.objectives ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.objectives ul li{font-size:14px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px}
+.objectives ul li::before{content:'→';color:var(--accent-blue);font-family:var(--mono);flex-shrink:0;margin-top:1px}
+.section{margin-bottom:56px;scroll-margin-top:80px}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.section h2{font-size:20px;font-weight:600;color:var(--text-primary);margin-bottom:16px;line-height:1.3}
+.section h3{font-size:16px;font-weight:600;color:var(--text-primary);margin-top:32px;margin-bottom:12px}
+.section p{color:var(--text-secondary);margin-bottom:16px;line-height:1.75}
+.section p code,.section li code{font-family:var(--mono);font-size:13px;background:var(--bg-card);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.section ul,.section ol{color:var(--text-secondary);padding-left:20px;margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.code-lang{font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.code-copy{font-family:var(--mono);font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}.code-copy:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.code-block pre{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--text-primary)}
+.code-block pre::-webkit-scrollbar{height:4px}.code-block pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.cm{color:#6e7681;font-style:italic}.kw{color:#ff7b72}.fn{color:var(--accent-blue)}.st{color:#a5d6ff}.va{color:var(--accent-purple)}.nu{color:var(--accent-orange)}.op{color:#ff7b72}.sh{color:#6e7681}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:12px}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}.callout-body{flex:1}
+.callout-title{font-family:var(--mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.callout-body p{font-size:13px;margin-bottom:0;color:var(--text-secondary)}
+.callout.warning{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25)}.callout.warning .callout-title{color:var(--accent-yellow)}
+.callout.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)}.callout.tip .callout-title{color:var(--accent-green)}
+.callout.info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2)}.callout.info .callout-title{color:var(--accent-blue)}
+.callout.danger{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2)}.callout.danger .callout-title{color:var(--accent-red)}
+.schema-block{background:#010409;border:1px solid var(--border);border-radius:10px;padding:20px;margin:20px 0;overflow-x:auto}
+.schema-block pre{font-family:var(--mono);font-size:12px;line-height:1.6;color:#7ee787;white-space:pre}
+.summary-table{width:100%;border-collapse:collapse;font-size:13px;margin:20px 0}
+.summary-table th{background:var(--bg-card);color:var(--text-muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:10px 14px;text-align:left;border:1px solid var(--border)}
+.summary-table td{padding:10px 14px;border:1px solid var(--border);color:var(--text-secondary);vertical-align:top}
+.summary-table td:first-child{font-family:var(--mono);color:var(--accent-orange);white-space:nowrap}
+.summary-table tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:32px;border-top:1px solid var(--border)}
+.nav-bottom a{font-family:var(--mono);font-size:12px;color:var(--text-secondary);text-decoration:none;padding:10px 16px;border:1px solid var(--border);border-radius:8px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.nav-bottom a:hover{border-color:var(--border-bright);color:var(--text-primary);background:var(--bg-hover)}
+</style>
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a><span class="topbar-sep">›</span>
+    <a href="#">Phase 0</a><span class="topbar-sep">›</span>
+    <span class="current">M2 · Git Avancé · Cours</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase0-module2-tp.html" class="btn btn-tp">⚡ Aller aux TP</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Phase 0 · M2</div>
+    <a href="#s1" class="sidebar-item active"><span class="dot"></span>Pourquoi Git avancé</a>
+    <a href="#s2" class="sidebar-item"><span class="dot"></span>Configuration globale</a>
+    <a href="#s3" class="sidebar-item"><span class="dot"></span>Branches & GitFlow</a>
+    <a href="#s4" class="sidebar-item"><span class="dot"></span>Rebase & historique</a>
+    <a href="#s5" class="sidebar-item"><span class="dot"></span>Stash & récupération</a>
+    <a href="#s6" class="sidebar-item"><span class="dot"></span>Hooks Git</a>
+    <a href="#s7" class="sidebar-item"><span class="dot"></span>SSH & multi-remote</a>
+    <a href="#s8" class="sidebar-item"><span class="dot"></span>.gitignore & secrets</a>
+    <a href="#s9" class="sidebar-item"><span class="dot"></span>Récapitulatif</a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Navigation</div>
+    <a href="phase0-module2-tp.html" class="sidebar-item"><span class="dot" style="background:var(--accent-orange)"></span>Cahier de TP</a>
+    <a href="phase0-module1-cours.html" class="sidebar-item"><span class="dot"></span>← M1 Bash</a>
+    <a href="phase1-module1-cours.html" class="sidebar-item"><span class="dot"></span>M3 Docker →</a>
+    <a href="index.html" class="sidebar-item"><span class="dot"></span>Dashboard</a>
+  </div>
+</aside>
+<main class="content">
+  <div class="module-header">
+    <div class="module-path">phase-0 / module-2 / cours</div>
+    <h1 class="module-title">Git Avancé</h1>
+    <p class="module-subtitle">Maîtriser Git comme un ingénieur DevOps — branches, rebase, hooks et workflows d'équipe.</p>
+    <div class="module-meta">
+      <span class="meta-item">📅 <span class="val">Semaine 2</span></span>
+      <span class="meta-item">⏱ <span class="val">~5h</span></span>
+      <span class="meta-item">🎯 <span class="val">Phase 0 · Module 2</span></span>
+      <span class="meta-item">📦 <span class="val">Projet : DevCorp</span></span>
+    </div>
+  </div>
+
+  <div class="objectives">
+    <h4>// Objectifs du module</h4>
+    <ul>
+      <li>Configurer Git de façon professionnelle avec aliases et paramètres globaux</li>
+      <li>Maîtriser les workflows de branches : GitFlow et trunk-based development</li>
+      <li>Utiliser le rebase interactif pour maintenir un historique propre</li>
+      <li>Récupérer des erreurs Git sans paniquer grâce au reflog</li>
+      <li>Automatiser des vérifications avec les hooks pre-commit</li>
+      <li>Configurer SSH pour GitHub et GitLab simultanément</li>
+    </ul>
+  </div>
+
+  <!-- S1 -->
+  <section class="section" id="s1">
+    <div class="section-num">// 01</div>
+    <h2>Pourquoi aller plus loin que les bases ?</h2>
+    <p>Tu connais <code>git init</code>, <code>git commit</code>, <code>git push</code>. C'est suffisant pour travailler seul. Mais dans un contexte DevOps, Git est le déclencheur de tout : un push sur <code>main</code> lance un pipeline, déploie en production, notifie une équipe. Un mauvais usage de Git peut casser une prod, effacer le travail d'une équipe, ou exposer un secret en clair dans l'historique public.</p>
+    <p>Ce module t'apprend à utiliser Git comme un outil de collaboration et d'automatisation — pas seulement comme un système de sauvegarde.</p>
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">Posture formateur</div>
+        <p>L'analogie qui fonctionne le mieux pour les débutants : Git c'est comme un système de sauvegarde de jeu vidéo, mais avec des sauvegardes parallèles (branches) qu'on peut fusionner. Le rebase, c'est "rejouer ses actions depuis un autre point de sauvegarde".</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S2 -->
+  <section class="section" id="s2">
+    <div class="section-num">// 02</div>
+    <h2>Configuration globale professionnelle</h2>
+    <p>Avant tout, une configuration Git soignée. Ces réglages s'appliquent à tous tes dépôts et t'évitent des erreurs récurrentes.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># ── Identité ───────────────────────────────────────────────</span>
+<span class="fn">git</span> config --global user.name  <span class="st">"Titi"</span>
+<span class="fn">git</span> config --global user.email <span class="st">"titi@capgemini.com"</span>
+
+<span class="cm"># ── Comportements par défaut ───────────────────────────────</span>
+<span class="fn">git</span> config --global init.defaultBranch main      <span class="cm"># main au lieu de master</span>
+<span class="fn">git</span> config --global pull.rebase true              <span class="cm"># rebase au lieu de merge</span>
+<span class="fn">git</span> config --global push.autoSetupRemote true     <span class="cm"># push sans -u à chaque fois</span>
+<span class="fn">git</span> config --global core.editor nano              <span class="cm"># éditeur de ton choix</span>
+<span class="fn">git</span> config --global core.autocrlf input           <span class="cm"># gestion des fins de ligne</span>
+
+<span class="cm"># ── Aliases indispensables ─────────────────────────────────</span>
+<span class="fn">git</span> config --global alias.lg  <span class="st">"log --oneline --graph --decorate --all"</span>
+<span class="fn">git</span> config --global alias.st  <span class="st">"status -sb"</span>
+<span class="fn">git</span> config --global alias.undo <span class="st">"reset HEAD~1 --mixed"</span>
+<span class="fn">git</span> config --global alias.unstage <span class="st">"reset HEAD --"</span>
+<span class="fn">git</span> config --global alias.last <span class="st">"log -1 HEAD --stat"</span>
+
+<span class="cm"># Vérifier la configuration complète</span>
+<span class="fn">git</span> config --global --list</pre>
+    </div>
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <div class="callout-title">git lg — ton meilleur ami</div>
+        <p>La commande <code>git lg</code> affiche l'historique sous forme de graphe coloré. C'est souvent le moment où les débutants "voient" enfin ce que font les branches. Lance-la régulièrement pendant les TP.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S3 -->
+  <section class="section" id="s3">
+    <div class="section-num">// 03</div>
+    <h2>Branches & GitFlow</h2>
+    <p>Une branche Git est un pointeur léger vers un commit. Créer une branche ne coûte presque rien — c'est l'un des grands avantages de Git sur les anciens systèmes de versioning.</p>
+
+    <h3>Le modèle GitFlow</h3>
+    <p>GitFlow est le workflow standard en entreprise pour des projets avec des releases planifiées. Il structure le travail en branches avec des rôles définis.</p>
+
+    <div class="schema-block"><pre>
+main        ●────────────────────────────────●────  production stable
+             \                              /
+develop       ●──────────────────────────●─────── intégration continue
+               \          \             /
+feature/login   ●─●─●      |           |
+                            \          |
+feature/api                  ●─●─●─●──●
+                                         \
+hotfix/crash                              ●─●── patch urgent → main
+</pre></div>
+
+    <p>Les branches ont des rôles précis :</p>
+    <ul>
+      <li><code>main</code> — code en production. On ne pousse jamais directement dessus.</li>
+      <li><code>develop</code> — branche d'intégration. Toutes les features y convergent.</li>
+      <li><code>feature/*</code> — une branche par fonctionnalité, créée depuis <code>develop</code>.</li>
+      <li><code>hotfix/*</code> — correction urgente créée depuis <code>main</code>, mergée dans <code>main</code> ET <code>develop</code>.</li>
+      <li><code>release/*</code> — préparation d'une version (tests finaux, bump de version).</li>
+    </ul>
+
+    <h3>Workflow complet d'une feature</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># 1. Toujours partir d'un develop à jour</span>
+<span class="fn">git</span> checkout develop
+<span class="fn">git</span> pull origin develop
+
+<span class="cm"># 2. Créer la branche de feature</span>
+<span class="fn">git</span> checkout -b feature/docker-setup
+
+<span class="cm"># 3. Travailler et committer régulièrement</span>
+<span class="cm">#    Convention : feat / fix / docs / chore / refactor / test</span>
+<span class="fn">git</span> add Dockerfile
+<span class="fn">git</span> commit -m <span class="st">"feat(docker): add Dockerfile for backend service"</span>
+<span class="fn">git</span> commit -m <span class="st">"feat(docker): add docker-compose for local dev"</span>
+<span class="fn">git</span> commit -m <span class="st">"docs: add Docker setup instructions to README"</span>
+
+<span class="cm"># 4. Mettre à jour sa branche si develop a avancé</span>
+<span class="fn">git</span> fetch origin
+<span class="fn">git</span> rebase origin/develop
+
+<span class="cm"># 5. Merger dans develop (--no-ff = garder la trace de la feature)</span>
+<span class="fn">git</span> checkout develop
+<span class="fn">git</span> merge --no-ff feature/docker-setup -m <span class="st">"merge: docker setup for DevCorp"</span>
+<span class="fn">git</span> push origin develop
+
+<span class="cm"># 6. Supprimer la branche (local + remote)</span>
+<span class="fn">git</span> branch -d feature/docker-setup
+<span class="fn">git</span> push origin --delete feature/docker-setup</pre>
+    </div>
+
+    <h3>Résolution de conflits</h3>
+    <p>Un conflit survient quand deux branches ont modifié la même partie d'un fichier. Git ne choisit pas — il te demande de décider.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Pendant un merge ou rebase, si conflit :</span>
+<span class="fn">git</span> status         <span class="cm"># voir les fichiers en conflit (both modified)</span>
+
+<span class="cm"># Dans le fichier en conflit, Git insère des marqueurs :</span>
+<span class="cm"># &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD          ← ta version actuelle</span>
+<span class="cm"># ton contenu</span>
+<span class="cm"># =======</span>
+<span class="cm"># leur contenu</span>
+<span class="cm"># &gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/api   ← version entrante</span>
+
+<span class="cm"># Éditer le fichier, supprimer les marqueurs, garder ce qu'il faut</span>
+<span class="fn">nano</span> fichier_en_conflit.txt
+
+<span class="cm"># Marquer comme résolu</span>
+<span class="fn">git</span> add fichier_en_conflit.txt
+<span class="fn">git</span> rebase --continue    <span class="cm"># si tu étais en rebase</span>
+<span class="cm"># ou</span>
+<span class="fn">git</span> merge --continue     <span class="cm"># si tu étais en merge</span>
+
+<span class="cm"># Abandonner en cas de doute</span>
+<span class="fn">git</span> rebase --abort
+<span class="fn">git</span> merge --abort</pre>
+    </div>
+    <div class="callout danger">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">Erreur classique</div>
+        <p><code>git pull</code> sans configuration fait un merge automatique et crée des commits de merge parasites dans l'historique. Avec <code>pull.rebase true</code> configuré plus haut, <code>git pull</code> fera automatiquement un rebase — historique propre garanti.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S4 -->
+  <section class="section" id="s4">
+    <div class="section-num">// 04</div>
+    <h2>Rebase & historique propre</h2>
+    <p>Le rebase est l'outil qui distingue un historique Git lisible d'un historique chaotique. Il "rejoue" tes commits sur une base différente — comme si tu avais commencé à travailler depuis un point plus récent.</p>
+
+    <h3>Rebase simple vs rebase interactif</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Rebase simple — mettre à jour sa branche</span>
+<span class="fn">git</span> rebase origin/develop    <span class="cm"># rejoue tes commits sur le dernier develop</span>
+
+<span class="cm"># Rebase interactif — réécrire les N derniers commits</span>
+<span class="fn">git</span> rebase -i HEAD~4         <span class="cm"># ouvre un éditeur avec les 4 derniers commits</span></pre>
+    </div>
+
+    <p>L'éditeur du rebase interactif ressemble à ça :</p>
+    <div class="schema-block"><pre>
+pick a1b2c3d feat: add Dockerfile
+pick e4f5g6h fix: typo in Dockerfile
+pick i7j8k9l feat: add docker-compose
+pick m1n2o3p WIP: still working on volumes
+
+# Commandes disponibles :
+# pick   = garder tel quel
+# reword = garder mais changer le message
+# squash = fusionner avec le commit précédent
+# fixup  = fusionner (ignorer le message)
+# drop   = supprimer ce commit
+</pre></div>
+
+    <p>Exemple concret — nettoyer avant de pousser :</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Avant : 4 commits dont un WIP et un fix de typo</span>
+pick a1b2c3d feat: add Dockerfile
+squash e4f5g6h fix: typo in Dockerfile   <span class="cm">← fusionné dans le précédent</span>
+pick i7j8k9l feat: add docker-compose
+drop m1n2o3p WIP: still working          <span class="cm">← supprimé</span>
+
+<span class="cm"># Après : 2 commits propres</span>
+<span class="cm"># a1b2c3d feat: add Dockerfile</span>
+<span class="cm"># i7j8k9l feat: add docker-compose</span></pre>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">Règle d'or du rebase</div>
+        <p>Ne jamais rebaser des commits déjà poussés sur une branche partagée (<code>main</code>, <code>develop</code>). Le rebase réécrit l'historique — sur ta branche locale c'est parfait, sur une branche partagée c'est le chaos pour tes collègues.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S5 -->
+  <section class="section" id="s5">
+    <div class="section-num">// 05</div>
+    <h2>Stash & récupération d'erreurs</h2>
+    <h3>Le stash — mettre son travail en pause</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Tu travailles sur quelque chose, une urgence arrive</span>
+<span class="fn">git</span> stash save <span class="st">"WIP: docker volumes configuration"</span>
+
+<span class="cm"># Traiter l'urgence sur une autre branche...</span>
+
+<span class="cm"># Lister les stashs</span>
+<span class="fn">git</span> stash list
+<span class="cm"># stash@{0}: On feature/docker: WIP: docker volumes configuration</span>
+
+<span class="cm"># Reprendre le stash (et le supprimer de la liste)</span>
+<span class="fn">git</span> stash pop
+
+<span class="cm"># Reprendre un stash spécifique sans le supprimer</span>
+<span class="fn">git</span> stash apply stash@{1}
+
+<span class="cm"># Supprimer un stash sans l'appliquer</span>
+<span class="fn">git</span> stash drop stash@{0}</pre>
+    </div>
+
+    <h3>Récupérer des erreurs — le reflog comme filet de sécurité</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Annuler le dernier commit (garder les modifs en staging)</span>
+<span class="fn">git</span> reset --soft HEAD~1
+
+<span class="cm"># Annuler le dernier commit (garder les modifs non-stagées)</span>
+<span class="fn">git</span> reset --mixed HEAD~1   <span class="cm"># c'est le défaut</span>
+
+<span class="cm"># Annuler le dernier commit ET effacer les modifs (ATTENTION)</span>
+<span class="fn">git</span> reset --hard HEAD~1
+
+<span class="cm"># Récupérer un fichier supprimé par erreur</span>
+<span class="fn">git</span> checkout HEAD -- fichier_supprime.txt
+
+<span class="cm"># Le reflog — journal de TOUT ce que Git a fait</span>
+<span class="fn">git</span> reflog
+<span class="cm"># abc1234 HEAD@{0}: reset: moving to HEAD~1</span>
+<span class="cm"># def5678 HEAD@{1}: commit: feat: add volumes config  ← le commit "perdu"</span>
+<span class="cm"># ghi9012 HEAD@{2}: commit: feat: add Dockerfile</span>
+
+<span class="cm"># Récupérer un commit "perdu" après un reset --hard</span>
+<span class="fn">git</span> checkout def5678      <span class="cm"># se placer sur le commit perdu</span>
+<span class="fn">git</span> checkout -b recovery  <span class="cm"># créer une branche pour le sauver</span></pre>
+    </div>
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">Le reflog sauve des vies</div>
+        <p>Git ne supprime jamais vraiment un commit immédiatement — il le garde pendant 90 jours par défaut. Le <code>reflog</code> liste tout l'historique de tes actions HEAD, même après un <code>reset --hard</code>. En production, avant de paniquer, lance toujours <code>git reflog</code> en premier.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S6 -->
+  <section class="section" id="s6">
+    <div class="section-num">// 06</div>
+    <h2>Hooks Git</h2>
+    <p>Les hooks sont des scripts exécutés automatiquement par Git avant ou après certaines actions. C'est ta première introduction à l'automatisation dans un workflow DevOps — les pipelines CI/CD reposent sur le même principe.</p>
+
+    <div class="schema-block"><pre>
+git commit → pre-commit hook → commit-msg hook → commit créé → post-commit hook
+git push   → pre-push hook → push → post-receive hook (côté serveur)
+</pre></div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Les hooks se trouvent dans .git/hooks/</span>
+<span class="fn">ls</span> .git/hooks/
+<span class="cm"># pre-commit.sample  commit-msg.sample  pre-push.sample ...</span>
+<span class="cm"># Supprimer le .sample pour activer un hook</span>
+
+<span class="cm"># ── Hook pre-commit : vérifier avant chaque commit ─────────</span>
+<span class="fn">cat</span> &gt; .git/hooks/pre-commit <span class="op">&lt;&lt;</span> <span class="st">'EOF'</span>
+#!/bin/bash
+set -euo pipefail
+
+echo "── Vérifications pre-commit ──"
+
+# Bloquer le commit si un fichier .env est stagé
+if git diff --cached --name-only | grep -q "\.env$"; then
+    echo "ERREUR : tentative de commit d'un fichier .env !"
+    echo "Ajoutez .env à votre .gitignore"
+    exit 1
+fi
+
+# Bloquer si des mots-clés de debug sont présents
+if git diff --cached | grep -E "^\+" | grep -qE "(TODO: REMOVE|FIXME: PROD|console\.log\(|pdb\.set_trace)"; then
+    echo "AVERTISSEMENT : code de debug détecté dans le diff"
+    echo "Vérifiez avant de committer"
+    exit 1
+fi
+
+# Vérifier la syntaxe des scripts shell modifiés
+for file in $(git diff --cached --name-only | grep "\.sh$"); do
+    bash -n "$file" || { echo "Syntaxe incorrecte : $file"; exit 1; }
+done
+
+echo "── Vérifications OK ──"
+EOF
+<span class="fn">chmod</span> +x .git/hooks/pre-commit</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># ── Hook commit-msg : valider le format du message ─────────</span>
+<span class="fn">cat</span> &gt; .git/hooks/commit-msg <span class="op">&lt;&lt;</span> <span class="st">'EOF'</span>
+#!/bin/bash
+MSG_FILE="$1"
+MSG=$(cat "$MSG_FILE")
+
+# Conventional commits : type(scope): description
+PATTERN="^(feat|fix|docs|chore|refactor|test|style|perf|ci|build|revert)(\(.+\))?: .{1,72}$"
+
+if ! echo "$MSG" | grep -qE "$PATTERN"; then
+    echo "ERREUR : format de commit invalide"
+    echo "Format attendu : type(scope): description"
+    echo "Types valides  : feat fix docs chore refactor test style perf ci build revert"
+    echo "Exemple        : feat(docker): add Dockerfile for backend"
+    exit 1
+fi
+EOF
+<span class="fn">chmod</span> +x .git/hooks/commit-msg</pre>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <div class="callout-title">Hooks partagés avec l'équipe</div>
+        <p>Les hooks dans <code>.git/hooks/</code> ne sont pas versionnés. Pour partager des hooks avec ton équipe, crée un dossier <code>.githooks/</code> à la racine du projet, versionne-le, et configure Git : <code>git config core.hooksPath .githooks</code>. On le fera dans la Phase 2 avec GitLab CI.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S7 -->
+  <section class="section" id="s7">
+    <div class="section-num">// 07</div>
+    <h2>SSH & multi-remote</h2>
+    <p>Travailler avec GitHub et GitLab simultanément nécessite une configuration SSH soignée. Le fichier <code>~/.ssh/config</code> permet de router automatiquement la bonne clé vers le bon service.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Générer une clé par service (ED25519 — plus moderne que RSA)</span>
+<span class="fn">ssh-keygen</span> -t ed25519 -C <span class="st">"titi@capgemini.com"</span> -f ~/.ssh/id_ed25519_github
+<span class="fn">ssh-keygen</span> -t ed25519 -C <span class="st">"titi@capgemini.com"</span> -f ~/.ssh/id_ed25519_gitlab
+
+<span class="cm"># Afficher la clé publique à copier dans GitHub / GitLab</span>
+<span class="fn">cat</span> ~/.ssh/id_ed25519_github.pub
+<span class="fn">cat</span> ~/.ssh/id_ed25519_gitlab.pub
+
+<span class="cm"># Configurer le routage automatique</span>
+<span class="fn">cat</span> &gt; ~/.ssh/config <span class="op">&lt;&lt;</span> <span class="st">'EOF'</span>
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_github
+    IdentitiesOnly yes
+
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_gitlab
+    IdentitiesOnly yes
+EOF
+<span class="fn">chmod</span> 600 ~/.ssh/config
+
+<span class="cm"># Tester les connexions</span>
+<span class="fn">ssh</span> -T git@github.com    <span class="cm"># Hi Titi! You've successfully authenticated...</span>
+<span class="fn">ssh</span> -T git@gitlab.com    <span class="cm"># Welcome to GitLab, @titi!</span></pre>
+    </div>
+
+    <h3>Travailler avec plusieurs remotes</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Voir les remotes configurés</span>
+<span class="fn">git</span> remote -v
+
+<span class="cm"># Ajouter un second remote (ex: miroir sur GitLab)</span>
+<span class="fn">git</span> remote add gitlab git@gitlab.com:titi/devcorp.git
+
+<span class="cm"># Pousser vers les deux</span>
+<span class="fn">git</span> push origin main    <span class="cm"># GitHub</span>
+<span class="fn">git</span> push gitlab main    <span class="cm"># GitLab</span>
+
+<span class="cm"># Ou configurer un push vers plusieurs remotes en même temps</span>
+<span class="fn">git</span> remote set-url --add --push origin git@gitlab.com:titi/devcorp.git</pre>
+    </div>
+  </section>
+
+  <!-- S8 -->
+  <section class="section" id="s8">
+    <div class="section-num">// 08</div>
+    <h2>.gitignore & gestion des secrets</h2>
+    <p>Un <code>.gitignore</code> mal configuré est à l'origine de nombreuses fuites de secrets sur GitHub. Une fois un secret poussé publiquement, il faut considérer qu'il est compromis — même si tu supprimes le fichier dans un commit suivant, il reste dans l'historique.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash — .gitignore projet DevOps</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># ── Secrets — JAMAIS dans Git ──────────────────────────────</span>
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*_rsa
+*_ed25519
+secrets/
+vault-token
+.vault-token
+
+<span class="cm"># ── Dépendances (régénérables) ─────────────────────────────</span>
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+<span class="cm"># ── Outils locaux ──────────────────────────────────────────</span>
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+<span class="cm"># ── Artefacts de build ─────────────────────────────────────</span>
+*.log
+dist/
+build/
+target/
+*.tar.gz
+*.zip</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+      <pre><span class="cm"># Supprimer un fichier déjà versionné par erreur</span>
+<span class="fn">git</span> rm --cached fichier_secret.env   <span class="cm"># retire du suivi Git sans supprimer le fichier</span>
+<span class="fn">git</span> commit -m <span class="st">"chore: remove accidentally tracked secret file"</span>
+
+<span class="cm"># Vérifier ce qui sera commité avant de commiter</span>
+<span class="fn">git</span> diff --cached --name-only
+
+<span class="cm"># gitignore global (pour tous tes projets)</span>
+<span class="fn">git</span> config --global core.excludesfile ~/.gitignore_global
+<span class="fn">echo</span> <span class="st">".DS_Store"</span> &gt;&gt; ~/.gitignore_global
+<span class="fn">echo</span> <span class="st">"*.swp"</span> &gt;&gt; ~/.gitignore_global</pre>
+    </div>
+  </section>
+
+  <!-- S9 -->
+  <section class="section" id="s9">
+    <div class="section-num">// 09</div>
+    <h2>Récapitulatif</h2>
+    <table class="summary-table">
+      <thead><tr><th>Commande / Concept</th><th>Usage</th><th>Piège à éviter</th></tr></thead>
+      <tbody>
+        <tr><td>git lg</td><td>Visualiser l'historique en graphe</td><td>—</td></tr>
+        <tr><td>git rebase origin/develop</td><td>Mettre à jour sa branche</td><td>Ne pas rebaser des commits partagés</td></tr>
+        <tr><td>git rebase -i HEAD~N</td><td>Nettoyer les N derniers commits</td><td>Idem — uniquement sur branche locale</td></tr>
+        <tr><td>git stash save "message"</td><td>Mettre le travail en pause</td><td>Oublier ses stashs (git stash list)</td></tr>
+        <tr><td>git reset --hard HEAD~1</td><td>Annuler un commit + les modifs</td><td>Irréversible sans reflog</td></tr>
+        <tr><td>git reflog</td><td>Retrouver tout ce qui a été fait</td><td>—</td></tr>
+        <tr><td>pre-commit hook</td><td>Bloquer les commits invalides</td><td>Non partagé par défaut (.git/hooks)</td></tr>
+        <tr><td>.gitignore</td><td>Exclure les fichiers sensibles</td><td>Ajouter APRÈS que le fichier est tracké</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="nav-bottom">
+    <a href="phase0-module1-cours.html">← M1 · Bash Scripting</a>
+    <a href="phase0-module2-tp.html">⚡ Cahier de TP →</a>
+  </div>
+</main>
+</div>
+<script>
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ copié';setTimeout(()=>btn.textContent='copier',2000)})}
+const sections=document.querySelectorAll('.section');
+const items=document.querySelectorAll('.sidebar-item[href^="#"]');
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){const id=en.target.id;items.forEach(i=>i.classList.toggle('active',i.getAttribute('href')==='#'+id))}})},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

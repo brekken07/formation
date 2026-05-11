@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P1·M1 TP — Fondamentaux Docker | DevCorp Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-card:#1c2128;--bg-hover:#21262d;--bg-code:#161b22;--border:#30363d;--border-bright:#484f58;--text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#484f58;--accent-green:#3fb950;--accent-blue:#58a6ff;--accent-purple:#bc8cff;--accent-orange:#f0883e;--accent-yellow:#d29922;--accent-red:#f85149;--accent-teal:#39d353;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--sidebar-width:260px;--topbar-height:56px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sans);font-size:15px;line-height:1.7}
+.topbar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 24px;height:var(--topbar-height);display:flex;align-items:center;gap:16px;position:fixed;top:0;left:0;right:0;z-index:200}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent-green);text-decoration:none}
+.topbar-sep{color:var(--border-bright)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);font-family:var(--mono);flex:1}
+.breadcrumb a{color:var(--text-secondary);text-decoration:none}.breadcrumb .current{color:var(--accent-orange)}
+.topbar-actions{display:flex;gap:8px;margin-left:auto}
+.btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:6px;text-decoration:none;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-cours{background:rgba(57,211,83,.1);color:var(--accent-teal);border-color:rgba(57,211,83,.3)}.btn-cours:hover{background:rgba(57,211,83,.2)}
+.btn-nav{background:transparent;color:var(--text-secondary);border-color:var(--border)}.btn-nav:hover{background:var(--bg-hover);color:var(--text-primary)}
+.layout{display:flex;padding-top:var(--topbar-height);min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:var(--bg-secondary);border-right:1px solid var(--border);position:fixed;top:var(--topbar-height);left:0;bottom:0;overflow-y:auto;padding:24px 0}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-section{padding:0 16px;margin-bottom:24px}
+.sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 8px;margin-bottom:8px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:all .15s}
+.sidebar-item:hover{background:var(--bg-hover);color:var(--text-primary)}.sidebar-item.active{background:rgba(240,136,62,.1);color:var(--accent-orange)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border-bright);flex-shrink:0}
+.tp-num{font-family:var(--mono);font-size:10px;background:var(--bg-card);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--text-muted);margin-left:auto}
+.sidebar-item.active .tp-num{background:rgba(240,136,62,.15);border-color:rgba(240,136,62,.3);color:var(--accent-orange)}
+.sidebar-divider{height:1px;background:var(--border);margin:12px 16px}
+.content{margin-left:var(--sidebar-width);flex:1;max-width:860px;padding:48px 56px}
+.module-header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.module-path{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.module-title{font-size:28px;font-weight:600;line-height:1.2;margin-bottom:12px}
+.module-title span{color:var(--accent-teal)}
+.module-desc{color:var(--text-secondary);font-size:15px;margin-bottom:20px}
+.module-meta{display:flex;gap:20px;flex-wrap:wrap}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text-muted)}.meta-item .val{color:var(--text-secondary)}
+.intro-box{background:rgba(240,136,62,.06);border:1px solid rgba(240,136,62,.2);border-left:3px solid var(--accent-orange);border-radius:8px;padding:20px 24px;margin-bottom:40px}
+.intro-box h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-orange);margin-bottom:12px}
+.intro-box p{font-size:14px;color:var(--text-secondary);margin-bottom:8px}.intro-box p:last-child{margin-bottom:0}
+.intro-box code{font-family:var(--mono);font-size:12px;background:var(--bg-card);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.tp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:40px;overflow:hidden;scroll-margin-top:80px}
+.tp-card-header{background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;gap:16px}
+.tp-badge{font-family:var(--mono);font-size:12px;font-weight:700;padding:6px 14px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.tp1{background:rgba(88,166,255,.12);color:var(--accent-blue);border:1px solid rgba(88,166,255,.3)}
+.tp2{background:rgba(63,185,80,.12);color:var(--accent-green);border:1px solid rgba(63,185,80,.3)}
+.tp3{background:rgba(188,140,255,.12);color:var(--accent-purple);border:1px solid rgba(188,140,255,.3)}
+.tp4{background:rgba(240,136,62,.12);color:var(--accent-orange);border:1px solid rgba(240,136,62,.3)}
+.tp-header-text{flex:1}
+.tp-title{font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.tp-subtitle{font-size:13px;color:var(--text-secondary)}
+.diff{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid;white-space:nowrap}
+.diff-easy{color:var(--accent-green);border-color:rgba(63,185,80,.3);background:rgba(63,185,80,.06)}
+.diff-medium{color:var(--accent-yellow);border-color:rgba(210,153,34,.3);background:rgba(210,153,34,.06)}
+.diff-hard{color:var(--accent-red);border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.06)}
+.tp-body{padding:28px}
+.tp-section{margin-bottom:28px}
+.tp-section h4{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tp-section h4::before{content:'';width:3px;height:16px;background:var(--accent-teal);border-radius:2px;flex-shrink:0}
+.tp-section p{font-size:14px;color:var(--text-secondary);margin-bottom:12px;line-height:1.7}
+.tp-section p code,.tp-section li code{font-family:var(--mono);font-size:12px;background:var(--bg-secondary);color:var(--accent-orange);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.tp-section ul,.tp-section ol{padding-left:20px;display:flex;flex-direction:column;gap:8px;color:var(--text-secondary);font-size:14px}
+.code-block{background:var(--bg-code);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.code-lang{font-family:var(--mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+.code-copy{font-family:var(--mono);font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}.code-copy:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.code-block pre{padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--text-primary)}
+.cm{color:#6e7681;font-style:italic}.fn{color:var(--accent-blue)}.st{color:#a5d6ff}.va{color:var(--accent-purple)}.kw{color:#ff7b72}
+.expected-output{background:#010409;border:1px solid var(--border);border-left:3px solid var(--accent-green);border-radius:8px;padding:16px;margin:12px 0}
+.expected-output .label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--accent-green);margin-bottom:10px}
+.expected-output pre{font-family:var(--mono);font-size:12px;color:#7ee787;line-height:1.6;white-space:pre-wrap}
+.validation-box{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:18px 22px;margin-top:20px}
+.validation-box h5{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--accent-green);margin-bottom:12px}
+.validation-box ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.validation-box li{font-size:13px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:8px}
+.validation-box li::before{content:'☐';color:var(--text-muted);font-family:var(--mono);flex-shrink:0}
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;display:flex;gap:10px;font-size:13px}
+.callout-body{flex:1;color:var(--text-secondary)}
+.callout-title{font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.callout.warning{background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.2)}.callout.warning .callout-title{color:var(--accent-yellow)}
+.callout.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)}.callout.tip .callout-title{color:var(--accent-green)}
+.callout.info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2)}.callout.info .callout-title{color:var(--accent-blue)}
+.commit-section{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-top:16px}
+.commit-section h5{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px}
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:32px;border-top:1px solid var(--border)}
+.nav-bottom a{font-family:var(--mono);font-size:12px;color:var(--text-secondary);text-decoration:none;padding:10px 16px;border:1px solid var(--border);border-radius:8px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.nav-bottom a:hover{border-color:var(--border-bright);color:var(--text-primary);background:var(--bg-hover)}
+</style>
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+<link rel="icon" href="devcorp/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">~/devcorp$</a>
+  <span class="topbar-sep">/</span>
+  <div class="breadcrumb">
+    <a href="index.html">Formation</a><span class="topbar-sep">›</span>
+    <a href="#">Phase 1</a><span class="topbar-sep">›</span>
+    <span class="current">M1 · Fondamentaux Docker · TP</span>
+  </div>
+  <div class="topbar-actions">
+    <a href="phase1-module1-cours.html" class="btn btn-cours">📖 Retour au cours</a>
+    <a href="index.html" class="btn btn-nav">← Dashboard</a>
+  </div>
+</nav>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Cahier de TP</div>
+    <a href="#tp1" class="sidebar-item active"><span class="dot" style="background:var(--accent-blue)"></span>TP 3.1 — Installation<span class="tp-num">01</span></a>
+    <a href="#tp2" class="sidebar-item"><span class="dot" style="background:var(--accent-green)"></span>TP 3.2 — Dockerfile backend<span class="tp-num">02</span></a>
+    <a href="#tp3" class="sidebar-item"><span class="dot" style="background:var(--accent-purple)"></span>TP 3.3 — Réseau & volumes<span class="tp-num">03</span></a>
+    <a href="#tp4" class="sidebar-item"><span class="dot" style="background:var(--accent-orange)"></span>TP 3.4 — Stack complète<span class="tp-num">04</span></a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">// Navigation</div>
+    <a href="phase1-module1-cours.html" class="sidebar-item"><span class="dot"></span>Retour au cours</a>
+    <a href="phase1-module2-cours.html" class="sidebar-item"><span class="dot"></span>Docker Compose →</a>
+    <a href="index.html" class="sidebar-item"><span class="dot"></span>← Dashboard</a>
+  </div>
+</aside>
+<main class="content">
+  <div class="module-header">
+    <div class="module-path">phase-1 / module-1 / travaux-pratiques</div>
+    <h1 class="module-title">Cahier de TP — <span>Fondamentaux Docker</span></h1>
+    <p class="module-desc">4 exercices progressifs pour conteneuriser les composants du projet DevCorp.</p>
+    <div class="module-meta">
+      <span class="meta-item">⚡ <span class="val">4 exercices</span></span>
+      <span class="meta-item">⏱ <span class="val">~5h</span></span>
+      <span class="meta-item">📦 <span class="val">Dépôt : devcorp/</span></span>
+    </div>
+  </div>
+
+  <div class="intro-box">
+    <h4>// Contexte DevCorp</h4>
+    <p>Tu vas conteneuriser les trois composants de l'application DevCorp : un backend Python (FastAPI), un frontend statique Nginx, et une base de données PostgreSQL. À la fin de ce module, chaque composant tourne dans son propre conteneur et peut communiquer avec les autres.</p>
+    <p>Les fichiers applicatifs sont fournis ci-dessous dans chaque TP — tu n'as pas besoin de coder l'application, seulement de la conteneuriser.</p>
+  </div>
+
+  <!-- TP 3.1 -->
+  <div class="tp-card" id="tp1">
+    <div class="tp-card-header">
+      <span class="tp-badge tp1">TP 3.1</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Installation Docker & exploration</div>
+        <div class="tp-subtitle">Installation, premiers conteneurs, commandes de base</div>
+      </div>
+      <span class="diff diff-easy">Débutant</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Installer Docker sur le VPS, se familiariser avec les commandes de base, et comprendre le cycle de vie d'un conteneur par la pratique.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Étapes</h4>
+        <ol>
+          <li>Installer Docker sur le VPS avec le script officiel</li>
+          <li>Ajouter ton utilisateur au groupe <code>docker</code> et vérifier sans <code>sudo</code></li>
+          <li>Lancer <code>docker run hello-world</code> et analyser la sortie — comprendre ce qui s'est passé</li>
+          <li>Lancer un conteneur Ubuntu interactif, explorer le système de fichiers, puis sortir</li>
+          <li>Lancer Nginx en arrière-plan sur le port 8080 de l'hôte :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> run -d --name test-nginx -p 8080:80 nginx
+<span class="fn">curl</span> http://localhost:8080</pre></div>
+          </li>
+          <li>Consulter les logs, entrer dans le conteneur, puis le supprimer</li>
+          <li>Lancer un conteneur PostgreSQL :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> run -d \
+  --name test-postgres \
+  -e POSTGRES_USER=devcorp \
+  -e POSTGRES_PASSWORD=secret \
+  -e POSTGRES_DB=devcorp \
+  -p 5432:5432 \
+  postgres:15-alpine
+
+<span class="cm"># Tester la connexion</span>
+<span class="fn">docker</span> exec -it test-postgres psql -U devcorp -c <span class="st">"\l"</span></pre></div>
+          </li>
+          <li>Faire le ménage : supprimer tous les conteneurs de test et les images inutiles</li>
+        </ol>
+      </div>
+      <div class="tp-section">
+        <h4>Questions de réflexion</h4>
+        <ul>
+          <li>Que se passe-t-il si tu supprimes le conteneur PostgreSQL et le recrées ? Les données sont-elles là ?</li>
+          <li>Quelle est la différence entre <code>docker stop</code> et <code>docker kill</code> ?</li>
+          <li>Pourquoi <code>EXPOSE 80</code> dans un Dockerfile ne suffit pas à rendre le port accessible depuis l'hôte ?</li>
+        </ul>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li><code>docker run hello-world</code> fonctionne sans <code>sudo</code></li>
+          <li><code>curl http://localhost:8080</code> retourne la page Nginx</li>
+          <li>Connexion PostgreSQL réussie avec <code>psql</code></li>
+          <li>Tu peux expliquer ce que fait <code>-d -p -e -v --name</code></li>
+          <li><code>docker ps -a</code> ne montre plus les conteneurs de test</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 3.2 -->
+  <div class="tp-card" id="tp2">
+    <div class="tp-card-header">
+      <span class="tp-badge tp2">TP 3.2</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Dockerfile — Backend DevCorp</div>
+        <div class="tp-subtitle">Écrire un Dockerfile optimisé pour une app Python FastAPI</div>
+      </div>
+      <span class="diff diff-medium">Intermédiaire</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Contexte</h4>
+        <p>Tu vas créer le Dockerfile du backend DevCorp. L'application est une API Python avec FastAPI. Crée la structure suivante dans le dossier <code>backend/</code> de ton dépôt :</p>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">mkdir</span> -p backend/app
+<span class="fn">cd</span> backend</pre></div>
+      </div>
+      <div class="tp-section">
+        <h4>Fichiers applicatifs à créer</h4>
+        <div class="code-block"><div class="code-header"><span class="code-lang">python — backend/app/main.py</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre>from fastapi import FastAPI
+import os
+
+app = FastAPI(title="DevCorp API", version="1.0.0")
+
+@app.get("/")
+def root():
+    return {"message": "DevCorp Backend", "version": "1.0.0"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "env": os.getenv("APP_ENV", "local")}
+
+@app.get("/info")
+def info():
+    return {
+        "app": "DevCorp",
+        "db_host": os.getenv("DB_HOST", "not configured"),
+        "environment": os.getenv("APP_ENV", "local")
+    }</pre></div>
+        <div class="code-block"><div class="code-header"><span class="code-lang">text — backend/requirements.txt</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre>fastapi==0.110.0
+uvicorn[standard]==0.27.1</pre></div>
+      </div>
+      <div class="tp-section">
+        <h4>Ton travail — le Dockerfile</h4>
+        <p>Crée <code>backend/Dockerfile</code> qui respecte ces contraintes :</p>
+        <ul>
+          <li>Image de base : <code>python:3.11-slim</code></li>
+          <li>Utilisateur non-root pour lancer l'application</li>
+          <li>Ordre des instructions optimisé pour le cache (dépendances avant le code)</li>
+          <li>Variables d'environnement : <code>PYTHONUNBUFFERED=1</code>, <code>APP_ENV=production</code></li>
+          <li><code>WORKDIR</code> dans <code>/app</code></li>
+          <li>Le serveur démarre avec <code>uvicorn app.main:app --host 0.0.0.0 --port 8000</code></li>
+          <li><code>.dockerignore</code> à créer également</li>
+        </ul>
+      </div>
+      <div class="tp-section">
+        <h4>Build et tests</h4>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="cm"># Construire depuis le dossier backend/</span>
+<span class="fn">docker</span> build -t devcorp-backend:1.0.0 .
+
+<span class="cm"># Lancer et tester</span>
+<span class="fn">docker</span> run -d \
+  --name devcorp-backend \
+  -p 8000:8000 \
+  -e APP_ENV=development \
+  devcorp-backend:1.0.0
+
+<span class="cm"># Vérifier</span>
+<span class="fn">curl</span> http://localhost:8000/
+<span class="fn">curl</span> http://localhost:8000/health
+<span class="fn">curl</span> http://localhost:8000/info
+
+<span class="cm"># Vérifier que l'utilisateur n'est pas root</span>
+<span class="fn">docker</span> exec devcorp-backend whoami</pre></div>
+      </div>
+      <div class="tp-section">
+        <h4>Sortie attendue</h4>
+        <div class="expected-output">
+          <div class="label">// curl http://localhost:8000/health</div>
+          <pre>{"status":"ok","env":"development"}</pre>
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li>L'image se construit sans erreur</li>
+          <li>Les 3 endpoints répondent correctement</li>
+          <li><code>docker exec devcorp-backend whoami</code> ne retourne pas <code>root</code></li>
+          <li>Modifier <code>requirements.txt</code> invalide le bon layer (pas le layer FROM)</li>
+          <li>Modifier <code>app/main.py</code> n'invalide pas le layer des dépendances</li>
+          <li><code>docker image history devcorp-backend:1.0.0</code> montre les layers attendus</li>
+        </ul>
+      </div>
+      <div class="commit-section">
+        <h5>// Commit attendu</h5>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">git</span> add backend/Dockerfile backend/.dockerignore backend/requirements.txt backend/app/
+<span class="fn">git</span> commit -m <span class="st">"feat(docker): add optimized Dockerfile for backend service"</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 3.3 -->
+  <div class="tp-card" id="tp3">
+    <div class="tp-card-header">
+      <span class="tp-badge tp3">TP 3.3</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Réseaux & volumes — PostgreSQL persistant</div>
+        <div class="tp-subtitle">Réseau custom, volumes nommés, communication inter-conteneurs</div>
+      </div>
+      <span class="diff diff-medium">Intermédiaire</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Faire communiquer le backend DevCorp avec une base de données PostgreSQL dans un réseau Docker isolé, avec persistance des données via un volume nommé.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Étapes</h4>
+        <ol>
+          <li>Créer un réseau Docker dédié : <code>devcorp-net</code></li>
+          <li>Créer un volume nommé : <code>devcorp-db-data</code></li>
+          <li>Lancer PostgreSQL sur le réseau avec le volume :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> run -d \
+  --name devcorp-db \
+  --network devcorp-net \
+  -e POSTGRES_USER=devcorp \
+  -e POSTGRES_PASSWORD=secret \
+  -e POSTGRES_DB=devcorp \
+  -v devcorp-db-data:/var/lib/postgresql/data \
+  --restart unless-stopped \
+  postgres:15-alpine</pre></div>
+          </li>
+          <li>Relancer le backend sur le même réseau :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> run -d \
+  --name devcorp-backend \
+  --network devcorp-net \
+  -e APP_ENV=production \
+  -e DB_HOST=devcorp-db \
+  -e DB_PORT=5432 \
+  -p 8000:8000 \
+  devcorp-backend:1.0.0</pre></div>
+          </li>
+          <li>Vérifier que le backend atteint la DB par son nom :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> exec devcorp-backend ping -c 2 devcorp-db
+<span class="fn">curl</span> http://localhost:8000/info</pre></div>
+          </li>
+          <li>Tester la persistance du volume :
+            <ul>
+              <li>Créer une table dans PostgreSQL</li>
+              <li>Supprimer le conteneur <code>devcorp-db</code></li>
+              <li>Recréer le conteneur avec le même volume</li>
+              <li>Vérifier que la table est toujours là</li>
+            </ul>
+          </li>
+          <li>Inspecter le réseau et le volume :
+            <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+            <pre><span class="fn">docker</span> network inspect devcorp-net
+<span class="fn">docker</span> volume inspect devcorp-db-data</pre></div>
+          </li>
+        </ol>
+      </div>
+      <div class="callout warning">
+        <span>⚠️</span>
+        <div class="callout-body">
+          <div class="callout-title">Ne jamais exposer PostgreSQL publiquement</div>
+          Dans ce TP, on n'expose pas le port 5432 sur l'hôte (pas de <code>-p 5432:5432</code> pour la DB). Elle est accessible uniquement depuis le réseau Docker interne. C'est la bonne pratique de sécurité.
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li>Le ping depuis backend vers <code>devcorp-db</code> fonctionne</li>
+          <li><code>curl http://localhost:8000/info</code> affiche <code>"db_host":"devcorp-db"</code></li>
+          <li>La table créée dans PostgreSQL survit à la suppression/recréation du conteneur</li>
+          <li>Le port 5432 n'est pas exposé sur l'hôte (<code>docker ps</code> ne montre pas 5432)</li>
+          <li><code>docker network inspect devcorp-net</code> montre les deux conteneurs connectés</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP 3.4 -->
+  <div class="tp-card" id="tp4">
+    <div class="tp-card-header">
+      <span class="tp-badge tp4">TP 3.4</span>
+      <div class="tp-header-text">
+        <div class="tp-title">Stack complète avec frontend — TP de synthèse</div>
+        <div class="tp-subtitle">Frontend Nginx, multi-conteneurs, script de démarrage</div>
+      </div>
+      <span class="diff diff-hard">Avancé</span>
+    </div>
+    <div class="tp-body">
+      <div class="tp-section">
+        <h4>Objectif</h4>
+        <p>Ajouter le frontend DevCorp (Nginx servant une page HTML statique) et scripter le démarrage de la stack complète. C'est le précurseur de Docker Compose — tu vas faire à la main ce que Compose automatisera.</p>
+      </div>
+      <div class="tp-section">
+        <h4>Fichiers frontend à créer</h4>
+        <div class="code-block"><div class="code-header"><span class="code-lang">html — frontend/index.html</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="fr"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;DevCorp&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: monospace; background: #0d1117; color: #e6edf3;
+           display: flex; align-items: center; justify-content: center;
+           height: 100vh; margin: 0; }
+    .card { text-align: center; border: 1px solid #30363d;
+            padding: 40px; border-radius: 12px; }
+    h1 { color: #3fb950; }
+    #status { color: #8b949e; margin-top: 20px; font-size: 14px; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="card"&gt;
+    &lt;h1&gt;DevCorp&lt;/h1&gt;
+    &lt;p&gt;Application 3-tiers conteneurisée&lt;/p&gt;
+    &lt;div id="status"&gt;Connexion au backend...&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script&gt;
+    fetch('/api/health')
+      .then(r =&gt; r.json())
+      .then(d =&gt; document.getElementById('status').textContent =
+            'Backend : ' + d.status + ' | Env : ' + d.env)
+      .catch(() =&gt; document.getElementById('status').textContent = 'Backend inaccessible')
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre></div>
+        <div class="code-block"><div class="code-header"><span class="code-lang">nginx — frontend/nginx.conf</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre>server {
+    listen 80;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://devcorp-backend:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}</pre></div>
+        <div class="code-block"><div class="code-header"><span class="code-lang">dockerfile — frontend/Dockerfile</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="kw">FROM</span> nginx:1.25-alpine
+<span class="kw">COPY</span> nginx.conf /etc/nginx/conf.d/default.conf
+<span class="kw">COPY</span> index.html /usr/share/nginx/html/index.html
+<span class="kw">EXPOSE</span> 80</pre></div>
+      </div>
+      <div class="tp-section">
+        <h4>Ton travail — script de stack</h4>
+        <p>Crée un script <code>scripts/stack.sh</code> avec les commandes <code>start</code>, <code>stop</code> et <code>status</code> :</p>
+        <ul>
+          <li><code>./stack.sh start</code> — crée le réseau et le volume si inexistants, build les images, lance les 3 conteneurs dans le bon ordre (db → backend → frontend)</li>
+          <li><code>./stack.sh stop</code> — arrête et supprime les conteneurs (mais garde le volume)</li>
+          <li><code>./stack.sh status</code> — affiche l'état des 3 conteneurs et teste les endpoints</li>
+        </ul>
+        <p>Le script doit utiliser les fonctions <code>log_info</code> / <code>log_error</code> et attendre que la DB soit prête avant de lancer le backend (pattern retry du cours Bash).</p>
+      </div>
+      <div class="tp-section">
+        <h4>Test final</h4>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">./scripts/stack.sh</span> start
+<span class="cm"># Ouvrir http://&lt;IP_VPS&gt; dans un navigateur</span>
+<span class="cm"># La page doit afficher "Backend : ok | Env : production"</span>
+
+<span class="fn">./scripts/stack.sh</span> status
+<span class="fn">./scripts/stack.sh</span> stop</pre></div>
+      </div>
+      <div class="callout tip">
+        <span>💡</span>
+        <div class="callout-body">
+          <div class="callout-title">Avant-goût de Docker Compose</div>
+          Tu viens de recréer à la main ce que Docker Compose fait automatiquement. Le module suivant va te montrer comment réduire tout ce script à un fichier <code>docker-compose.yml</code> de 40 lignes.
+        </div>
+      </div>
+      <div class="validation-box">
+        <h5>✓ Critères de validation</h5>
+        <ul>
+          <li><code>./stack.sh start</code> démarre les 3 conteneurs sans erreur</li>
+          <li>La page web est accessible sur le port 80 du VPS</li>
+          <li>Le frontend affiche le statut du backend en temps réel</li>
+          <li><code>./stack.sh stop</code> arrête tout proprement</li>
+          <li><code>./stack.sh start</code> après un stop repart sans erreur (volume préservé)</li>
+          <li>Les images sont taguées et versionnées</li>
+        </ul>
+      </div>
+      <div class="commit-section">
+        <h5>// Commits attendus</h5>
+        <div class="code-block"><div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">copier</button></div>
+        <pre><span class="fn">git</span> add frontend/
+<span class="fn">git</span> commit -m <span class="st">"feat(docker): add Nginx frontend with API proxy"</span>
+<span class="fn">git</span> add scripts/stack.sh
+<span class="fn">git</span> commit -m <span class="st">"feat(scripts): add stack management script"</span>
+<span class="fn">git</span> push origin develop</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bottom">
+    <a href="phase1-module1-cours.html">← Retour au cours</a>
+    <a href="phase1-module2-cours.html">Docker Compose →</a>
+  </div>
+</main>
+</div>
+<script>
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='✓ copié';setTimeout(()=>btn.textContent='copier',2000)})}
+const tps=document.querySelectorAll('.tp-card');
+const items=document.querySelectorAll('.sidebar-item[href^="#"]');
+const obs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){const id=en.target.id;items.forEach(i=>i.classList.toggle('active',i.getAttribute('href')==='#'+id))}})},{rootMargin:'-10% 0px -70% 0px'});
+tps.forEach(t=>obs.observe(t));
+</script>
+</body>
+</html>
