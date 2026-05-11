@@ -5,7 +5,7 @@
       "title": "Parcours DevCorp",
       "icon": "🚀",
       "description": "Formation devops — zero to hero",
-      "color": "pink",
+      "color": "blue",
       "modules": [
         {
           "file": "index.html",
@@ -21,7 +21,7 @@
       "title": "DevOps",
       "icon": "🚀",
       "description": "Du CI/CD à Kubernetes — construire, automatiser, déployer.",
-      "color": "blue",
+      "color": "purple",
       "modules": [
         {
           "file": "module1_cicd-github-guide.html",
@@ -116,7 +116,7 @@
       "title": "Parcours Ansible",
       "icon": "🚀",
       "description": "Formation Ansible pour les Nuls",
-      "color": "pink",
+      "color": "orange",
       "modules": [
         {
           "file": "ansible-fiches-revision.html",
@@ -124,7 +124,7 @@
           "description": "Fiches de révisions Ansible.",
           "tags": ["ANSIBLE", "PLAYBOOK"],
           "status": "done"
-        },        
+        },
         {
           "file": "ansible_reference.html",
           "title": "Guide de référence rapide",
@@ -153,7 +153,7 @@
       "title": "Parcours Terraform",
       "icon": "🚀",
       "description": "Préparation à la certification Terraform",
-      "color": "blue",
+      "color": "pink",
       "modules": [
         {
           "file": "terraform-fiches-revision.html",
@@ -190,7 +190,7 @@
         "title": "Pense-bêtes",
         "icon": "📋",
         "description": "Références rapides à garder sous la main — commandes, syntaxes, bonnes pratiques.",
-        "color": "orange",
+        "color": "red",
         "modules": [
         {
             "file": "git-cheatsheet.html",
