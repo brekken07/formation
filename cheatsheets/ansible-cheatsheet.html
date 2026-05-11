@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ansible Cheatsheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Barlow:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg:      #07090e;
+  --bg2:     #0c0f16;
+  --card:    #0f1520;
+  --card2:   #141c2a;
+  --border:  #1a2535;
+  --border2: #223040;
+
+  /* Ansible rouge/orange signature */
+  --ans:     #ee0000;
+  --ans2:    #ff4444;
+  --ans3:    #ff8080;
+
+  --teal:    #00b4d8;
+  --teal2:   #48cae4;
+  --green:   #06d6a0;
+  --green2:  #40e0b0;
+  --yellow:  #ffd166;
+  --yellow2: #ffe599;
+  --orange:  #f4820a;
+  --orange2: #ffaa44;
+  --purple:  #9b5de5;
+  --purple2: #c77dff;
+  --pink:    #f72585;
+
+  --text:    #dde4ee;
+  --muted:   #5a6a80;
+  --muted2:  #8899aa;
+  --code:    #060810;
+  --r:       11px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.55;
+}
+
+/* ── GRID LINES BG ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(238,0,0,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(238,0,0,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ═══════════════ HERO ═══════════════ */
+.hero {
+  background: linear-gradient(150deg, #1a0000 0%, #07090e 55%);
+  border-bottom: 1px solid var(--border);
+  padding: 3rem 2rem 2.5rem;
+  position: relative; overflow: hidden; z-index: 1;
+}
+.hero::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 55% at 10% 50%, rgba(238,0,0,.16) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 35% at 90% 20%, rgba(0,180,216,.09) 0%, transparent 60%);
+}
+.hero-inner { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+
+/* Ansible logo shape */
+.ans-logo { display: flex; align-items: center; gap: .9rem; margin-bottom: 1rem; }
+.ans-symbol {
+  width: 46px; height: 46px; position: relative; flex-shrink: 0;
+}
+.ans-symbol::before {
+  content: 'A';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--ans) 0%, var(--orange) 100%);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow', sans-serif; font-size: 1.6rem; font-weight: 900;
+  color: white; line-height: 46px; text-align: center;
+  box-shadow: 0 0 28px rgba(238,0,0,.5);
+}
+.hero h1 {
+  font-size: 2.7rem; font-weight: 900;
+  letter-spacing: -.03em; line-height: 1;
+  background: linear-gradient(120deg, #fff 0%, var(--ans3) 45%, var(--orange2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub {
+  font-size: .9rem; color: var(--muted2); margin-top: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.hero-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.2rem; }
+.hbadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .66rem; font-weight: 500;
+  padding: .25rem .65rem; border-radius: 20px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.hb-r  { background: rgba(238,0,0,.15);   border: 1px solid rgba(238,0,0,.4);   color: var(--ans3); }
+.hb-t  { background: rgba(0,180,216,.12); border: 1px solid rgba(0,180,216,.35); color: var(--teal2); }
+.hb-g  { background: rgba(6,214,160,.12); border: 1px solid rgba(6,214,160,.35); color: var(--green2); }
+
+.version-box {
+  background: rgba(238,0,0,.08); border: 1px solid rgba(238,0,0,.25);
+  border-radius: 10px; padding: .75rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+  text-align: left; min-width: 220px;
+}
+.version-box .vl { color: var(--muted); font-size: .7rem; margin-bottom: .2rem; }
+.version-box .vv { color: var(--ans3); font-weight: 600; }
+
+/* ═══════════════ SEARCH ═══════════════ */
+.search-wrap { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 0; position: relative; z-index: 1; }
+.search-box {
+  display: flex; align-items: center; gap: .75rem;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 10px; padding: .65rem 1rem; transition: border-color .2s;
+}
+.search-box:focus-within { border-color: var(--ans); }
+.search-box input {
+  background: transparent; border: none; outline: none;
+  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: .85rem; width: 100%;
+}
+.search-box input::placeholder { color: var(--muted); }
+
+/* ═══════════════ LAYOUT ═══════════════ */
+.page { max-width: 1400px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  display: flex; align-items: center; gap: .75rem;
+  font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em;
+  margin-bottom: 1rem; margin-top: 2.5rem;
+  padding-bottom: .55rem; border-bottom: 1px solid var(--border);
+}
+.section-title:first-child { margin-top: 0; }
+.si {
+  width: 30px; height: 30px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0;
+}
+.si-r { background: rgba(238,0,0,.18);  border: 1px solid rgba(238,0,0,.4); }
+.si-t { background: rgba(0,180,216,.14); border: 1px solid rgba(0,180,216,.35); }
+.si-g { background: rgba(6,214,160,.13); border: 1px solid rgba(6,214,160,.35); }
+.si-y { background: rgba(255,209,102,.13);border: 1px solid rgba(255,209,102,.35); }
+.si-o { background: rgba(244,130,10,.13); border: 1px solid rgba(244,130,10,.35); }
+.si-p { background: rgba(155,93,229,.14); border: 1px solid rgba(155,93,229,.35); }
+.si-pk{ background: rgba(247,37,133,.13); border: 1px solid rgba(247,37,133,.35); }
+
+/* ── GRIDS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+@media(max-width:1100px){ .grid-4 { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:900px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+@media(max-width:640px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; } }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 1.1rem 1.2rem;
+  transition: border-color .2s, transform .15s;
+}
+.card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.card-title {
+  font-size: .75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; margin-bottom: .8rem;
+  display: flex; align-items: center; gap: .4rem;
+}
+.ct-r  { color: var(--ans3); }
+.ct-t  { color: var(--teal2); }
+.ct-g  { color: var(--green2); }
+.ct-y  { color: var(--yellow2); }
+.ct-o  { color: var(--orange2); }
+.ct-p  { color: var(--purple2); }
+.ct-pk { color: var(--pink); }
+
+/* ── CMD ROWS ── */
+.cmd-list { display: flex; flex-direction: column; gap: .42rem; }
+.cmd-row {
+  display: flex; align-items: flex-start; gap: .6rem;
+  padding: .42rem .65rem; border-radius: 7px;
+  background: var(--card2); border: 1px solid var(--border);
+  transition: background .15s;
+}
+.cmd-row:hover { background: #1a2535; }
+.cmd-row code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .76rem; color: var(--teal2); flex-shrink: 0; white-space: nowrap;
+}
+.cmd-row .desc { font-size: .77rem; color: var(--muted2); line-height: 1.4; padding-top: .05rem; }
+.flag { color: var(--yellow2); }
+.arg  { color: var(--orange2); }
+.opt  { color: var(--purple2); }
+
+/* ── SYNTAX BLOCKS ── */
+.syn {
+  background: var(--code); border: 1px solid var(--border);
+  border-radius: 9px; padding: .85rem 1rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  line-height: 1.65; overflow-x: auto; position: relative; white-space: pre;
+}
+.syn .lbl {
+  position: absolute; top: .5rem; right: .75rem;
+  font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em;
+}
+/* YAML syntax colors */
+.y-k  { color: #82aaff; }   /* key */
+.y-v  { color: #c3e88d; }   /* value string */
+.y-n  { color: #f78c6c; }   /* number/bool */
+.y-c  { color: #546e7a; font-style: italic; } /* comment */
+.y-t  { color: var(--teal2); }  /* task name / section */
+.y-m  { color: var(--ans3); font-weight: 600; } /* module name */
+.y-s  { color: #c792ea; }   /* special keyword */
+.y-j  { color: var(--yellow2); } /* jinja */
+.y-h  { color: var(--orange2); font-weight: 600; } /* header/play */
+
+/* ── INLINE CODE ── */
+.ic   { font-family:'JetBrains Mono',monospace; font-size:.82em; background:rgba(238,0,0,.12); border:1px solid rgba(238,0,0,.3); border-radius:4px; padding:.05em .35em; color:var(--ans3); }
+.ic-t { font-family:'JetBrains Mono',monospace; font-size:.82em; background:rgba(0,180,216,.1); border:1px solid rgba(0,180,216,.3); border-radius:4px; padding:.05em .35em; color:var(--teal2); }
+.ic-g { font-family:'JetBrains Mono',monospace; font-size:.82em; background:rgba(6,214,160,.1); border:1px solid rgba(6,214,160,.3); border-radius:4px; padding:.05em .35em; color:var(--green2); }
+.ic-y { font-family:'JetBrains Mono',monospace; font-size:.82em; background:rgba(255,209,102,.1); border:1px solid rgba(255,209,102,.3); border-radius:4px; padding:.05em .35em; color:var(--yellow2); }
+
+/* ── TABLES ── */
+.ref-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.ref-table th { text-align: left; padding: .45rem .7rem; font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--border2); }
+.ref-table td { padding: .42rem .7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table tr:hover td { background: rgba(255,255,255,.02); }
+.ref-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: .74rem; color: var(--teal2); white-space: nowrap; }
+.ref-table td:last-child { color: var(--muted2); }
+.ref-table td:nth-child(2) { color: var(--muted2); }
+
+/* ── NOTES ── */
+.note { display: flex; gap: .65rem; align-items: flex-start; padding: .6rem .9rem; border-radius: 8px; font-size: .79rem; margin-top: .6rem; }
+.note-w { background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.25); color: var(--yellow2); }
+.note-r { background: rgba(238,0,0,.07);     border: 1px solid rgba(238,0,0,.25);    color: var(--ans3); }
+.note-g { background: rgba(6,214,160,.07);   border: 1px solid rgba(6,214,160,.25);  color: var(--green2); }
+.note-t { background: rgba(0,180,216,.07);   border: 1px solid rgba(0,180,216,.25);  color: var(--teal2); }
+.note-icon { font-size: .95rem; flex-shrink: 0; margin-top: .05rem; }
+
+/* ── TAGS ── */
+.tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: .63rem; font-weight: 600; padding: .13rem .48rem; border-radius: 4px; letter-spacing: .03em; text-transform: uppercase; margin-right: .2rem; }
+.tag-g { background: rgba(6,214,160,.13); border: 1px solid rgba(6,214,160,.3); color: var(--green2); }
+.tag-r { background: rgba(238,0,0,.1);    border: 1px solid rgba(238,0,0,.3);   color: var(--ans3); }
+.tag-y { background: rgba(255,209,102,.1);border: 1px solid rgba(255,209,102,.3);color: var(--yellow2); }
+.tag-t { background: rgba(0,180,216,.1);  border: 1px solid rgba(0,180,216,.3);  color: var(--teal2); }
+
+/* ── WORKFLOW STEPS ── */
+.wf { display: flex; align-items: stretch; flex-wrap: wrap; gap: 0; margin-top: .3rem; }
+.wf-step { flex:1; min-width:100px; background:var(--card2); border:1px solid var(--border); padding:.6rem .7rem; text-align:center; position:relative; }
+.wf-step:first-child { border-radius: 8px 0 0 8px; }
+.wf-step:last-child  { border-radius: 0 8px 8px 0; }
+.wf-step::after { content:'▶'; position:absolute; right:-10px; top:50%; transform:translateY(-50%); color:var(--border2); font-size:.65rem; z-index:2; }
+.wf-step:last-child::after { display:none; }
+.wf-n { font-size:.6rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+.wf-c { font-family:'JetBrains Mono',monospace; font-size:.76rem; color:var(--teal2); font-weight:600; }
+.wf-l { font-size:.68rem; color:var(--muted2); margin-top:.1rem; }
+
+/* ── PRECEDENCE ── */
+.prec-list { display: flex; flex-direction: column; gap: .28rem; }
+.prec-row { display: flex; align-items: center; gap: .6rem; padding: .32rem .7rem; border-radius: 6px; background: var(--card2); border-left: 3px solid transparent; }
+.prec-row .pn { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--muted); width: 18px; flex-shrink: 0; }
+.prec-row .ps { font-family: 'JetBrains Mono', monospace; font-size: .76rem; flex: 1; }
+.prec-row .pl { font-size: .69rem; color: var(--muted2); }
+.p1 { border-color: var(--ans);    } .p1 .ps { color: var(--ans3); }
+.p2 { border-color: var(--orange); } .p2 .ps { color: var(--orange2); }
+.p3 { border-color: var(--yellow); } .p3 .ps { color: var(--yellow2); }
+.p4 { border-color: var(--green);  } .p4 .ps { color: var(--green2); }
+.p5 { border-color: var(--teal);   } .p5 .ps { color: var(--teal2); }
+.p6 { border-color: var(--purple); } .p6 .ps { color: var(--purple2); }
+.p7 { border-color: var(--muted);  } .p7 .ps { color: var(--muted2); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── SEARCH FILTER ── */
+.cs-hidden { display: none !important; }
+
+/* ── FOOTER ── */
+.footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; text-align: center; color: var(--muted); font-size: .78rem; position: relative; z-index: 1; }
+.footer span { color: var(--ans2); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="hero-left">
+        <div class="ans-logo">
+          <div class="ans-symbol"></div>
+          <div>
+            <div style="font-size:.68rem;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Red Hat</div>
+            <h1>Ansible</h1>
+          </div>
+        </div>
+        <div class="hero-sub">$ ansible --version &nbsp;·&nbsp; Agentless · SSH · YAML · Idempotent</div>
+        <div class="hero-badges">
+          <span class="hbadge hb-r">Automatisation</span>
+          <span class="hbadge hb-t">Agentless SSH</span>
+          <span class="hbadge hb-g">Configuration Mgmt</span>
+          <span class="hbadge hb-r">Idempotent</span>
+          <span class="hbadge hb-t">YAML Playbooks</span>
+          <span class="hbadge hb-g">Multi-OS</span>
+        </div>
+      </div>
+      <div class="version-box">
+        <div class="vl">Architecture</div>
+        <div class="vv">Control Node → SSH → Managed Nodes</div>
+        <div style="margin-top:.6rem"><div class="vl">Composants clés</div></div>
+        <div style="color:var(--teal2);font-size:.78rem">Inventory · Playbook · Role · Module · Vault</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SEARCH ═══════════════ -->
+<div class="search-wrap">
+  <div class="search-box">
+    <span style="color:var(--muted)">🔍</span>
+    <input type="text" id="searchInput" placeholder="Rechercher une commande, un module, une directive…" oninput="filterCards()"/>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="page" id="mainContent">
+
+  <!-- ══ 1. COMMANDES AD-HOC & ANSIBLE-PLAYBOOK ══ -->
+  <div class="section-title">
+    <div class="si si-r">⚡</div>
+    <span style="color:var(--ans3)">Commandes CLI — ansible &amp; ansible-playbook</span>
+  </div>
+
+  <!-- WORKFLOW VISUEL -->
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-title ct-t">🔄 Workflow Ansible</div>
+    <div class="wf">
+      <div class="wf-step"><div class="wf-n">1</div><div class="wf-c">inventory</div><div class="wf-l">Définir les hôtes</div></div>
+      <div class="wf-step"><div class="wf-n">2</div><div class="wf-c">playbook</div><div class="wf-l">Écrire les tâches</div></div>
+      <div class="wf-step"><div class="wf-n">3</div><div class="wf-c">--check</div><div class="wf-l">Dry-run</div></div>
+      <div class="wf-step"><div class="wf-n">4</div><div class="wf-c">--diff</div><div class="wf-l">Voir les diff</div></div>
+      <div class="wf-step"><div class="wf-n">5</div><div class="wf-c">ansible-playbook</div><div class="wf-l">Exécuter</div></div>
+      <div class="wf-step"><div class="wf-n">6</div><div class="wf-c">--tags</div><div class="wf-l">Exécution partielle</div></div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title ct-r">⚡ Commandes Ad-hoc</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>ansible <span class="arg">all</span> <span class="flag">-m</span> ping</code><div class="desc">Teste la connexion à tous les hôtes</div></div>
+        <div class="cmd-row"><code>ansible <span class="arg">webservers</span> <span class="flag">-m</span> command <span class="flag">-a</span> <span class="arg">"uptime"</span></code><div class="desc">Exécute une commande sur un groupe</div></div>
+        <div class="cmd-row"><code>ansible <span class="arg">all</span> <span class="flag">-m</span> setup</code><div class="desc">Collecte les facts de tous les hôtes</div></div>
+        <div class="cmd-row"><code>ansible <span class="arg">host</span> <span class="flag">-m</span> copy <span class="flag">-a</span> <span class="arg">"src=f dest=/tmp"</span></code><div class="desc">Copie un fichier sur l'hôte</div></div>
+        <div class="cmd-row"><code>ansible <span class="arg">all</span> <span class="flag">-m</span> apt <span class="flag">-a</span> <span class="arg">"name=nginx state=present"</span></code><div class="desc">Installe un paquet (become requis)</div></div>
+        <div class="cmd-row"><code>ansible <span class="arg">all</span> <span class="flag">-m</span> service <span class="flag">-a</span> <span class="arg">"name=nginx state=started"</span></code><div class="desc">Démarre un service</div></div>
+        <div class="cmd-row"><code>ansible <span class="arg">all</span> <span class="flag">-b</span> <span class="flag">-K</span></code><div class="desc">Exécute avec become + demande mot de passe sudo</div></div>
+        <div class="cmd-row"><code>ansible <span class="arg">all</span> <span class="flag">-i</span> <span class="arg">inventory.ini</span> <span class="flag">-u</span> <span class="arg">admin</span></code><div class="desc">Spécifie l'inventory et l'utilisateur SSH</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-t">▶️ ansible-playbook</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span></code><div class="desc">Lance un playbook</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">--check</span></code><div class="desc">Dry-run : simule sans modifier</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">--diff</span></code><div class="desc">Affiche les différences de fichiers</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">--check --diff</span></code><div class="desc">Dry-run + diff (le combo parfait)</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">-l</span> <span class="arg">webservers</span></code><div class="desc">Limite à un groupe/hôte</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">-t</span> <span class="arg">install</span></code><div class="desc">Exécute seulement les tâches avec ce tag</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">--skip-tags</span> <span class="arg">debug</span></code><div class="desc">Ignore les tâches avec ce tag</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">-e</span> <span class="arg">"var=val"</span></code><div class="desc">Passe une variable extra (priorité max)</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">-e</span> <span class="arg">@vars.yml</span></code><div class="desc">Passe un fichier de variables extra</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">--step</span></code><div class="desc">Exécution interactive tâche par tâche</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">--start-at-task</span> <span class="arg">"Install nginx"</span></code><div class="desc">Reprend depuis une tâche spécifique</div></div>
+        <div class="cmd-row"><code>ansible-playbook <span class="arg">site.yml</span> <span class="flag">-f</span> <span class="arg">10</span></code><div class="desc">Nombre de forks parallèles (défaut: 5)</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-g">🔧 Autres commandes CLI</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>ansible-inventory <span class="flag">--list</span></code><div class="desc">Affiche l'inventory complet en JSON</div></div>
+        <div class="cmd-row"><code>ansible-inventory <span class="flag">--graph</span></code><div class="desc">Affiche l'arborescence de l'inventory</div></div>
+        <div class="cmd-row"><code>ansible-inventory <span class="flag">--host</span> <span class="arg">hostname</span></code><div class="desc">Affiche les variables d'un hôte</div></div>
+        <div class="cmd-row"><code>ansible-doc <span class="arg">module_name</span></code><div class="desc">Documentation d'un module Ansible</div></div>
+        <div class="cmd-row"><code>ansible-doc <span class="flag">-l</span></code><div class="desc">Liste tous les modules disponibles</div></div>
+        <div class="cmd-row"><code>ansible-galaxy role install <span class="arg">user.role</span></code><div class="desc">Installe un rôle depuis Galaxy</div></div>
+        <div class="cmd-row"><code>ansible-galaxy role init <span class="arg">my_role</span></code><div class="desc">Crée la structure d'un rôle</div></div>
+        <div class="cmd-row"><code>ansible-galaxy collection install <span class="arg">ns.col</span></code><div class="desc">Installe une collection Ansible</div></div>
+        <div class="cmd-row"><code>ansible-galaxy install <span class="flag">-r</span> <span class="arg">requirements.yml</span></code><div class="desc">Installe depuis un fichier requirements</div></div>
+        <div class="cmd-row"><code>ansible-vault encrypt <span class="arg">file.yml</span></code><div class="desc">Chiffre un fichier avec Vault</div></div>
+        <div class="cmd-row"><code>ansible-vault decrypt <span class="arg">file.yml</span></code><div class="desc">Déchiffre un fichier Vault</div></div>
+        <div class="cmd-row"><code>ansible-vault edit <span class="arg">file.yml</span></code><div class="desc">Édite un fichier Vault chiffré</div></div>
+        <div class="cmd-row"><code>ansible-lint <span class="arg">site.yml</span></code><div class="desc">Analyse les bonnes pratiques du playbook</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 2. INVENTORY ══ -->
+  <div class="section-title">
+    <div class="si si-t">📋</div>
+    <span style="color:var(--teal2)">Inventory — Hôtes &amp; Groupes</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-t">Inventory INI (classique)</div>
+      <div class="syn"><span class="lbl">INI</span><span class="y-c"># Hôtes individuels</span>
+<span class="y-v">web1.example.com</span>
+<span class="y-v">web2.example.com</span> <span class="y-k">ansible_port</span>=<span class="y-n">2222</span>
+
+<span class="y-c"># Groupe</span>
+[<span class="y-h">webservers</span>]
+<span class="y-v">web1.example.com</span>
+<span class="y-v">web2.example.com</span>
+<span class="y-v">web[3:9].example.com</span>   <span class="y-c"># pattern</span>
+
+[<span class="y-h">dbservers</span>]
+<span class="y-v">db1.example.com</span> <span class="y-k">ansible_user</span>=<span class="y-v">postgres</span>
+
+<span class="y-c"># Groupe de groupes</span>
+[<span class="y-h">prod:children</span>]
+<span class="y-v">webservers</span>
+<span class="y-v">dbservers</span>
+
+<span class="y-c"># Variables de groupe dans l'inventory</span>
+[<span class="y-h">webservers:vars</span>]
+<span class="y-k">ansible_user</span>=<span class="y-v">ubuntu</span>
+<span class="y-k">ansible_python_interpreter</span>=<span class="y-v">/usr/bin/python3</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-g">Inventory YAML (moderne) &amp; Variables hôte</div>
+      <div class="syn"><span class="lbl">YAML</span><span class="y-c"># inventory.yml</span>
+<span class="y-h">all:</span>
+  <span class="y-h">children:</span>
+    <span class="y-h">webservers:</span>
+      <span class="y-h">hosts:</span>
+        <span class="y-k">web1:</span>
+          <span class="y-k">ansible_host:</span> <span class="y-v">192.168.1.10</span>
+          <span class="y-k">ansible_user:</span> <span class="y-v">ubuntu</span>
+        <span class="y-k">web2:</span>
+          <span class="y-k">ansible_host:</span> <span class="y-v">192.168.1.11</span>
+      <span class="y-h">vars:</span>
+        <span class="y-k">http_port:</span> <span class="y-n">80</span>
+    <span class="y-h">dbservers:</span>
+      <span class="y-h">hosts:</span>
+        <span class="y-k">db1:</span>
+          <span class="y-k">ansible_host:</span> <span class="y-v">192.168.1.20</span>
+  <span class="y-h">vars:</span>
+    <span class="y-k">ansible_ssh_private_key_file:</span> <span class="y-v">~/.ssh/id_rsa</span>
+</div>
+      <div class="note note-t" style="margin-top:.6rem">
+        <span class="note-icon">💡</span>
+        <div>Préférer les répertoires <code class="ic-t">host_vars/</code> et <code class="ic-t">group_vars/</code> pour séparer les variables de l'inventory.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variables de connexion -->
+  <div class="card" style="margin-top:1rem">
+    <div class="card-title ct-r">Variables de connexion Ansible (ansible_* variables)</div>
+    <div class="grid-2" style="gap:.8rem;margin-top:0">
+      <table class="ref-table">
+        <tr><th>Variable</th><th>Description</th></tr>
+        <tr><td>ansible_host</td><td>Adresse IP ou hostname de connexion</td></tr>
+        <tr><td>ansible_port</td><td>Port SSH (défaut: 22)</td></tr>
+        <tr><td>ansible_user</td><td>Utilisateur SSH</td></tr>
+        <tr><td>ansible_password</td><td>Mot de passe SSH (préférer les clés)</td></tr>
+        <tr><td>ansible_ssh_private_key_file</td><td>Chemin vers la clé privée SSH</td></tr>
+        <tr><td>ansible_become</td><td>true = active l'élévation de privilèges</td></tr>
+      </table>
+      <table class="ref-table">
+        <tr><th>Variable</th><th>Description</th></tr>
+        <tr><td>ansible_become_method</td><td>Méthode : sudo / su / pbrun / pfexec</td></tr>
+        <tr><td>ansible_become_user</td><td>Utilisateur cible (défaut: root)</td></tr>
+        <tr><td>ansible_become_password</td><td>Mot de passe sudo</td></tr>
+        <tr><td>ansible_python_interpreter</td><td>Chemin Python sur l'hôte distant</td></tr>
+        <tr><td>ansible_connection</td><td>Type: ssh / local / docker / winrm</td></tr>
+        <tr><td>ansible_shell_type</td><td>sh / bash / powershell / cmd</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ 3. STRUCTURE D'UN PLAYBOOK ══ -->
+  <div class="section-title">
+    <div class="si si-g">📄</div>
+    <span style="color:var(--green2)">Playbook — Structure complète</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-g">Playbook complet avec toutes les directives</div>
+      <div class="syn" style="font-size:.72rem"><span class="lbl">YAML</span><span class="y-c">--- # playbook.yml</span>
+- <span class="y-k">name:</span> <span class="y-t">Deploy web application</span>
+  <span class="y-k">hosts:</span> <span class="y-v">webservers</span>
+  <span class="y-k">gather_facts:</span> <span class="y-n">true</span>       <span class="y-c"># collecte les facts</span>
+  <span class="y-k">become:</span> <span class="y-n">true</span>             <span class="y-c"># sudo global</span>
+  <span class="y-k">become_user:</span> <span class="y-v">root</span>
+  <span class="y-k">serial:</span> <span class="y-n">2</span>                 <span class="y-c"># rolling update: 2 à la fois</span>
+  <span class="y-k">max_fail_percentage:</span> <span class="y-n">30</span>  <span class="y-c"># tolère 30% d'erreurs</span>
+  <span class="y-k">any_errors_fatal:</span> <span class="y-n">false</span>
+  <span class="y-k">timeout:</span> <span class="y-n">30</span>
+  <span class="y-k">tags:</span> <span class="y-v">deploy</span>
+
+  <span class="y-k">vars:</span>
+    <span class="y-k">app_version:</span> <span class="y-v">"1.2.3"</span>
+    <span class="y-k">app_port:</span> <span class="y-n">8080</span>
+
+  <span class="y-k">vars_files:</span>
+    - <span class="y-v">vars/common.yml</span>
+    - <span class="y-v">vars/{{ ansible_os_family }}.yml</span>
+
+  <span class="y-k">pre_tasks:</span>
+    - <span class="y-k">name:</span> <span class="y-t">Vérifier la version OS</span>
+      <span class="y-m">ansible.builtin.assert</span>:
+        <span class="y-k">that:</span> <span class="y-j">ansible_distribution_major_version | int >= 20</span>
+
+  <span class="y-k">roles:</span>
+    - <span class="y-v">common</span>
+    - <span class="y-v">nginx</span>
+
+  <span class="y-k">tasks:</span>
+    - <span class="y-k">name:</span> <span class="y-t">Déployer l'application</span>
+      <span class="y-m">ansible.builtin.template:</span>
+        <span class="y-k">src:</span>  <span class="y-v">app.conf.j2</span>
+        <span class="y-k">dest:</span> <span class="y-v">/etc/app/app.conf</span>
+        <span class="y-k">mode:</span> <span class="y-v">'0644'</span>
+      <span class="y-k">notify:</span> <span class="y-v">restart app</span>
+      <span class="y-k">tags:</span> [<span class="y-v">config</span>]
+
+  <span class="y-k">post_tasks:</span>
+    - <span class="y-k">name:</span> <span class="y-t">Vérification finale</span>
+      <span class="y-m">ansible.builtin.uri:</span>
+        <span class="y-k">url:</span> <span class="y-v">"http://localhost:{{ app_port }}/health"</span>
+        <span class="y-k">status_code:</span> <span class="y-n">200</span>
+
+  <span class="y-k">handlers:</span>
+    - <span class="y-k">name:</span> <span class="y-t">restart app</span>
+      <span class="y-m">ansible.builtin.service:</span>
+        <span class="y-k">name:</span> <span class="y-v">myapp</span>
+        <span class="y-k">state:</span> <span class="y-v">restarted</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-y">Contrôle de flux dans les tâches</div>
+      <div class="syn" style="font-size:.72rem"><span class="lbl">YAML</span><span class="y-c"># Conditions</span>
+- <span class="y-k">name:</span> <span class="y-t">Installer sur Debian/Ubuntu</span>
+  <span class="y-m">ansible.builtin.apt:</span>
+    <span class="y-k">name:</span> <span class="y-v">nginx</span>
+    <span class="y-k">state:</span> <span class="y-v">present</span>
+  <span class="y-k">when:</span> <span class="y-j">ansible_os_family == "Debian"</span>
+
+- <span class="y-k">name:</span> <span class="y-t">Installer sur RedHat</span>
+  <span class="y-m">ansible.builtin.yum:</span>
+    <span class="y-k">name:</span> <span class="y-v">nginx</span>
+  <span class="y-k">when:</span>
+    - <span class="y-j">ansible_os_family == "RedHat"</span>
+    - <span class="y-j">ansible_distribution_major_version | int >= 8</span>
+
+<span class="y-c"># Boucle avec loop</span>
+- <span class="y-k">name:</span> <span class="y-t">Créer des utilisateurs</span>
+  <span class="y-m">ansible.builtin.user:</span>
+    <span class="y-k">name:</span> <span class="y-j">"{{ item.name }}"</span>
+    <span class="y-k">groups:</span> <span class="y-j">"{{ item.groups }}"</span>
+  <span class="y-k">loop:</span>
+    - { <span class="y-k">name:</span> <span class="y-v">alice</span>, <span class="y-k">groups:</span> <span class="y-v">sudo</span> }
+    - { <span class="y-k">name:</span> <span class="y-v">bob</span>,   <span class="y-k">groups:</span> <span class="y-v">docker</span> }
+
+<span class="y-c"># Register + debug</span>
+- <span class="y-k">name:</span> <span class="y-t">Vérifier nginx</span>
+  <span class="y-m">ansible.builtin.command:</span> <span class="y-v">nginx -v</span>
+  <span class="y-k">register:</span> <span class="y-v">nginx_version</span>
+  <span class="y-k">changed_when:</span> <span class="y-n">false</span>
+
+- <span class="y-m">ansible.builtin.debug:</span>
+    <span class="y-k">msg:</span> <span class="y-j">"Version: {{ nginx_version.stdout }}"</span>
+  <span class="y-k">when:</span> <span class="y-j">nginx_version.rc == 0</span>
+
+<span class="y-c"># Gestion d'erreurs</span>
+- <span class="y-k">name:</span> <span class="y-t">Tâche qui peut échouer</span>
+  <span class="y-m">ansible.builtin.command:</span> <span class="y-v">/opt/script.sh</span>
+  <span class="y-k">ignore_errors:</span> <span class="y-n">true</span>
+  <span class="y-k">failed_when:</span> <span class="y-j">result.rc not in [0, 1]</span>
+  <span class="y-k">retries:</span> <span class="y-n">3</span>
+  <span class="y-k">delay:</span> <span class="y-n">5</span>
+  <span class="y-k">until:</span> <span class="y-j">result.rc == 0</span>
+
+<span class="y-c"># Blocks</span>
+- <span class="y-k">block:</span>
+    - <span class="y-k">name:</span> <span class="y-t">Tâche risquée</span>
+      <span class="y-m">ansible.builtin.command:</span> <span class="y-v">/risky.sh</span>
+  <span class="y-k">rescue:</span>
+    - <span class="y-k">name:</span> <span class="y-t">En cas d'erreur</span>
+      <span class="y-m">ansible.builtin.debug:</span>
+        <span class="y-k">msg:</span> <span class="y-v">"Échec — rollback"</span>
+  <span class="y-k">always:</span>
+    - <span class="y-k">name:</span> <span class="y-t">Toujours exécuté</span>
+      <span class="y-m">ansible.builtin.debug:</span>
+        <span class="y-k">msg:</span> <span class="y-v">"Nettoyage terminé"</span>
+</div>
+    </div>
+  </div>
+
+  <!-- ══ 4. MODULES ESSENTIELS ══ -->
+  <div class="section-title">
+    <div class="si si-y">🧩</div>
+    <span style="color:var(--yellow2)">Modules essentiels (ansible.builtin.*)</span>
+  </div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title ct-y">📦 Gestion de paquets</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># apt (Debian/Ubuntu)</span>
+- <span class="y-m">ansible.builtin.apt:</span>
+  <span class="y-k">name:</span> [<span class="y-v">nginx</span>, <span class="y-v">curl</span>]
+  <span class="y-k">state:</span> <span class="y-v">present</span> <span class="y-c"># /absent/latest</span>
+  <span class="y-k">update_cache:</span> <span class="y-n">true</span>
+  <span class="y-k">cache_valid_time:</span> <span class="y-n">3600</span>
+
+<span class="y-c"># yum/dnf (RHEL/CentOS)</span>
+- <span class="y-m">ansible.builtin.yum:</span>
+  <span class="y-k">name:</span> <span class="y-v">httpd</span>
+  <span class="y-k">state:</span> <span class="y-v">latest</span>
+
+- <span class="y-m">ansible.builtin.dnf:</span>
+  <span class="y-k">name:</span> <span class="y-v">nginx</span>
+  <span class="y-k">state:</span> <span class="y-v">installed</span>
+
+<span class="y-c"># pip (Python)</span>
+- <span class="y-m">ansible.builtin.pip:</span>
+  <span class="y-k">name:</span> <span class="y-v">flask</span>
+  <span class="y-k">version:</span> <span class="y-v">"2.0.0"</span>
+  <span class="y-k">virtualenv:</span> <span class="y-v">/opt/venv</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-t">🗂️ Fichiers &amp; Répertoires</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># Copie simple</span>
+- <span class="y-m">ansible.builtin.copy:</span>
+  <span class="y-k">src:</span>  <span class="y-v">files/nginx.conf</span>
+  <span class="y-k">dest:</span> <span class="y-v">/etc/nginx/nginx.conf</span>
+  <span class="y-k">owner:</span> <span class="y-v">root</span>
+  <span class="y-k">group:</span> <span class="y-v">root</span>
+  <span class="y-k">mode:</span>  <span class="y-v">'0644'</span>
+  <span class="y-k">backup:</span> <span class="y-n">true</span>
+
+<span class="y-c"># Template Jinja2</span>
+- <span class="y-m">ansible.builtin.template:</span>
+  <span class="y-k">src:</span>  <span class="y-v">app.conf.j2</span>
+  <span class="y-k">dest:</span> <span class="y-v">/etc/app/app.conf</span>
+  <span class="y-k">mode:</span> <span class="y-v">'0644'</span>
+
+<span class="y-c"># Créer dossier / lien / supprimer</span>
+- <span class="y-m">ansible.builtin.file:</span>
+  <span class="y-k">path:</span>  <span class="y-v">/opt/myapp</span>
+  <span class="y-k">state:</span> <span class="y-v">directory</span> <span class="y-c"># /absent/link/touch</span>
+  <span class="y-k">mode:</span>  <span class="y-v">'0755'</span>
+  <span class="y-k">recurse:</span> <span class="y-n">true</span>
+
+<span class="y-c"># Fetch (hôte → control node)</span>
+- <span class="y-m">ansible.builtin.fetch:</span>
+  <span class="y-k">src:</span>  <span class="y-v">/var/log/app.log</span>
+  <span class="y-k">dest:</span> <span class="y-v">./logs/</span>
+  <span class="y-k">flat:</span> <span class="y-n">true</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-g">⚙️ Services &amp; Système</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># Gérer un service</span>
+- <span class="y-m">ansible.builtin.service:</span>
+  <span class="y-k">name:</span>    <span class="y-v">nginx</span>
+  <span class="y-k">state:</span>   <span class="y-v">started</span>   <span class="y-c"># /stopped/restarted/reloaded</span>
+  <span class="y-k">enabled:</span> <span class="y-n">true</span>      <span class="y-c"># démarrage auto</span>
+
+<span class="y-c"># Exécuter une commande</span>
+- <span class="y-m">ansible.builtin.command:</span>
+  <span class="y-k">cmd:</span> <span class="y-v">"/opt/deploy.sh {{ version }}"</span>
+  <span class="y-k">chdir:</span> <span class="y-v">/opt/app</span>
+  <span class="y-k">creates:</span> <span class="y-v">/opt/app/.deployed</span> <span class="y-c"># skip si existe</span>
+
+<span class="y-c"># Shell (pipes, redirections)</span>
+- <span class="y-m">ansible.builtin.shell:</span>
+  <span class="y-k">cmd:</span> <span class="y-v">"cat /etc/passwd | wc -l"</span>
+  <span class="y-k">executable:</span> <span class="y-v">/bin/bash</span>
+
+<span class="y-c"># Redémarrer le système</span>
+- <span class="y-m">ansible.builtin.reboot:</span>
+  <span class="y-k">reboot_timeout:</span> <span class="y-n">300</span>
+  <span class="y-k">test_command:</span> <span class="y-v">whoami</span>
+
+<span class="y-c"># Gestion utilisateurs</span>
+- <span class="y-m">ansible.builtin.user:</span>
+  <span class="y-k">name:</span>   <span class="y-v">deploy</span>
+  <span class="y-k">groups:</span> <span class="y-v">sudo,docker</span>
+  <span class="y-k">shell:</span>  <span class="y-v">/bin/bash</span>
+  <span class="y-k">state:</span>  <span class="y-v">present</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-o">🌐 Réseau &amp; Vérifications</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># Requête HTTP</span>
+- <span class="y-m">ansible.builtin.uri:</span>
+  <span class="y-k">url:</span>         <span class="y-v">"https://api.example.com"</span>
+  <span class="y-k">method:</span>      <span class="y-v">GET</span>
+  <span class="y-k">status_code:</span> <span class="y-n">200</span>
+  <span class="y-k">headers:</span>
+    <span class="y-k">Authorization:</span> <span class="y-v">"Bearer {{ token }}"</span>
+  <span class="y-k">register:</span>    <span class="y-v">api_response</span>
+
+<span class="y-c"># Attendre un port</span>
+- <span class="y-m">ansible.builtin.wait_for:</span>
+  <span class="y-k">host:</span>    <span class="y-v">localhost</span>
+  <span class="y-k">port:</span>    <span class="y-n">8080</span>
+  <span class="y-k">timeout:</span> <span class="y-n">60</span>
+  <span class="y-k">state:</span>   <span class="y-v">started</span>
+
+<span class="y-c"># Télécharger un fichier</span>
+- <span class="y-m">ansible.builtin.get_url:</span>
+  <span class="y-k">url:</span>      <span class="y-v">"https://dl.example.com/app.tar.gz"</span>
+  <span class="y-k">dest:</span>     <span class="y-v">/tmp/app.tar.gz</span>
+  <span class="y-k">checksum:</span> <span class="y-v">sha256:abc123...</span>
+
+<span class="y-c"># Ligne dans un fichier</span>
+- <span class="y-m">ansible.builtin.lineinfile:</span>
+  <span class="y-k">path:</span>   <span class="y-v">/etc/ssh/sshd_config</span>
+  <span class="y-k">regexp:</span> <span class="y-v">"^PasswordAuthentication"</span>
+  <span class="y-k">line:</span>   <span class="y-v">"PasswordAuthentication no"</span>
+  <span class="y-k">state:</span>  <span class="y-v">present</span>
+</div>
+    </div>
+  </div>
+
+  <!-- Modules supplémentaires -->
+  <div class="grid-3" style="margin-top:1rem">
+    <div class="card">
+      <div class="card-title ct-p">📝 Debug &amp; Assertions</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># Afficher un message</span>
+- <span class="y-m">ansible.builtin.debug:</span>
+  <span class="y-k">msg:</span> <span class="y-v">"Bonjour {{ inventory_hostname }}"</span>
+  <span class="y-k">verbosity:</span> <span class="y-n">2</span>   <span class="y-c"># -vv</span>
+
+<span class="y-c"># Afficher une variable</span>
+- <span class="y-m">ansible.builtin.debug:</span>
+  <span class="y-k">var:</span> <span class="y-v">my_variable</span>
+
+<span class="y-c"># Assertion avec message</span>
+- <span class="y-m">ansible.builtin.assert:</span>
+  <span class="y-k">that:</span>
+    - <span class="y-j">app_port > 1024</span>
+    - <span class="y-j">ansible_memtotal_mb >= 512</span>
+  <span class="y-k">fail_msg:</span> <span class="y-v">"Conditions non remplies"</span>
+  <span class="y-k">success_msg:</span> <span class="y-v">"OK !"</span>
+
+<span class="y-c"># Définir une variable en cours</span>
+- <span class="y-m">ansible.builtin.set_fact:</span>
+  <span class="y-k">app_url:</span> <span class="y-j">"http://{{ ansible_default_ipv4.address }}:{{ app_port }}"</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-r">🔐 Gestion des clés SSH &amp; Firewall</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># Clé SSH autorisée</span>
+- <span class="y-m">ansible.posix.authorized_key:</span>
+  <span class="y-k">user:</span>  <span class="y-v">deploy</span>
+  <span class="y-k">state:</span> <span class="y-v">present</span>
+  <span class="y-k">key:</span>   <span class="y-j">"{{ lookup('file','~/.ssh/id_rsa.pub') }}"</span>
+
+<span class="y-c"># UFW (Ubuntu firewall)</span>
+- <span class="y-m">community.general.ufw:</span>
+  <span class="y-k">rule:</span>  <span class="y-v">allow</span>
+  <span class="y-k">port:</span>  <span class="y-v">'80'</span>
+  <span class="y-k">proto:</span> <span class="y-v">tcp</span>
+
+<span class="y-c"># Archives</span>
+- <span class="y-m">ansible.builtin.unarchive:</span>
+  <span class="y-k">src:</span>     <span class="y-v">/tmp/app.tar.gz</span>
+  <span class="y-k">dest:</span>    <span class="y-v">/opt/app</span>
+  <span class="y-k">remote_src:</span> <span class="y-n">true</span>
+
+<span class="y-c"># Cron job</span>
+- <span class="y-m">ansible.builtin.cron:</span>
+  <span class="y-k">name:</span>    <span class="y-v">"Backup quotidien"</span>
+  <span class="y-k">minute:</span>  <span class="y-v">"0"</span>
+  <span class="y-k">hour:</span>    <span class="y-v">"2"</span>
+  <span class="y-k">job:</span>     <span class="y-v">"/opt/backup.sh"</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-t">🐳 Docker &amp; Cloud</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># Container Docker</span>
+- <span class="y-m">community.docker.docker_container:</span>
+  <span class="y-k">name:</span>    <span class="y-v">myapp</span>
+  <span class="y-k">image:</span>   <span class="y-v">nginx:latest</span>
+  <span class="y-k">state:</span>   <span class="y-v">started</span>
+  <span class="y-k">ports:</span>   [<span class="y-v">"80:80"</span>]
+  <span class="y-k">restart_policy:</span> <span class="y-v">unless-stopped</span>
+  <span class="y-k">env:</span>
+    <span class="y-k">ENV:</span> <span class="y-v">production</span>
+
+<span class="y-c"># Image Docker</span>
+- <span class="y-m">community.docker.docker_image:</span>
+  <span class="y-k">name:</span>   <span class="y-v">myapp</span>
+  <span class="y-k">tag:</span>    <span class="y-v">"{{ app_version }}"</span>
+  <span class="y-k">source:</span> <span class="y-v">build</span>
+  <span class="y-k">build:</span>
+    <span class="y-k">path:</span> <span class="y-v">./app</span>
+
+<span class="y-c"># EC2 (amazon.aws)</span>
+- <span class="y-m">amazon.aws.ec2_instance:</span>
+  <span class="y-k">name:</span>          <span class="y-v">"web-{{ env }}"</span>
+  <span class="y-k">instance_type:</span> <span class="y-v">t3.micro</span>
+  <span class="y-k">image_id:</span>      <span class="y-v">ami-0c55b159cbfafe1f0</span>
+  <span class="y-k">state:</span>         <span class="y-v">running</span>
+  <span class="y-k">region:</span>        <span class="y-v">eu-west-1</span>
+</div>
+    </div>
+  </div>
+
+  <!-- ══ 5. RÔLES ══ -->
+  <div class="section-title">
+    <div class="si si-o">🏗️</div>
+    <span style="color:var(--orange2)">Rôles — Structure &amp; Bonnes pratiques</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-o">Structure d'un rôle Ansible</div>
+      <div class="syn" style="font-size:.73rem"><span class="lbl">FS</span>roles/
+└── nginx/
+    ├── tasks/
+    │   ├── main.yml        <span class="y-c"># entrée principale</span>
+    │   └── install.yml     <span class="y-c"># importé depuis main</span>
+    ├── handlers/
+    │   └── main.yml        <span class="y-c"># handlers du rôle</span>
+    ├── templates/
+    │   └── nginx.conf.j2   <span class="y-c"># templates Jinja2</span>
+    ├── files/
+    │   └── index.html      <span class="y-c"># fichiers statiques</span>
+    ├── vars/
+    │   └── main.yml        <span class="y-c"># variables haute priorité</span>
+    ├── defaults/
+    │   └── main.yml        <span class="y-c"># valeurs par défaut (basse priorité)</span>
+    ├── meta/
+    │   └── main.yml        <span class="y-c"># dépendances du rôle</span>
+    └── README.md
+
+<span class="y-c"># Créer automatiquement la structure :</span>
+<span class="y-t">$ ansible-galaxy role init nginx</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-y">requirements.yml &amp; Appel de rôle</div>
+      <div class="syn" style="font-size:.73rem"><span class="lbl">YAML</span><span class="y-c"># requirements.yml</span>
+<span class="y-c">---</span>
+<span class="y-k">roles:</span>
+  - <span class="y-k">name:</span> <span class="y-v">geerlingguy.nginx</span>
+  - <span class="y-k">src:</span>  <span class="y-v">https://github.com/org/role</span>
+    <span class="y-k">version:</span> <span class="y-v">v2.0.0</span>
+    <span class="y-k">name:</span> <span class="y-v">my_nginx</span>
+
+<span class="y-k">collections:</span>
+  - <span class="y-k">name:</span> <span class="y-v">community.docker</span>
+    <span class="y-k">version:</span> <span class="y-v">">=3.0"</span>
+
+<span class="y-c"># Installer :</span>
+<span class="y-t">$ ansible-galaxy install -r requirements.yml</span>
+
+<span class="y-c">---</span>
+<span class="y-c"># Appel de rôle dans un playbook</span>
+- <span class="y-k">hosts:</span> <span class="y-v">webservers</span>
+  <span class="y-k">roles:</span>
+    - <span class="y-v">common</span>
+    - <span class="y-k">role:</span> <span class="y-v">nginx</span>
+      <span class="y-k">vars:</span>
+        <span class="y-k">nginx_port:</span> <span class="y-n">8080</span>
+      <span class="y-k">tags:</span> [<span class="y-v">web</span>]
+      <span class="y-k">when:</span> <span class="y-j">install_nginx | bool</span>
+
+<span class="y-c"># Ou via include/import :</span>
+- <span class="y-m">ansible.builtin.include_role:</span>
+  <span class="y-k">name:</span> <span class="y-v">nginx</span>
+</div>
+    </div>
+  </div>
+
+  <!-- ══ 6. VARIABLES & PRÉCÉDENCE ══ -->
+  <div class="section-title">
+    <div class="si si-p">📊</div>
+    <span style="color:var(--purple2)">Variables &amp; Priorité (22 niveaux)</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-p">⬆️ Précédence des variables (+ haute en haut)</div>
+      <div class="prec-list">
+        <div class="prec-row p1"><span class="pn">1</span><span class="ps">-e / --extra-vars</span><span class="pl">Priorité absolue</span></div>
+        <div class="prec-row p2"><span class="pn">2</span><span class="ps">set_fact / registered vars</span><span class="pl">Définis en cours d'exécution</span></div>
+        <div class="prec-row p2"><span class="pn">3</span><span class="ps">include_vars</span><span class="pl">Variables importées inline</span></div>
+        <div class="prec-row p3"><span class="pn">4</span><span class="ps">vars (dans le play)</span><span class="pl">Variables du play</span></div>
+        <div class="prec-row p3"><span class="pn">5</span><span class="ps">vars_files</span><span class="pl">Fichiers de variables du play</span></div>
+        <div class="prec-row p3"><span class="pn">6</span><span class="ps">role vars/ (main.yml)</span><span class="pl">Variables du rôle (haute priorité)</span></div>
+        <div class="prec-row p4"><span class="pn">7</span><span class="ps">host_vars/ (inventory)</span><span class="pl">Variables hôte de l'inventory</span></div>
+        <div class="prec-row p4"><span class="pn">8</span><span class="ps">group_vars/hostname</span><span class="pl">Variables du groupe hôte</span></div>
+        <div class="prec-row p4"><span class="pn">9</span><span class="ps">group_vars/all</span><span class="pl">Variables de tous les groupes</span></div>
+        <div class="prec-row p5"><span class="pn">10</span><span class="ps">ansible facts</span><span class="pl">Variables collectées automatiquement</span></div>
+        <div class="prec-row p6"><span class="pn">11</span><span class="ps">role defaults/ (main.yml)</span><span class="pl">Valeurs par défaut du rôle (basse priorité)</span></div>
+      </div>
+      <div class="note note-r" style="margin-top:.7rem">
+        <span class="note-icon">⚠️</span>
+        <div><code class="ic">-e</code> (extra-vars) écrase TOUT. <code class="ic">role defaults/</code> est le plus facilement surchargeable. Toujours mettre les valeurs par défaut dans <code class="ic-t">defaults/main.yml</code>.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-g">Jinja2 — Filtres &amp; Lookups essentiels</div>
+      <div class="syn" style="font-size:.72rem"><span class="lbl">Jinja2</span><span class="y-c"># Filtres courants</span>
+<span class="y-j">{{ variable | default("valeur_defaut") }}</span>
+<span class="y-j">{{ variable | default(omit) }}</span>      <span class="y-c"># omit l'arg si absent</span>
+<span class="y-j">{{ liste   | join(", ") }}</span>
+<span class="y-j">{{ chaine  | upper }}</span> / <span class="y-j">{{ chaine | lower }}</span>
+<span class="y-j">{{ chaine  | replace("a","b") }}</span>
+<span class="y-j">{{ liste   | length }}</span>
+<span class="y-j">{{ valeur  | int }}</span> / <span class="y-j">{{ val | float }}</span> / <span class="y-j">{{ val | bool }}</span>
+<span class="y-j">{{ dict    | dict2items }}</span>
+<span class="y-j">{{ items   | items2dict }}</span>
+<span class="y-j">{{ liste   | flatten }}</span>
+<span class="y-j">{{ liste   | unique }}</span>
+<span class="y-j">{{ liste   | sort }}</span>
+<span class="y-j">{{ valeur  | to_json }}</span> / <span class="y-j">{{ val | from_json }}</span>
+<span class="y-j">{{ valeur  | to_yaml }}</span> / <span class="y-j">{{ val | from_yaml }}</span>
+<span class="y-j">{{ chaine  | b64encode }}</span> / <span class="y-j">{{ val | b64decode }}</span>
+<span class="y-j">{{ chaine  | hash("sha256") }}</span>
+<span class="y-j">{{ chaine  | password_hash("sha512") }}</span>
+
+<span class="y-c"># Lookups</span>
+<span class="y-j">{{ lookup("file", "~/.ssh/id_rsa.pub") }}</span>
+<span class="y-j">{{ lookup("env",  "HOME") }}</span>
+<span class="y-j">{{ lookup("password", "/dev/null length=16") }}</span>
+<span class="y-j">{{ lookup("template", "config.j2") }}</span>
+<span class="y-j">{{ query("inventory_hostnames", "webservers") }}</span>
+</div>
+    </div>
+  </div>
+
+  <!-- ══ 7. ANSIBLE VAULT ══ -->
+  <div class="section-title">
+    <div class="si si-pk">🔐</div>
+    <span style="color:var(--pink)">Ansible Vault — Gestion des secrets</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-pk">Commandes Vault</div>
+      <div class="cmd-list">
+        <div class="cmd-row"><code>ansible-vault create <span class="arg">secrets.yml</span></code><div class="desc">Crée un nouveau fichier chiffré</div></div>
+        <div class="cmd-row"><code>ansible-vault encrypt <span class="arg">vars.yml</span></code><div class="desc">Chiffre un fichier existant</div></div>
+        <div class="cmd-row"><code>ansible-vault decrypt <span class="arg">vars.yml</span></code><div class="desc">Déchiffre un fichier (⚠ permanent)</div></div>
+        <div class="cmd-row"><code>ansible-vault edit <span class="arg">secrets.yml</span></code><div class="desc">Édite sans déchiffrer sur disque</div></div>
+        <div class="cmd-row"><code>ansible-vault view <span class="arg">secrets.yml</span></code><div class="desc">Affiche le contenu déchiffré</div></div>
+        <div class="cmd-row"><code>ansible-vault rekey <span class="arg">secrets.yml</span></code><div class="desc">Change le mot de passe du vault</div></div>
+        <div class="cmd-row"><code>ansible-vault encrypt_string <span class="arg">'valeur'</span> <span class="flag">--name</span> <span class="arg">var_name</span></code><div class="desc">Chiffre une seule valeur inline</div></div>
+        <div class="cmd-row"><code>ansible-playbook site.yml <span class="flag">--vault-password-file</span> <span class="arg">.vault_pass</span></code><div class="desc">Utilise un fichier de mot de passe</div></div>
+        <div class="cmd-row"><code>ansible-playbook site.yml <span class="flag">--ask-vault-pass</span></code><div class="desc">Demande le mot de passe interactivement</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-t">Vault inline &amp; Bonnes pratiques</div>
+      <div class="syn" style="font-size:.72rem"><span class="lbl">YAML</span><span class="y-c"># Valeur chiffrée inline (encrypt_string)</span>
+<span class="y-k">db_password:</span> <span class="y-s">!vault</span> |
+  <span class="y-v">$ANSIBLE_VAULT;1.1;AES256</span>
+  <span class="y-v">61383839...</span>
+
+<span class="y-c"># ansible.cfg — Vault ID</span>
+[<span class="y-h">defaults</span>]
+<span class="y-k">vault_identity_list</span> = <span class="y-v">prod@.vault_prod,dev@.vault_dev</span>
+
+<span class="y-c"># Chiffrer pour un vault ID spécifique</span>
+<span class="y-t">$ ansible-vault encrypt --vault-id prod@.vault_prod file.yml</span>
+
+<span class="y-c"># Bonnes pratiques Vault</span>
+<span class="y-c"># ✅ Chiffrer les vars_files entiers en prod</span>
+<span class="y-c"># ✅ Utiliser vault_password_file en CI/CD</span>
+<span class="y-c"># ✅ Stocker .vault_pass hors du repo Git</span>
+<span class="y-c"># ✅ Ajouter .vault_pass au .gitignore</span>
+<span class="y-c"># ✅ Nommer les fichiers *_vault.yml</span>
+<span class="y-c"># ❌ Jamais commiter de secrets en clair</span>
+</div>
+    </div>
+  </div>
+
+  <!-- ══ 8. ANSIBLE.CFG & FACTS ══ -->
+  <div class="section-title">
+    <div class="si si-r">⚙️</div>
+    <span style="color:var(--ans3)">ansible.cfg &amp; Facts Magic Variables</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-r">ansible.cfg — Configuration principale</div>
+      <div class="syn" style="font-size:.72rem"><span class="lbl">INI</span>[<span class="y-h">defaults</span>]
+<span class="y-k">inventory</span>            = <span class="y-v">./inventory</span>
+<span class="y-k">remote_user</span>          = <span class="y-v">ubuntu</span>
+<span class="y-k">private_key_file</span>     = <span class="y-v">~/.ssh/id_rsa</span>
+<span class="y-k">host_key_checking</span>    = <span class="y-n">False</span>   <span class="y-c"># désactive vérif clé SSH</span>
+<span class="y-k">forks</span>                = <span class="y-n">10</span>      <span class="y-c"># parallélisme (défaut: 5)</span>
+<span class="y-k">gathering</span>            = <span class="y-v">smart</span>   <span class="y-c"># smart/implicit/explicit</span>
+<span class="y-k">fact_caching</span>         = <span class="y-v">jsonfile</span>
+<span class="y-k">fact_caching_connection</span> = <span class="y-v">/tmp/ansible_facts</span>
+<span class="y-k">fact_caching_timeout</span> = <span class="y-n">86400</span>
+<span class="y-k">retry_files_enabled</span>  = <span class="y-n">False</span>
+<span class="y-k">stdout_callback</span>      = <span class="y-v">yaml</span>    <span class="y-c"># affichage lisible</span>
+<span class="y-k">callbacks_enabled</span>    = <span class="y-v">profile_tasks</span>
+<span class="y-k">interpreter_python</span>   = <span class="y-v">auto_silent</span>
+<span class="y-k">roles_path</span>           = <span class="y-v">./roles:~/.ansible/roles</span>
+<span class="y-k">collections_paths</span>    = <span class="y-v">./collections:~/.ansible/collections</span>
+
+[<span class="y-h">privilege_escalation</span>]
+<span class="y-k">become</span>               = <span class="y-n">True</span>
+<span class="y-k">become_method</span>        = <span class="y-v">sudo</span>
+<span class="y-k">become_user</span>          = <span class="y-v">root</span>
+<span class="y-k">become_ask_pass</span>      = <span class="y-n">False</span>
+
+[<span class="y-h">ssh_connection</span>]
+<span class="y-k">ssh_args</span>             = <span class="y-v">-C -o ControlMaster=auto -o ControlPersist=60s</span>
+<span class="y-k">pipelining</span>           = <span class="y-n">True</span>    <span class="y-c"># améliore les performances</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-g">Magic Variables &amp; Facts essentiels</div>
+      <table class="ref-table">
+        <tr><th>Variable</th><th>Description</th></tr>
+        <tr><td>inventory_hostname</td><td>Nom de l'hôte tel que défini dans l'inventory</td></tr>
+        <tr><td>inventory_hostname_short</td><td>Partie courte avant le premier point</td></tr>
+        <tr><td>ansible_host</td><td>Adresse de connexion réelle</td></tr>
+        <tr><td>ansible_facts</td><td>Dictionnaire complet des facts collectés</td></tr>
+        <tr><td>ansible_distribution</td><td>OS: Ubuntu, CentOS, Debian…</td></tr>
+        <tr><td>ansible_distribution_version</td><td>Version de l'OS: 22.04, 8.5…</td></tr>
+        <tr><td>ansible_os_family</td><td>Famille: Debian, RedHat, Windows…</td></tr>
+        <tr><td>ansible_architecture</td><td>x86_64, arm64, i386…</td></tr>
+        <tr><td>ansible_default_ipv4.address</td><td>IP principale de l'hôte</td></tr>
+        <tr><td>ansible_memtotal_mb</td><td>RAM totale en MB</td></tr>
+        <tr><td>ansible_processor_vcpus</td><td>Nombre de vCPUs</td></tr>
+        <tr><td>ansible_hostname</td><td>Hostname système de la machine</td></tr>
+        <tr><td>hostvars[hostname]</td><td>Variables d'un autre hôte</td></tr>
+        <tr><td>groups['groupname']</td><td>Liste des hôtes d'un groupe</td></tr>
+        <tr><td>group_names</td><td>Liste des groupes de l'hôte courant</td></tr>
+        <tr><td>playbook_dir</td><td>Répertoire du playbook en cours</td></tr>
+        <tr><td>role_path</td><td>Chemin absolu du rôle en cours</td></tr>
+        <tr><td>ansible_check_mode</td><td>true si exécuté avec --check</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ 9. PIÈGES & BONNES PRATIQUES ══ -->
+  <div class="section-title">
+    <div class="si si-r">🎯</div>
+    <span style="color:var(--ans3)">Pièges fréquents &amp; Bonnes pratiques</span>
+  </div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title ct-r">⚠️ command vs shell</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># command : pas de shell</span>
+<span class="y-c"># ❌ pipes, redirections, &&, ||</span>
+- <span class="y-m">ansible.builtin.command:</span>
+  <span class="y-k">cmd:</span> <span class="y-v">"echo hello > /tmp/f"</span>
+  <span class="y-c"># ✗ Ne fonctionne PAS</span>
+
+<span class="y-c"># shell : avec shell bash</span>
+<span class="y-c"># ✅ pipes et redirections OK</span>
+- <span class="y-m">ansible.builtin.shell:</span>
+  <span class="y-k">cmd:</span> <span class="y-v">"ps aux | grep nginx"</span>
+
+<span class="y-c"># Préférer les modules natifs</span>
+<span class="y-c"># ✅ ansible.builtin.copy</span>
+<span class="y-c"># ✅ ansible.builtin.apt</span>
+<span class="y-c"># ✅ ansible.builtin.service</span>
+<span class="y-c"># au lieu de shell/command</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-y">⚠️ Idempotence</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># ❌ Pas idempotent</span>
+- <span class="y-m">ansible.builtin.shell:</span>
+  <span class="y-k">cmd:</span> <span class="y-v">"useradd myuser"</span>
+  <span class="y-c"># Échoue si déjà créé</span>
+
+<span class="y-c"># ✅ Idempotent</span>
+- <span class="y-m">ansible.builtin.user:</span>
+  <span class="y-k">name:</span>  <span class="y-v">myuser</span>
+  <span class="y-k">state:</span> <span class="y-v">present</span>
+
+<span class="y-c"># Contrôle changed_when</span>
+- <span class="y-m">ansible.builtin.command:</span>
+  <span class="y-k">cmd:</span> <span class="y-v">nginx -t</span>
+  <span class="y-k">changed_when:</span> <span class="y-n">false</span>
+  <span class="y-c"># Ne signale jamais de changement</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-g">✅ Handlers</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># Handlers : exécutés UNE seule fois</span>
+<span class="y-c"># à la FIN du play, si notifiés</span>
+<span class="y-k">tasks:</span>
+  - <span class="y-m">ansible.builtin.template:</span>
+    <span class="y-k">src:</span>  <span class="y-v">nginx.conf.j2</span>
+    <span class="y-k">dest:</span> <span class="y-v">/etc/nginx/nginx.conf</span>
+    <span class="y-k">notify:</span> <span class="y-v">restart nginx</span>
+
+<span class="y-k">handlers:</span>
+  - <span class="y-k">name:</span> <span class="y-t">restart nginx</span>
+    <span class="y-m">ansible.builtin.service:</span>
+      <span class="y-k">name:</span>  <span class="y-v">nginx</span>
+      <span class="y-k">state:</span> <span class="y-v">restarted</span>
+
+<span class="y-c"># Forcer les handlers immédiatement</span>
+- <span class="y-m">ansible.builtin.meta:</span>
+    <span class="y-k">flush_handlers</span>
+</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-t">✅ include vs import</div>
+      <div class="syn" style="font-size:.71rem"><span class="y-c"># import_* = statique (au chargement)</span>
+<span class="y-c"># ✅ Tags et conditions s'appliquent</span>
+- <span class="y-m">ansible.builtin.import_tasks:</span>
+  <span class="y-k">file:</span> <span class="y-v">install.yml</span>
+
+- <span class="y-m">ansible.builtin.import_role:</span>
+  <span class="y-k">name:</span> <span class="y-v">nginx</span>
+
+<span class="y-c"># include_* = dynamique (à l'exécution)</span>
+<span class="y-c"># ✅ Peut utiliser des variables</span>
+- <span class="y-m">ansible.builtin.include_tasks:</span>
+  <span class="y-k">file:</span> <span class="y-j">"{{ ansible_os_family }}.yml"</span>
+
+- <span class="y-m">ansible.builtin.include_role:</span>
+  <span class="y-k">name:</span> <span class="y-j">"{{ role_name }}"</span>
+
+<span class="y-c"># Règle : import pour structure fixe</span>
+<span class="y-c">#         include pour contenu dynamique</span>
+</div>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<div class="footer">
+  Ansible Cheatsheet · Red Hat Ansible Automation Platform · Formateur DevOps <span>Capgemini CIS</span> · Généré par Claude
+</div>
+
+<script>
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.classList.toggle('cs-hidden', q.length > 1 && !text.includes(q));
+  });
+}
+</script>
+</body>
+</html>
