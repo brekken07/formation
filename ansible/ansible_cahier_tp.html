@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ansible — Cahier de cours et de TP</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d1117;
+  --bg2:       #161b22;
+  --bg3:       #21262d;
+  --border:    #30363d;
+  --border2:   #484f58;
+  --text:      #e6edf3;
+  --text2:     #adbac7;
+  --text3:     #768390;
+  --blue:      #4493f8;
+  --blue-dim:  #1f6feb;
+  --blue-bg:   #0d2149;
+  --green:     #3fb950;
+  --green-dim: #196127;
+  --green-bg:  #0a2a12;
+  --orange:    #d29922;
+  --orange-dim:#9a6700;
+  --orange-bg: #2b1d00;
+  --purple:    #bc8cff;
+  --purple-dim:#6e40c9;
+  --purple-bg: #1e0a3c;
+  --teal:      #2dd4bf;
+  --teal-dim:  #0f766e;
+  --teal-bg:   #042f2e;
+  --code-bg:   #010409;
+  --radius:    10px;
+  --radius-lg: 16px;
+  --nav-h:     54px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 17px; scroll-padding-top: calc(var(--nav-h) + 16px); }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.75; }
+
+/* NAV */
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(13,17,23,.93);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 200;
+  display: flex; align-items: center;
+  padding: 0 28px; gap: 0;
+}
+.nav-logo { font-size: 16px; font-weight: 800; color: var(--blue); margin-right: 24px; white-space: nowrap; flex-shrink: 0; letter-spacing: -.5px; }
+.nav-links { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 13px; font-weight: 500; color: var(--text3); text-decoration: none; border-radius: 7px; white-space: nowrap; transition: all .15s; flex-shrink: 0; }
+.nav-item:hover { background: var(--bg3); color: var(--text2); }
+.nav-item.active { background: var(--bg3); color: var(--text); }
+.nav-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.nav-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+
+/* PROGRESS */
+.progress-bar { position: fixed; top: var(--nav-h); left: 0; right: 0; height: 2px; z-index: 201; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--purple)); width: 0%; transition: width .1s; }
+
+/* MAIN */
+.main { max-width: 820px; margin: 0 auto; padding: calc(var(--nav-h) + 40px) 28px 80px; }
+
+/* HERO */
+.hero { margin-bottom: 56px; }
+.hero-badge { display: inline-block; background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-dim); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 600; margin-bottom: 18px; }
+.hero h1 { font-size: 52px; font-weight: 800; line-height: 1.05; letter-spacing: -2px; margin-bottom: 10px; }
+.hero h1 span { color: var(--blue); }
+.hero-sub { font-size: 18px; color: var(--text2); margin-bottom: 24px; }
+.hero-info { background: var(--bg2); border: 1px solid var(--border); border-left: 4px solid var(--blue); border-radius: var(--radius-lg); padding: 18px 22px; font-size: 14px; color: var(--text2); line-height: 1.9; }
+.hero-info strong { color: var(--text); }
+
+/* MODULE HEADER */
+.module-header {
+  display: flex; align-items: flex-start; gap: 20px;
+  padding: 26px 30px; border-radius: var(--radius-lg);
+  margin: 48px 0 28px; border: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--blue-bg) 0%, var(--bg2) 100%);
+  border-color: var(--blue-dim);
+}
+.module-num { font-size: 52px; font-weight: 800; line-height: 1; letter-spacing: -3px; color: var(--blue); min-width: 72px; }
+.module-info h2 { font-size: 24px; font-weight: 700; color: var(--blue); margin-bottom: 6px; letter-spacing: -.5px; }
+.module-info p { font-size: 15px; color: var(--text2); line-height: 1.7; }
+
+/* SECTION LABEL */
+.slabel { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1.2px; margin: 28px 0 12px; display: flex; align-items: center; gap: 8px; }
+.slabel::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* PROSE */
+.prose { font-size: 16px; color: var(--text2); line-height: 1.85; margin: 12px 0; }
+.prose strong { color: var(--text); }
+.prose em { color: var(--text); font-style: italic; }
+
+/* BOXES */
+.box { border-radius: var(--radius); padding: 16px 20px; border-left: 4px solid; margin: 14px 0; }
+.box-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.box p, .box li { font-size: 15px; color: var(--text2); line-height: 1.8; }
+.box ul, .box ol { padding-left: 20px; margin-top: 6px; }
+.box li { margin: 3px 0; }
+.box strong { color: var(--text); }
+
+.box-info { background: var(--blue-bg); border-color: var(--blue-dim); }
+.box-info .box-label { color: var(--blue); }
+.box-tip { background: var(--green-bg); border-color: var(--green-dim); }
+.box-tip .box-label { color: var(--green); }
+.box-warn { background: var(--orange-bg); border-color: var(--orange-dim); }
+.box-warn .box-label { color: var(--orange); }
+
+/* Q&A */
+.qa { border-radius: var(--radius); overflow: hidden; margin: 14px 0; border: 1px solid var(--border); }
+.qa-q { background: var(--green-dim); padding: 12px 18px; font-size: 15px; font-weight: 600; color: #fff; }
+.qa-a { background: var(--green-bg); padding: 12px 18px; font-size: 15px; color: var(--text2); line-height: 1.8; border-top: 1px solid var(--green-dim); }
+
+/* EXERCICE */
+.exercice { border-radius: var(--radius); overflow: hidden; margin: 14px 0; }
+.exo-header { background: var(--purple-dim); padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
+.exo-num { background: rgba(255,255,255,.2); color: #fff; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; padding: 3px 9px; border-radius: 5px; }
+.exo-title { font-size: 15px; font-weight: 600; color: #fff; }
+.exo-body { background: var(--purple-bg); padding: 14px 18px; border: 1px solid var(--purple-dim); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+.exo-body p, .exo-body li { font-size: 15px; color: var(--text2); line-height: 1.8; }
+.exo-body ul, .exo-body ol { padding-left: 20px; margin-top: 6px; }
+.exo-body li { margin: 3px 0; }
+
+/* CODE */
+pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; overflow-x: auto; margin: 12px 0; }
+code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.9; color: var(--text); }
+.ic { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; padding: 1px 6px; color: var(--purple); white-space: nowrap; }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+th { background: var(--bg3); color: var(--text2); font-size: 12px; font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .5px; }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+tr:hover td { background: var(--bg2); }
+
+/* SEPARATOR */
+.sep { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-logo">Ansible — Cahier TP</div>
+  <div class="nav-links">
+    <a class="nav-item" href="#m1"><span class="nav-dot" style="background:var(--blue)"></span>M1</a>
+    <a class="nav-item" href="#m2"><span class="nav-dot" style="background:var(--green)"></span>M2</a>
+    <a class="nav-item" href="#m3"><span class="nav-dot" style="background:var(--orange)"></span>M3</a>
+    <a class="nav-item" href="#m4"><span class="nav-dot" style="background:var(--purple)"></span>M4</a>
+    <div class="nav-sep"></div>
+    <a class="nav-item" href="#m5"><span class="nav-dot" style="background:var(--blue)"></span>M5</a>
+    <a class="nav-item" href="#m6"><span class="nav-dot" style="background:var(--green)"></span>M6</a>
+    <a class="nav-item" href="#m7"><span class="nav-dot" style="background:var(--orange)"></span>M7</a>
+    <a class="nav-item" href="#m8"><span class="nav-dot" style="background:var(--purple)"></span>M8</a>
+    <div class="nav-sep"></div>
+    <a class="nav-item" href="#annexe"><span class="nav-dot" style="background:var(--text3)"></span>Annexe</a>
+  </div>
+</nav>
+<div class="progress-bar"><div class="progress-fill" id="pf"></div></div>
+
+<main class="main">
+
+<!-- HERO -->
+<section id="intro">
+  <div class="hero">
+    <div class="hero-badge">Formation DevOps — Capgemini CIS</div>
+    <h1>Ansible<br><span>Cahier de cours et de TP</span></h1>
+    <p class="hero-sub">Version complète — Modules 1 à 8</p>
+    <div class="hero-info">
+      <strong>Environnement utilisé :</strong><br>
+      Machine de contrôle : <strong>10.116.0.195</strong> — Machine cible 1 : <strong>10.116.0.238</strong> (machine2) — Machine cible 2 : <strong>10.116.0.239</strong> (machine3)<br>
+      OS : Debian 13 — Utilisateur : <strong>setupuser</strong>
+    </div>
+  </div>
+</section>
+
+<!-- MODULE 1 -->
+<section id="m1">
+  <div class="module-header">
+    <div class="module-num">01</div>
+    <div class="module-info"><h2>Pourquoi Ansible ?</h2><p>Comprendre le problème qu'Ansible résout avant d'apprendre la syntaxe.</p></div>
+  </div>
+
+  <div class="slabel">Le problème</div>
+  <p class="prose">Sans outil d'automatisation, gérer plusieurs serveurs Linux revient à se connecter manuellement en SSH sur chacun, taper les mêmes commandes, faire des erreurs différentes sur chaque machine, et ne plus savoir exactement ce qui est installé où.</p>
+  <p class="prose">Ansible résout ce problème : on décrit l'état désiré des machines dans des fichiers texte, et Ansible applique cet état partout, de façon identique et reproductible.</p>
+
+  <div class="slabel">Concept clé — l'idempotence</div>
+  <div class="box box-info">
+    <div class="box-label">ℹ Idempotence</div>
+    <p>Si tu lances le même playbook 10 fois, le résultat est identique à la 1re exécution. Ansible vérifie l'état actuel avant d'agir. Si nginx est déjà installé, il ne réinstalle pas.</p>
+    <ul><li><strong>changed: 1</strong> → Ansible a effectué une modification réelle</li><li><strong>changed: 0</strong> → Rien à faire, état déjà conforme</li></ul>
+  </div>
+
+  <div class="slabel">Comment ça fonctionne</div>
+  <pre><code>Machine de contrôle (10.116.0.195)
+├── Inventory  →  liste des machines cibles
+├── Playbook   →  ce qu'on veut faire
+└── Ansible    →  se connecte via SSH
+                       │
+          ┌────────────┼────────────┐
+          ▼            ▼            ▼
+     machine2      machine3      ...
+  (10.116.0.238) (10.116.0.239)</code></pre>
+
+  <div class="slabel">Les 4 concepts fondamentaux</div>
+  <table>
+    <thead><tr><th>Concept</th><th>Analogie</th><th>Rôle</th></tr></thead>
+    <tbody>
+      <tr><td>Inventory</td><td>Carnet d'adresses</td><td>Liste des machines cibles</td></tr>
+      <tr><td>Playbook</td><td>Recette de cuisine</td><td>Séquence de tâches à exécuter</td></tr>
+      <tr><td>Module</td><td>Outil dans une boîte</td><td>Action atomique (apt, copy, service…)</td></tr>
+      <tr><td>Role</td><td>Corps de métier</td><td>Regroupement organisé de tâches</td></tr>
+    </tbody>
+  </table>
+
+  <div class="slabel">Questions / Réponses</div>
+  <div class="qa"><div class="qa-q">Qu'est-ce que l'idempotence en Ansible ?</div><div class="qa-a">Si on lance le même playbook plusieurs fois, le résultat est identique à la 1re exécution. Ansible vérifie l'état actuel avant d'agir et ne modifie que ce qui est nécessaire.</div></div>
+  <div class="qa"><div class="qa-q">Ansible a-t-il besoin d'un agent sur les machines cibles ?</div><div class="qa-a">Non. Ansible utilise SSH + Python 3. Rien d'autre à installer sur les machines cibles.</div></div>
+</section>
+
+<hr class="sep">
+
+<!-- MODULE 2 -->
+<section id="m2">
+  <div class="module-header" style="background:linear-gradient(135deg,var(--green-bg) 0%,var(--bg2) 100%);border-color:var(--green-dim)">
+    <div class="module-num" style="color:var(--green)">02</div>
+    <div class="module-info"><h2 style="color:var(--green)">Installation et premier contact</h2><p>Mettre en place l'environnement et configurer l'accès SSH par clé.</p></div>
+  </div>
+
+  <div class="slabel">Installation sur la machine de contrôle</div>
+  <pre><code># Installation via pip (recommandée)
+$ pip3 install ansible
+
+# Ou via le dépôt Debian
+$ sudo apt install ansible -y
+
+# Vérification
+$ ansible --version</code></pre>
+
+  <div class="slabel">SSH vs sudo — deux mécanismes distincts</div>
+  <div class="box box-warn">
+    <div class="box-label">⚠ Point clé</div>
+    <ul>
+      <li><strong>La clé SSH</strong> → sert à SE CONNECTER à la machine</li>
+      <li><strong>Le mot de passe sudo</strong> → sert à ÉLEVER LES PRIVILÈGES une fois connecté</li>
+    </ul>
+    <p>Avec <code class="ic">become: true</code> dans un playbook, Ansible a besoin du mot de passe sudo séparément (option <code class="ic">--ask-become-pass</code>).</p>
+  </div>
+
+  <div class="slabel">Configuration de l'accès SSH par clé</div>
+  <pre><code># 1. Générer une paire de clés ED25519 sur la machine de contrôle
+$ ssh-keygen -t ed25519 -C "ansible" -f ~/.ssh/ansible_key
+
+# 2. Copier la clé publique sur chaque machine cible
+$ ssh-copy-id -i ~/.ssh/ansible_key.pub setupuser@10.116.0.238
+$ ssh-copy-id -i ~/.ssh/ansible_key.pub setupuser@10.116.0.239
+
+# 3. Tester la connexion sans mot de passe
+$ ssh -i ~/.ssh/ansible_key setupuser@10.116.0.238</code></pre>
+
+  <div class="exercice">
+    <div class="exo-header"><span class="exo-num">EX 1</span><span class="exo-title">Tester la connexion SSH par clé</span></div>
+    <div class="exo-body">
+      <ol>
+        <li>Vérifier que la clé ansible_key existe : <code class="ic">ls ~/.ssh/</code></li>
+        <li>Se connecter sans mot de passe : <code class="ic">ssh -i ~/.ssh/ansible_key setupuser@10.116.0.238</code></li>
+        <li>Faire de même sur machine3</li>
+      </ol>
+      <p><strong>Résultat attendu :</strong> connexion directe sans saisie de mot de passe.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- MODULE 3 -->
+<section id="m3">
+  <div class="module-header" style="background:linear-gradient(135deg,var(--orange-bg) 0%,var(--bg2) 100%);border-color:var(--orange-dim)">
+    <div class="module-num" style="color:var(--orange)">03</div>
+    <div class="module-info"><h2 style="color:var(--orange)">L'Inventory</h2><p>Définir quelles machines Ansible gère et comment les atteindre.</p></div>
+  </div>
+
+  <div class="slabel">Structure du projet</div>
+  <pre><code>ansible-tp/                    ← Racine du projet
+├── inventory/
+│   ├── hosts.ini              ← Liste des machines et groupes
+│   └── group_vars/
+│       └── all.yml            ← Variables communes à TOUTES les machines
+├── roles/
+├── templates/
+└── site.yml                   ← Playbook principal</code></pre>
+
+  <div class="slabel">Le fichier hosts.ini</div>
+  <pre><code>[machines_cibles]
+machine2   ansible_host=10.116.0.238
+machine3   ansible_host=10.116.0.239
+
+[machines_cibles:vars]
+ansible_user=setupuser
+ansible_ssh_private_key_file=~/.ssh/ansible_key
+ansible_python_interpreter=/usr/bin/python3</code></pre>
+
+  <div class="slabel">Ce qu'on invente vs ce qu'Ansible impose</div>
+  <table>
+    <thead><tr><th>Élément</th><th>Qui décide ?</th><th>Exemple</th></tr></thead>
+    <tbody>
+      <tr><td>Nom du groupe</td><td>Toi — libre</td><td>[machines_cibles]</td></tr>
+      <tr><td>Alias de la machine</td><td>Toi — libre</td><td>machine2</td></tr>
+      <tr><td>Valeurs des variables</td><td>Toi</td><td>setupuser, ~/.ssh/...</td></tr>
+      <tr><td>Noms ansible_XXX</td><td>Ansible — imposés</td><td>ansible_host, ansible_user</td></tr>
+      <tr><td>Syntaxe [groupe:vars]</td><td>Ansible — imposée</td><td>[machines_cibles:vars]</td></tr>
+    </tbody>
+  </table>
+
+  <div class="slabel">Règle group_vars</div>
+  <div class="box box-info">
+    <div class="box-label">ℹ Règle clé</div>
+    <p>Le nom du fichier dans <code class="ic">group_vars/</code> doit correspondre <strong>exactement</strong> au nom du groupe dans <code class="ic">hosts.ini</code>.</p>
+    <ul>
+      <li><code class="ic">[machines_cibles]</code> → <code class="ic">group_vars/machines_cibles.yml</code></li>
+      <li><code class="ic">[all]</code> → <code class="ic">group_vars/all.yml</code> (chargé pour TOUTES les machines)</li>
+    </ul>
+    <p>Une erreur de nommage est ignorée silencieusement, sans message d'erreur.</p>
+  </div>
+
+  <div class="slabel">Questions / Réponses</div>
+  <div class="qa"><div class="qa-q">Dans hosts.ini, 'machine2' est-il le hostname réel de la VM ?</div><div class="qa-a">Non. C'est un alias libre. Le hostname réel est défini par ansible_host=10.116.0.238. L'alias sert uniquement à l'affichage dans les sorties Ansible.</div></div>
+  <div class="qa"><div class="qa-q">Si j'ai [webservers] et un fichier group_vars/serveurs_web.yml, Ansible fait-il le lien ?</div><div class="qa-a">Non. Le nom du fichier doit être exactement identique au nom du groupe. group_vars/webservers.yml est le fichier correct.</div></div>
+
+  <div class="exercice">
+    <div class="exo-header"><span class="exo-num">EX 2</span><span class="exo-title">Créer et vérifier l'inventory</span></div>
+    <div class="exo-body">
+      <ol>
+        <li>Créer la structure : <code class="ic">mkdir -p ~/ansible-tp/inventory/group_vars</code></li>
+        <li>Créer <code class="ic">hosts.ini</code> avec le groupe <code class="ic">[machines_cibles]</code> et ses deux machines</li>
+        <li>Ajouter le bloc <code class="ic">[machines_cibles:vars]</code> avec les 3 directives de connexion</li>
+        <li>Vérifier : <code class="ic">ansible all -i inventory/hosts.ini --list-hosts</code></li>
+        <li>Tester : <code class="ic">ansible all -i inventory/hosts.ini -m ping</code></li>
+      </ol>
+      <p><strong>Résultat attendu :</strong> SUCCESS / pong sur machine2 et machine3.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- MODULE 4 -->
+<section id="m4">
+  <div class="module-header" style="background:linear-gradient(135deg,var(--purple-bg) 0%,var(--bg2) 100%);border-color:var(--purple-dim)">
+    <div class="module-num" style="color:var(--purple)">04</div>
+    <div class="module-info"><h2 style="color:var(--purple)">Le Playbook</h2><p>Décrire les actions à effectuer sur les machines cibles.</p></div>
+  </div>
+
+  <div class="slabel">Règles YAML</div>
+  <div class="box box-tip">
+    <div class="box-label">✅ Règles indispensables</div>
+    <ul>
+      <li>Indentation <strong>obligatoire</strong> avec des espaces, jamais des tabulations</li>
+      <li>Convention : 2 espaces par niveau d'indentation</li>
+      <li>Le tiret <code class="ic">-</code> signifie "élément d'une liste"</li>
+      <li>Toute valeur commençant par <code class="ic">{{</code> doit être entre guillemets : <code class="ic">"{{ variable }}"</code></li>
+      <li>Le fichier commence toujours par <code class="ic">---</code></li>
+    </ul>
+  </div>
+
+  <div class="slabel">Anatomie complète</div>
+  <pre><code>---                              # Marqueur de début YAML
+
+- name: Nom du play             # Nom libre
+  hosts: machines_cibles        # Groupe cible de l'inventory
+  become: true                  # Utiliser sudo
+
+  tasks:
+
+    - name: Installer nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present          # present / absent / latest
+
+    - name: Démarrer nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true           # Démarrage automatique au boot
+
+  handlers:                     # Exécutés une seule fois en fin de play
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted</code></pre>
+
+  <div class="slabel">Commandes d'exécution</div>
+  <pre><code># Simulation sans modification — TOUJOURS avant un déploiement
+$ ansible-playbook -i inventory/hosts.ini site.yml --check
+
+# Exécution réelle
+$ ansible-playbook -i inventory/hosts.ini site.yml
+
+# Avec mot de passe sudo
+$ ansible-playbook -i inventory/hosts.ini site.yml --ask-become-pass
+
+# Mode verbeux
+$ ansible-playbook -i inventory/hosts.ini site.yml -v
+
+# Limiter à une machine
+$ ansible-playbook -i inventory/hosts.ini site.yml --limit machine2</code></pre>
+
+  <div class="slabel">Lire la sortie</div>
+  <table>
+    <thead><tr><th>Statut</th><th>Signification</th></tr></thead>
+    <tbody>
+      <tr><td>ok</td><td>Tâche exécutée, rien modifié (idempotence)</td></tr>
+      <tr><td>changed</td><td>Ansible a effectué une modification réelle</td></tr>
+      <tr><td>skipped</td><td>Tâche ignorée (condition when non remplie)</td></tr>
+      <tr><td>unreachable</td><td>Machine non joignable</td></tr>
+      <tr><td>failed</td><td>La tâche a échoué</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box box-warn">
+    <div class="box-label">⚠ Limitation du mode --check</div>
+    <p>Le mode <code class="ic">--check</code> peut signaler des erreurs sur les tâches qui dépendent d'une tâche non encore exécutée (ex : démarrer un service non encore installé). Ce n'est pas forcément une erreur dans le playbook.</p>
+  </div>
+
+  <div class="exercice">
+    <div class="exo-header"><span class="exo-num">EX 3</span><span class="exo-title">Premier playbook — installer vim</span></div>
+    <div class="exo-body">
+      <ol>
+        <li>Créer <code class="ic">site.yml</code> avec un play qui installe vim</li>
+        <li>Tester avec <code class="ic">--check --ask-become-pass</code></li>
+        <li>Lancer pour de vrai avec <code class="ic">--ask-become-pass</code></li>
+        <li>Relancer une 2e fois → observer <strong>changed: 0</strong> (idempotence)</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- MODULE 5 -->
+<section id="m5">
+  <div class="module-header" style="background:linear-gradient(135deg,var(--blue-bg) 0%,var(--bg2) 100%);border-color:var(--blue-dim)">
+    <div class="module-num" style="color:var(--blue)">05</div>
+    <div class="module-info"><h2 style="color:var(--blue)">Modules essentiels et boucles</h2><p>La boîte à outils Ansible pour gérer une infrastructure Linux.</p></div>
+  </div>
+
+  <div class="slabel">ansible.builtin.apt — paquets Debian/Ubuntu</div>
+  <pre><code>- name: Installer nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present        # present / absent / latest
+    update_cache: true    # équivaut à apt update</code></pre>
+
+  <div class="slabel">ansible.builtin.service — services système</div>
+  <pre><code>- name: Démarrer nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started        # started / stopped / restarted / reloaded
+    enabled: true         # démarrage automatique au boot</code></pre>
+
+  <div class="slabel">ansible.builtin.user — utilisateurs</div>
+  <pre><code>- name: Créer un utilisateur
+  ansible.builtin.user:
+    name: deployer
+    shell: /bin/bash
+    create_home: true
+    groups: sudo
+    state: present</code></pre>
+
+  <div class="slabel">ansible.builtin.copy — fichiers statiques</div>
+  <pre><code>- name: Copier un fichier de configuration
+  ansible.builtin.copy:
+    src: files/app.conf
+    dest: /etc/app/app.conf
+    owner: root
+    mode: '0644'</code></pre>
+
+  <div class="slabel">ansible.builtin.file — fichiers, dossiers, liens</div>
+  <pre><code>- name: Créer un répertoire
+  ansible.builtin.file:
+    path: /opt/myapp
+    state: directory      # directory / file / absent / link
+    owner: deployer
+    mode: '0755'</code></pre>
+
+  <div class="slabel">ansible.builtin.lineinfile — modifier une ligne</div>
+  <pre><code>- name: Désactiver PermitRootLogin
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin no'
+  notify: Restart sshd</code></pre>
+
+  <div class="slabel">ansible.builtin.debug — afficher des informations</div>
+  <pre><code>- name: Afficher l'IP
+  ansible.builtin.debug:
+    msg: "IP : {{ ansible_default_ipv4.address }}"</code></pre>
+
+  <div class="slabel">Les boucles avec loop</div>
+  <p class="prose">Sans boucle, installer 5 paquets demande 5 tâches identiques. Avec <code class="ic">loop</code>, on écrit la tâche une seule fois et on lui passe une liste. <code class="ic">{{ item }}</code> est remplacé automatiquement par chaque élément.</p>
+  <pre><code># Boucle avec liste directe
+- name: Installer les outils
+  ansible.builtin.apt:
+    name: "{{ item }}"      # guillemets obligatoires
+    state: present
+  loop:
+    - vim
+    - curl
+    - git
+
+# Boucle avec une variable depuis group_vars/all.yml
+- name: Installer les outils
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ outils_base }}"</code></pre>
+
+  <div class="box box-warn">
+    <div class="box-label">⚠ Piège fréquent</div>
+    <p>Ne jamais écrire <code class="ic">name: {{ item }}</code> sans guillemets. En YAML, une valeur qui commence par <code class="ic">{{</code> est ambiguë. Toujours écrire <code class="ic">name: "{{ item }}"</code>.</p>
+  </div>
+
+  <div class="qa"><div class="qa-q">Pourquoi préférer loop: "{{ outils }}" à une liste directe dans le playbook ?</div><div class="qa-a">Séparation des données et de la logique. La liste est dans group_vars/all.yml. Pour changer les outils, on modifie le fichier de variables sans toucher au playbook.</div></div>
+
+  <div class="exercice">
+    <div class="exo-header"><span class="exo-num">EX 4</span><span class="exo-title">Boucles et utilisateurs</span></div>
+    <div class="exo-body">
+      <ol>
+        <li>Dans <code class="ic">group_vars/all.yml</code> : créer les variables <code class="ic">outils</code> et <code class="ic">stagiaires</code></li>
+        <li>Dans <code class="ic">site.yml</code> : utiliser <code class="ic">loop: "{{ outils }}"</code> pour l'installation</li>
+        <li>Ajouter une tâche qui crée les utilisateurs en boucle sur <code class="ic">stagiaires</code></li>
+        <li>Vérifier : <code class="ic">cat /etc/passwd | grep stagiaire</code></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- MODULE 6 -->
+<section id="m6">
+  <div class="module-header" style="background:linear-gradient(135deg,var(--green-bg) 0%,var(--bg2) 100%);border-color:var(--green-dim)">
+    <div class="module-num" style="color:var(--green)">06</div>
+    <div class="module-info"><h2 style="color:var(--green)">Variables et Templates Jinja2</h2><p>Rendre les playbooks dynamiques et séparés de leurs données.</p></div>
+  </div>
+
+  <div class="slabel">Sources de variables — priorité croissante</div>
+  <table>
+    <thead><tr><th>Priorité</th><th>Source</th><th>Usage typique</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>group_vars/all.yml</td><td>Variables communes à toutes les machines</td></tr>
+      <tr><td>2</td><td>group_vars/nom_groupe.yml</td><td>Variables d'un groupe précis</td></tr>
+      <tr><td>3</td><td>host_vars/nom_machine.yml</td><td>Variables d'une machine spécifique</td></tr>
+      <tr><td>4</td><td>vars: dans le playbook</td><td>Variables locales au play</td></tr>
+      <tr><td>5</td><td>--extra-vars</td><td>Surcharge ponctuelle (priorité max)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="slabel">Facts Ansible — variables automatiques</div>
+  <p class="prose">Les facts sont collectés automatiquement par Ansible sur chaque machine au début de chaque play (tâche Gathering Facts). Tu ne les définis nulle part.</p>
+  <table>
+    <thead><tr><th>Fact</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td>ansible_hostname</td><td>Nom d'hôte</td></tr>
+      <tr><td>ansible_default_ipv4.address</td><td>Adresse IP principale</td></tr>
+      <tr><td>ansible_os_family</td><td>Famille d'OS (Debian, RedHat…)</td></tr>
+      <tr><td>ansible_distribution</td><td>Distribution Linux</td></tr>
+      <tr><td>ansible_memtotal_mb</td><td>RAM totale en Mo</td></tr>
+      <tr><td>ansible_date_time.date</td><td>Date courante</td></tr>
+    </tbody>
+  </table>
+  <pre><code># Voir tous les facts d'une machine
+$ ansible machine2 -i inventory/hosts.ini -m setup</code></pre>
+
+  <div class="slabel">Templates Jinja2</div>
+  <pre><code># templates/index.html.j2
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;{{ formation_name }}&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;{{ ansible_hostname }}&lt;/h1&gt;
+    &lt;p&gt;IP : {{ ansible_default_ipv4.address }}&lt;/p&gt;
+
+    &lt;ul&gt;
+    {% for s in stagiaires %}
+        &lt;li&gt;{{ s }}&lt;/li&gt;
+    {% endfor %}
+    &lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+  <div class="box box-info">
+    <div class="box-label">ℹ Syntaxe Jinja2</div>
+    <ul>
+      <li><code class="ic">{{ variable }}</code> → afficher une variable ou un fact</li>
+      <li><code class="ic">{% if condition %}</code> → bloc conditionnel</li>
+      <li><code class="ic">{% for x in liste %}</code> → boucle sur une liste</li>
+      <li><code class="ic">{% endif %}</code> / <code class="ic">{% endfor %}</code> → fermer le bloc</li>
+    </ul>
+  </div>
+
+  <div class="box box-warn">
+    <div class="box-label">⚠ Piège fréquent</div>
+    <p><code class="ic">ansible_default_ipv4.address</code> s'écrit avec deux <strong>d</strong> dans <em>address</em>. Erreur très fréquente qui provoque une erreur au rendu du template.</p>
+  </div>
+
+  <div class="qa"><div class="qa-q">Quelle est la différence entre ansible.builtin.copy et ansible.builtin.template ?</div><div class="qa-a">copy dépose un fichier statique tel quel. template interprète les variables Jinja2 avant de déposer le fichier — chaque machine reçoit un fichier personnalisé avec ses propres valeurs.</div></div>
+
+  <div class="exercice">
+    <div class="exo-header"><span class="exo-num">EX 5</span><span class="exo-title">Déployer une page web avec nginx</span></div>
+    <div class="exo-body">
+      <ol>
+        <li>Créer <code class="ic">templates/index.html.j2</code> avec hostname, IP et liste des stagiaires</li>
+        <li>Ajouter <code class="ic">formation_name</code> dans <code class="ic">group_vars/all.yml</code></li>
+        <li>Dans <code class="ic">site.yml</code> : installer nginx, déployer le template, démarrer nginx</li>
+        <li>Vérifier dans un navigateur : <code class="ic">http://10.116.0.238</code> et <code class="ic">http://10.116.0.239</code></li>
+      </ol>
+      <p><strong>Résultat attendu :</strong> page personnalisée avec le hostname et l'IP de chaque machine.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- MODULE 7 -->
+<section id="m7">
+  <div class="module-header" style="background:linear-gradient(135deg,var(--orange-bg) 0%,var(--bg2) 100%);border-color:var(--orange-dim)">
+    <div class="module-num" style="color:var(--orange)">07</div>
+    <div class="module-info"><h2 style="color:var(--orange)">Les Handlers</h2><p>Déclencher des actions uniquement quand quelque chose a vraiment changé.</p></div>
+  </div>
+
+  <div class="slabel">Pourquoi les handlers ?</div>
+  <p class="prose">Sans handler, on serait tenté d'ajouter une tâche "restart nginx" après chaque modification de config. Le problème : cette tâche redémarrerait nginx à chaque exécution du playbook, même si rien n'a changé — provoquant des interruptions de service inutiles.</p>
+
+  <div class="box box-info">
+    <div class="box-label">ℹ Un handler s'exécute si :</div>
+    <ol>
+      <li>Une tâche l'a notifié avec <code class="ic">notify:</code></li>
+      <li>ET cette tâche a produit un <strong>changed</strong> (pas un ok)</li>
+    </ol>
+    <p>Il s'exécute <strong>une seule fois</strong> en fin de play, même si plusieurs tâches l'ont notifié.</p>
+  </div>
+
+  <div class="slabel">Syntaxe</div>
+  <pre><code>  tasks:
+
+    - name: Déployer la config nginx
+      ansible.builtin.template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: Redémarrer nginx      # ← même nom EXACT que le handler
+
+  handlers:
+
+    - name: Redémarrer nginx        # ← doit correspondre exactement
+      ansible.builtin.service:
+        name: nginx
+        state: restarted</code></pre>
+
+  <div class="slabel">Ce qu'on voit dans la sortie</div>
+  <pre><code>TASK [Déployer la config nginx] *****
+changed: [machine2]                  ← changed → handler sera déclenché
+
+RUNNING HANDLERS ********************
+changed: [machine2]                  ← handler exécuté en fin de play
+
+PLAY RECAP **************************</code></pre>
+
+  <div class="box box-warn">
+    <div class="box-label">⚠ Piège fréquent</div>
+    <p>Le lien notify / handler se fait par correspondance <strong>stricte</strong> du nom. Un seul caractère différent (majuscule, accent, espace) et le handler est silencieusement ignoré, sans message d'erreur.</p>
+  </div>
+
+  <div class="qa"><div class="qa-q">Quand le handler ne se déclenche-t-il pas ?</div><div class="qa-a">Quand la tâche qui le notifie retourne ok (pas changed). Si la config nginx n'a pas été modifiée, la tâche retourne ok et le handler n'est pas déclenché — nginx n'est pas redémarré inutilement.</div></div>
+
+  <div class="exercice">
+    <div class="exo-header"><span class="exo-num">EX 6</span><span class="exo-title">Ajouter un handler au playbook</span></div>
+    <div class="exo-body">
+      <ol>
+        <li>Dans <code class="ic">site.yml</code>, ajouter un bloc <code class="ic">handlers:</code> après <code class="ic">tasks:</code></li>
+        <li>Créer un handler "Redémarrer nginx" avec <code class="ic">state: restarted</code></li>
+        <li>Ajouter <code class="ic">notify: Redémarrer nginx</code> sur la tâche de déploiement du template</li>
+        <li>Lancer sans modifier le template → handler <strong>NON déclenché</strong></li>
+        <li>Modifier une ligne dans le template, relancer → <strong>RUNNING HANDLERS</strong> apparaît</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- MODULE 8 -->
+<section id="m8">
+  <div class="module-header" style="background:linear-gradient(135deg,var(--purple-bg) 0%,var(--bg2) 100%);border-color:var(--purple-dim)">
+    <div class="module-num" style="color:var(--purple)">08</div>
+    <div class="module-info"><h2 style="color:var(--purple)">Les Roles</h2><p>Organiser le code en briques réutilisables.</p></div>
+  </div>
+
+  <div class="slabel">Pourquoi les roles ?</div>
+  <p class="prose">Un playbook qui grossit devient vite illisible. Les roles découpent le code en modules indépendants, chacun responsable d'une seule fonctionnalité. Un role peut être réutilisé sur n'importe quel projet.</p>
+
+  <div class="slabel">Structure d'un role</div>
+  <pre><code>roles/
+└── nginx/                    # Nom du role
+    ├── tasks/
+    │   └── main.yml          # Point d'entrée des tâches (obligatoire)
+    ├── handlers/
+    │   └── main.yml          # Handlers du role
+    ├── templates/
+    │   └── *.j2              # Templates Jinja2
+    ├── files/                # Fichiers statiques
+    ├── vars/
+    │   └── main.yml          # Variables (priorité haute)
+    └── defaults/
+        └── main.yml          # Variables par défaut (priorité basse)</code></pre>
+
+  <div class="box box-info">
+    <div class="box-label">ℹ Règle importante</div>
+    <p>Un <code class="ic">main.yml</code> de role ne contient que la liste des tâches — <strong>pas d'entête de play</strong>. On commence directement par le premier tiret.</p>
+    <p>Dans un role, le <code class="ic">src:</code> d'un template ne contient que le nom du fichier. Ansible cherche automatiquement dans <code class="ic">roles/nom_role/templates/</code>.</p>
+  </div>
+
+  <div class="slabel">Contenu d'un main.yml de role</div>
+  <pre><code># roles/nginx/tasks/main.yml
+- name: Installation de nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: Démarrage du service nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Déploiement de la page d'accueil
+  ansible.builtin.template:
+    src: index.html.j2        # Relatif à roles/nginx/templates/
+    dest: /var/www/html/index.html
+  notify: Redémarrer nginx</code></pre>
+
+  <div class="slabel">Utiliser les roles dans site.yml</div>
+  <pre><code>---
+
+- name: Configurer les serveurs web
+  hosts: machines_cibles
+  become: true
+
+  roles:
+    - role: common
+      tags: common
+    - role: nginx
+      tags: nginx
+    - role: docker
+      when: install_docker | default(false)</code></pre>
+
+  <div class="qa"><div class="qa-q">Dans un role, doit-on préciser le chemin complet dans src du module template ?</div><div class="qa-a">Non. Dans un role, Ansible cherche automatiquement dans roles/nom_role/templates/. On écrit uniquement le nom du fichier : src: index.html.j2</div></div>
+
+  <div class="qa"><div class="qa-q">Ansible parcourt-il automatiquement toute l'arborescence du projet ?</div><div class="qa-a">Non. Ansible suit des chemins conventionnels précis. Il charge group_vars/ automatiquement, et pour les roles il cherche tasks/main.yml, handlers/main.yml, templates/ à des emplacements fixes. Un fichier mal nommé ou mal placé est ignoré silencieusement.</div></div>
+
+  <div class="exercice">
+    <div class="exo-header"><span class="exo-num">EX 7</span><span class="exo-title">Découper le playbook en roles</span></div>
+    <div class="exo-body">
+      <ol>
+        <li>Créer la structure : <code class="ic">mkdir -p roles/common/tasks roles/nginx/{tasks,handlers,templates} roles/web/{tasks,templates}</code></li>
+        <li>Créer <code class="ic">roles/common/tasks/main.yml</code> avec les tâches outils et utilisateurs</li>
+        <li>Créer <code class="ic">roles/nginx/tasks/main.yml</code> avec installation et démarrage nginx</li>
+        <li>Créer <code class="ic">roles/nginx/handlers/main.yml</code> avec le handler de redémarrage</li>
+        <li>Déplacer <code class="ic">index.html.j2</code> dans <code class="ic">roles/web/templates/</code></li>
+        <li>Créer <code class="ic">roles/web/tasks/main.yml</code> avec la tâche de déploiement du template</li>
+        <li>Réécrire <code class="ic">site.yml</code> pour appeler les 3 roles</li>
+        <li>Lancer le playbook et vérifier que tout fonctionne</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ANNEXE -->
+<section id="annexe">
+  <h2 style="font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:20px;">Annexe — Fichiers finaux du projet</h2>
+
+  <div class="slabel">inventory/hosts.ini</div>
+  <pre><code>[machines_cibles]
+machine2   ansible_host=10.116.0.238
+machine3   ansible_host=10.116.0.239
+
+[machines_cibles:vars]
+ansible_user=setupuser
+ansible_ssh_private_key_file=~/.ssh/ansible_key
+ansible_python_interpreter=/usr/bin/python3</code></pre>
+
+  <div class="slabel">inventory/group_vars/all.yml</div>
+  <pre><code>---
+
+formation_name: "Formation Ansible"
+
+outils:
+  - vim
+  - curl
+  - git
+  - htop
+  - tree
+
+stagiaires:
+  - stagiaire01
+  - stagiaire02
+  - stagiaire03</code></pre>
+
+  <div class="slabel">site.yml</div>
+  <pre><code>---
+
+- name: mon premier playbook
+  hosts: machines_cibles
+  become: true
+
+  roles:
+    - role: common
+    - role: nginx
+    - role: web</code></pre>
+
+  <div class="slabel">roles/common/tasks/main.yml</div>
+  <pre><code>- name: installation des outils de base
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ outils }}"
+
+- name: création des utilisateurs stagiaires
+  ansible.builtin.user:
+    name: "{{ item }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+  loop: "{{ stagiaires }}"</code></pre>
+
+  <div class="slabel">roles/nginx/tasks/main.yml</div>
+  <pre><code>- name: installation de nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: démarrage du service nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true</code></pre>
+
+  <div class="slabel">roles/nginx/handlers/main.yml</div>
+  <pre><code>- name: redémarrer nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted</code></pre>
+
+  <div class="slabel">roles/web/tasks/main.yml</div>
+  <pre><code>- name: déploiement de la page web
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+  notify: redémarrer nginx</code></pre>
+
+  <div class="slabel">Commandes essentielles</div>
+  <table>
+    <thead><tr><th>Commande</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td>ansible all -i inventory/hosts.ini --list-hosts</td><td>Lister les hôtes</td></tr>
+      <tr><td>ansible all -i inventory/hosts.ini -m ping</td><td>Tester SSH + Python</td></tr>
+      <tr><td>ansible-playbook site.yml --check</td><td>Simulation sans modification</td></tr>
+      <tr><td>ansible-playbook site.yml --ask-become-pass</td><td>Exécution avec sudo</td></tr>
+      <tr><td>ansible-playbook site.yml -v</td><td>Mode verbeux</td></tr>
+      <tr><td>ansible machine2 -m setup</td><td>Voir les facts d'une machine</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+
+<script>
+window.addEventListener('scroll', () => {
+  const t = document.body.scrollHeight - window.innerHeight;
+  document.getElementById('pf').style.width = (t > 0 ? window.scrollY / t * 100 : 0) + '%';
+});
+const secs = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.nav-item');
+new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { threshold: 0.2, rootMargin: '-54px 0px -60% 0px' }).observe && secs.forEach(s => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-54px 0px -60% 0px' }).observe(s);
+});
+</script>
+</body>
+</html>
